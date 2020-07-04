@@ -24,7 +24,7 @@
             var is_ready = false;
             var curConfig = {
                 canvas_expansion: 1,
-                dimensions: [580, 400],
+                dimensions: [500, 400],
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
                 initOpacity: 1,
@@ -193,11 +193,9 @@
                         "#logo .svg_icon": 15,
                         ".flyout_arrow_horiz .svg_icon": 5,
                         "#fill_bg .svg_icon, #stroke_bg .svg_icon": svgedit.browser.isTouch() ?
-                            24 :
-                            24,
+                            24 : 24,
                         ".palette_item:first .svg_icon": svgedit.browser.isTouch() ?
-                            30 :
-                            16,
+                            30 : 16,
                         "#zoomLabel .svg_icon": 16,
                         "#zoom_dropdown .svg_icon": 7,
                     },
@@ -425,7 +423,7 @@
                                 height: height - 65 + "px",
                             });
                         } else {
-                            //default vaues
+                            //default values
                             $("#dialog_container").css({
                                 width: "300px",
                                 height: "150px",
@@ -1029,6 +1027,7 @@
                                         });
                                     }
                                     break;
+
                                 case "select":
                                     var html =
                                         "<label" + cont_id + ">" + '<select id="' + tool.id + '">';
@@ -1667,9 +1666,13 @@
                             text: ["x", "y"],
                             use: [],
                             path: [],
+                            //cforioluis - update cajeado contextual tools
+                            cajeado: ["cajeado_Width_x", "cajeado_Height_Y"],
                         };
 
                         var el_name = elem.tagName;
+                        /*console.log("elem.tagName");
+                                    console.log(elem.tagName);*/
 
                         if ($(elem).data("gsvg")) {
                             $("#g_panel").show();
@@ -1708,6 +1711,7 @@
                                 }
 
                                 //update the draginput cursors
+                                //console.log(elem)
                                 var name_item = document.getElementById(el_name + "_" + item);
                                 name_item.value = Math.round(attrVal) || 0;
                                 if (name_item.getAttribute("data-cursor") === "true") {
@@ -1933,12 +1937,38 @@
                         el.value = selectedElement.getAttribute(attr);
                         return false;
                     }
+
                     //if (!noUndo) svgCanvas.changeSelectedAttribute(attr, val);
                     /*console.log("attr");
-                                                            console.log(attr);
-                                                            console.log("val");
-                                                            console.log(val);*/
+                                                                      console.log(attr);
+                                                                      console.log("val");
+                                                                      console.log(val);*/
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+                    //en caso de ser un cajeado alinear a la esquina correspondiente //cflorioluis
+                    if (svgCanvas.getSelectedElems()[0].getAttribute("nameMecanizado")) {
+                        //console.log(svgCanvas.getSelectedElems()[0].getAttribute("side"))
+                        switch (svgCanvas.getSelectedElems()[0].getAttribute("side")) {
+                            case "1":
+                                svgCanvas.alignSelectedElements("b", "page");
+                                svgCanvas.alignSelectedElements("l", "page");
+                                break;
+                            case "2":
+                                svgCanvas.alignSelectedElements("b", "page");
+                                svgCanvas.alignSelectedElements("r", "page");
+                                break;
+                            case "3":
+                                svgCanvas.alignSelectedElements("t", "page");
+                                svgCanvas.alignSelectedElements("r", "page");
+                                break;
+                            case "4":
+                                svgCanvas.alignSelectedElements("t", "page");
+                                svgCanvas.alignSelectedElements("l", "page");
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
                 };
 
                 picking = false;
@@ -2354,92 +2384,157 @@
                 };
                 //add new toll - cflorioluis
                 var clickCajeadoTool = function() {
-                    var side = null;
-                    var widthX = null;
-                    var heigthY = null;
+                    var side = null,
+                        widthX = null,
+                        heigthY = null,
+                        radio = null;
+
+                    var cajeadoReady1 =
+                        `<label>
+                            <input type="radio" name="corner" value="1">
+                            <img src="http://placehold.it/30x20/333/333&text=3">
+                        </label>`,
+                        cajeadoReady2 =
+                        `<label>
+                            <input type="radio" name="corner" value="2">
+                            <img src="http://placehold.it/30x20/333/333&text=9">
+                        </label>`,
+                        cajeadoReady3 =
+                        `<label>
+                            <input type="radio" name="corner" value="3" >
+                            <img src="http://placehold.it/30x20/333/333&text=7">
+                        </label>`,
+                        cajeadoReady4 =
+                        `<label>
+                            <input type="radio" name="corner" value="4" >
+                            <img src="http://placehold.it/30x20/333/333&text=1">
+                        </label>`;
+
+                    var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+
+                    if (cajeadoReady.length > 0) {
+                        for (let i = 0; i < cajeadoReady.length; i++) {
+                            const element = cajeadoReady[i];
+                            switch (element.getAttribute("side")) {
+                                case "1":
+                                    cajeadoReady1 =
+                                        `<label>
+                                            <input type="radio" name="corner" value="1" disabled>
+                                            <img src="http://placehold.it/30x20/333/333&text=3">
+                                        </label>`;
+                                    break;
+                                case "2":
+                                    cajeadoReady2 =
+                                        `<label>
+                                            <input type="radio" name="corner" value="2" disabled>
+                                            <img src="http://placehold.it/30x20/333/333&text=9">
+                                        </label>`;
+                                    break;
+                                case "3":
+                                    cajeadoReady3 =
+                                        `<label>
+                                            <input type="radio" name="corner" value="3" disabled>
+                                            <img src="http://placehold.it/30x20/333/333&text=7">
+                                        </label>`
+                                    break;
+                                case "4":
+                                    cajeadoReady4 =
+                                        `<label>
+                                            <input type="radio" name="corner" value="4" disabled>
+                                            <img src="http://placehold.it/30x20/333/333&text=1">
+                                        </label>`
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
+                    }
 
                     $.confirm(
                         `<strong><h2>Cajeado</h2></strong>` +
-                        `<div class="rowFromCajeado">
-                            <div class="columnFromCajeado right"><h3>Side</h3></div>
-                            <div class="columnFromCajeado">
-                                <div class="tablero grid">
-                                    <div class="columnCajeado">
-                                        <label>
-                                            <input type="radio" name="corner" value="4" >
-                                            <img src="http://placehold.it/30x20/333/333&text=1">
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="corner" value="0" disabled >
-                                            <img src="http://placehold.it/30x20/fff/fff&text=2" >
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="corner" value="1">
-                                            <img src="http://placehold.it/30x20/333/333&text=3">
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="columnCajeado">                       
-                                        <label>
-                                            <input type="radio" name="corner" value="0" disabled>
-                                            <img src="http://placehold.it/30x20/fff/fff&text=4" >
-                                        </label>
+                        `<form>
+                            <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                                <div class="columnFromCajeado right"><h3>Side</h3></div>
+                                <div class="columnFromCajeado">
+                                    <div class="tablero grid">
+                                        <div class="columnCajeado">` +
+                        cajeadoReady4 +
+                        `<label>
+                                                <input type="radio" name="corner" value="0" disabled >
+                                                <img src="http://placehold.it/30x20/fff/fff&text=2" >
+                                            </label>` +
+                        cajeadoReady1 +
+                        `</div>
                                         
-                                        <label>
-                                            <input type="radio" name="corner" value="0" disabled>
-                                            <img src="http://placehold.it/30x20/fff/fff&text=5" >
-                                        </label>
+                                        <div class="columnCajeado">                       
+                                            <label>
+                                                <input type="radio" name="corner" value="0" disabled>
+                                                <img src="http://placehold.it/30x20/fff/fff&text=4" >
+                                            </label>
+                                            
+                                            <label>
+                                                <input type="radio" name="corner" value="0" disabled>
+                                                <img src="http://placehold.it/30x20/fff/fff&text=5" >
+                                            </label>
+                                            
+                                            <label>
+                                                <input type="radio" name="corner" value="0" disabled>
+                                                <img src="http://placehold.it/30x20/fff/fff&text=6" >
+                                            </label>
+                                        </div>
                                         
-                                        <label>
-                                            <input type="radio" name="corner" value="0" disabled>
-                                            <img src="http://placehold.it/30x20/fff/fff&text=6" >
-                                        </label>
-                                    </div>
-                                    
-                                    <div  class="columnCajeado" style="margin-bottom: -40px !important;">
-                                        <label>
-                                            <input type="radio" name="corner" value="3" >
-                                            <img src="http://placehold.it/30x20/333/333&text=7">
-                                        </label>
-                                        
-                                        <label>
-                                            <input type="radio" name="corner" value="0" disabled >
-                                            <img src="http://placehold.it/30x20/fff/fff&text=8">
-                                        </label>
-                                        
-                                        <label>
-                                            <input type="radio" name="corner" value="2">
-                                            <img src="http://placehold.it/30x20/333/333&text=9">
-                                        </label>
+                                        <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+                        cajeadoReady3 +
+                        `<label>
+                                                <input type="radio" name="corner" value="0" disabled >
+                                                <img src="http://placehold.it/30x20/fff/fff&text=8">
+                                            </label>` +
+                        cajeadoReady2 +
+                        `</div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <br>
-                        <div class="rowFromCajeado">
-                            <div class="columnFromCajeado right"><h3>Width_X</h3></div>
-                            <div class="columnFromCajeado">
-                                <input class="inputMecanizado" id="newWidth" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Width_X</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input autofocus required class="inputMecanizado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
                             </div>
-                        </div>
-                        <br>
-                        <div class="rowFromCajeado">
-                            <div class="columnFromCajeado right"><h3>Heigth_Y</h3></div>
-                            <div class="columnFromCajeado">
-                                <input class="inputMecanizado" id="newHeight" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Heigth_Y</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
                             </div>
-                        </div>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Radio</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                        </form>
                         `,
                         function(ok) {
                             if (!ok) return;
                             //Capturando los Datos del Formulario Pop-Up para el Cajeado
                             side = $("input[name=corner]:checked").val();
-                            widthX = $("#newWidth").val();
-                            heigthY = $("#newHeight").val();
-                            svgCanvas.cajeado(side, widthX, heigthY);
+                            widthX = $("#newWidthCajeado").val();
+                            heigthY = $("#newHeightCajeado").val();
+                            radio = $("#newRadioCajeado").val();
+                            console.log(" " + side + " " + widthX + " " + heigthY + " " + curConfig.dimensions[0] + " " + curConfig.dimensions[1] + " " + radio);
+
+                            svgCanvas.cajeado(
+                                side,
+                                widthX,
+                                heigthY,
+                                curConfig.dimensions[0],
+                                curConfig.dimensions[1],
+                                radio
+                            );
                         },
                         500,
-                        310,
+                        330,
                         true
                     );
 
@@ -2447,6 +2542,7 @@
                         svgCanvas.setMode("cajeadoToolCanvas");
                     }
                 };
+
                 var clickCremalleraTool = function() {
                     if (toolButtonClick("#tool_cremalleraTool")) {
                         svgCanvas.setMode("cremalleraToolCanvas");
@@ -2707,26 +2803,6 @@
                         function(ok) {
                             if (!ok) return;
                             //cflorioluis - dialogo para hacer el tamaño del tablero
-
-                            /*$.confirm(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      `<input type="text" id="fname" name="fname" value="John"><br>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <label for="lname">Last name:</label><br>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <input type="text" id="lname" name="lname" value="Doe"><br><br>`,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      function(ok) {}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  );*/
-
-                            /*$.confirm(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `<strong>Medidas Nuevo Tablero</strong> <form action="" class="formName">` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            //`<div class="form-group">` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `<strong>Width</strong>` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            //`<input id="newWidth" type="text" placeholder="Your name" class="name form-control" required />` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `<input id="newWidth" type="number" height="100" min="0" required /><br>` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `<strong>Height</strong>` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `<input id="newHeight" type="number" height="100" min="0" required />` +
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            //`</div>`+
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `</form>`
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );*/
-
                             setSelectMode();
                             svgCanvas.deleteSelectedElements();
                             svgCanvas.clear();
@@ -3252,9 +3328,7 @@
                         "Pick a Stroke Paint and Opacity" :
                         "Pick a Fill Paint and Opacity";
                     var was_none = false;
-                    var pos = is_background ?
-                        { right: 175, top: 50 } :
-                        { left: 50, bottom: 50 };
+                    var pos = is_background ? { right: 175, top: 50 } : { left: 50, bottom: 50 };
 
                     $("#color_picker")
                         .draggable({
@@ -3496,8 +3570,8 @@
 
                 //cflorioluis - quitar funcion para pintar hoja (pieza)
                 /*$("#tool_canvas").on("click touchstart", function() {
-                                                                                                                                    colorPicker($("#canvas_color"));
-                                                                                                                                });*/
+                                                                                                                                            colorPicker($("#canvas_color"));
+                                                                                                                                        });*/
 
                 $("#tool_stroke").on("touchstart", function() {
                     $("#tool_stroke").addClass("active");
@@ -4201,13 +4275,13 @@
                         pre_tool = container.find("#tool_" + itool),
                         reg_tool = container.find("#" + itool);
                     /*console.log("itool");
-                                        console.log(itool);
-                                        console.log("container");
-                                        console.log(container);
-                                        console.log("pre_tool");
-                                        console.log(pre_tool);*/
+                                                  console.log(itool);
+                                                  console.log("container");
+                                                  console.log(container);
+                                                  console.log("pre_tool");
+                                                  console.log(pre_tool);*/
                     /*console.log()
-                                                      console.log()*/
+                                                                console.log()*/
                     if (pre_tool.length) {
                         tool = pre_tool;
                     } else if (reg_tool.length) {
@@ -4402,18 +4476,18 @@
                 });
                 //cflorioluis - agregar funciones al cajeado
                 $("#cajeado_Width_x").dragInput({
-                    min: null,
-                    max: null,
+                    min: 1,
+                    max: curConfig.dimensions[0],
                     step: 1,
                     callback: changeAttribute,
-                    cursor: false,
+                    cursor: true,
                 });
                 $("#cajeado_Height_y").dragInput({
-                    min: null,
-                    max: null,
+                    min: 1,
+                    max: curConfig.dimensions[1],
                     step: 1,
                     callback: changeAttribute,
-                    cursor: false,
+                    cursor: true,
                 });
 
                 $("#rect_x").dragInput({

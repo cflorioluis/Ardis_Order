@@ -2513,6 +2513,23 @@ $.SvgCanvas = function(container, config) {
         //  }
 
         return mouse_target;
+
+        //en caso de ser un cajeado no mover pieza //cflorioluis
+        //if (!mouse_target.getAttribute("nameMecanizado")) {
+
+        // } else {
+        //selectOnly([getElem(getId())], true);
+        //selectOnly([getElem(mouse_target.getAttribute("id"))], true);
+        //return getElem(mouse_target.getAttribute("id"))
+        /*console.log(getElem(mouse_target.getAttribute("id")))
+         */
+        //addToSelection(mouse_target, true);
+        //}
+
+        //console.log(svgCanvas.getSelectedElems()[0])
+        /*console.log(mouse_target)
+                                                                                                                                                                                                                                                                            console.log(mouse_target.getAttribute("nameMecanizado"))*/
+        //return mouse_target;
     });
 
     // Mouse events
@@ -2535,6 +2552,7 @@ $.SvgCanvas = function(container, config) {
         // - when we are in select mode, select the element, remember the position
         //   and do nothing else
         var mouseDown = function(evt) {
+            //console.log(evt)
             if (canvas.spaceKey) return;
             var right_click = evt.button === 2;
 
@@ -2551,9 +2569,11 @@ $.SvgCanvas = function(container, config) {
                 lastClickPoint = pt;
             }
 
-            var x = mouse_x / current_zoom,
-                y = mouse_y / current_zoom,
-                mouse_target = getMouseTarget(evt);
+            var x = mouse_x / current_zoom;
+            var y = mouse_y / current_zoom;
+            var mouse_target = getMouseTarget(evt);
+
+            //console.log(mouse_target)
 
             if (
                 mouse_target.tagName === "a" &&
@@ -2597,6 +2617,7 @@ $.SvgCanvas = function(container, config) {
 
             start_transform = mouse_target.getAttribute("transform");
             var tlist = getTransformList(mouse_target);
+            //console.log(current_mode + "current_mode")
             switch (current_mode) {
                 //add new toll - cflorioluis - add new Method svgcanvas DownMouse event
                 case "cajeadoToolCanvas":
@@ -2790,35 +2811,11 @@ $.SvgCanvas = function(container, config) {
                             opacity: cur_shape.opacity / 2,
                         },
                     });
-                    /*console.log({
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            x: x,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            y: y,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            width: 0,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            height: 0,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            id: 0,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            opacity: cur_shape.opacity / 2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        });*/
                     break;
                 case "line":
                     started = true;
                     var stroke_w =
                         cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
-                    /*console.log({  //cflorioluis
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    x1: x,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    y1: y,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    x2: x,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    y2: y,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    id: getNextId(),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    stroke: cur_shape.stroke,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "stroke-width": stroke_w,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "stroke-dasharray": cur_shape.stroke_dasharray,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "stroke-linejoin": cur_shape.stroke_linejoin,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "stroke-linecap": cur_shape.stroke_linecap,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "stroke-opacity": cur_shape.stroke_opacity,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    fill: "none",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    opacity: cur_shape.opacity / 2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    style: "pointer-events:none",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                });*/
                     addSvgElementFromJson({
                         element: "line",
                         curStyles: true,
@@ -2960,9 +2957,6 @@ $.SvgCanvas = function(container, config) {
 
             switch (current_mode) {
                 //add new toll - cflorioluis - add new Method svgcanvas MouseMove event
-                /*case "cajeadoToolCanvas":
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    break;*/
-
                 case "cremalleraToolCanvas":
                     break;
 
@@ -3006,7 +3000,13 @@ $.SvgCanvas = function(container, config) {
                                     dx = xya.x - start_x;
                                     dy = xya.y - start_y;
                                 }
-                                xform.setTranslate(dx, dy);
+                                //cflorioluis - Hacer que los mecanizados no se muevan y eliminar sus selectores
+                                //console.log(selected)
+                                if (!selected.getAttribute("nameMecanizado")) {
+                                    xform.setTranslate(dx, dy);
+                                } else {
+                                    selectorManager.releaseSelector(selected, "cajeado");
+                                }
                                 if (tlist.numberOfItems) {
                                     tlist.replaceItem(xform, 0);
                                 } else {
@@ -3161,7 +3161,37 @@ $.SvgCanvas = function(container, config) {
                         if (sx == 1) sx = sy;
                         else sy = sx;
                     }
-                    scale.setScale(sx, sy);
+
+                    //cflorioluis - limitar que un cajeado se expanda mas que la pieza
+
+
+                    if (!selectedElements[0].getAttribute("nameMecanizado")) {
+                        scale.setScale(sx, sy);
+                    } else {
+                        var widthX = parseInt(selectedElements[0].getAttribute("widthX"));
+                        var maxWidth = parseInt(selectedElements[0].getAttribute("maxWidth"));
+                        var heightY = parseInt(selectedElements[0].getAttribute("heightY"));
+                        var maxHeight = parseInt(selectedElements[0].getAttribute("maxHeight"));
+
+                        if (widthX * sx < maxWidth && heightY * sy < maxHeight) {
+                            scale.setScale(sx, sy);
+                        } else if (widthX * sx > maxWidth && heightY * sy < maxHeight) {
+                            sx = maxWidth / widthX;
+                            scale.setScale(sx, sy);
+                        } else if (widthX * sx < maxWidth && heightY * sy > maxHeight) {
+                            sy = maxHeight / heightY;
+                            scale.setScale(sx, sy);
+                        } else {
+                            sx = maxWidth / widthX;
+                            sy = maxHeight / heightY;
+                            scale.setScale(sx, sy);
+                        }
+                        selectedElements[0].setAttribute("tempWidth", (sx * widthX).toString());
+                        selectedElements[0].setAttribute("tempHeight", (sy * heightY).toString());
+                    }
+
+
+                    //cflorioluis
 
                     translateBack.setTranslate(left + tx, top + ty);
                     if (hasMatrix) {
@@ -3175,7 +3205,11 @@ $.SvgCanvas = function(container, config) {
                         tlist.replaceItem(scale, N - 2);
                         tlist.replaceItem(translateOrigin, N - 1);
                     }
-
+                    //console.log(translateOrigin);
+                    /*console.log(selectedElements[0]); * /
+                    /*console.log(selectedElements[0].attr("width"));
+                    console.log(selectedElements[0].attr("maxWidth"));
+*/
                     selectorManager.requestSelector(selected).resize();
 
                     call("transition", selectedElements);
@@ -3255,6 +3289,15 @@ $.SvgCanvas = function(container, config) {
                         new_y = snapToGrid(new_y);
                     }
 
+                    /*console.log(shape)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              console.log("shape")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              console.log("json")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              console.log({
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  width: w,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  height: h,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  x: new_x,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  y: new_y,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              })*/
                     assignAttributes(
                         shape, {
                             width: w,
@@ -3401,7 +3444,11 @@ $.SvgCanvas = function(container, config) {
                         angle = Math.round(angle / snap) * snap;
                     }
 
-                    canvas.setRotationAngle(angle < -180 ? 360 + angle : angle, true);
+                    //cflorioluis - bloquear rotacion de los elementos de mecanizado
+                    if (!selected.getAttribute("nameMecanizado")) {
+                        canvas.setRotationAngle(angle < -180 ? 360 + angle : angle, true);
+                    }
+
                     call("transition", selectedElements);
                     break;
                 default:
@@ -3473,6 +3520,10 @@ $.SvgCanvas = function(container, config) {
             // TODO: Make true when in multi-unit mode
             var useUnit = false; // (curConfig.baseUnit !== 'px');
             started = false;
+
+            //cflorioluis - limitar que un cajeado se expanda mas que la pieza
+            var tempWidth, tempHeight, widthX, heightY, newWidthX, newHeightY, side, w, h, r, d;
+            //cflorioluis
             switch (current_mode) {
                 // intentionally fall-through to select here
                 //add new toll - cflorioluis - add new Method svgcanvas MouseUp event
@@ -3480,6 +3531,17 @@ $.SvgCanvas = function(container, config) {
                 case "cremalleraToolCanvas":
                     break;
                 case "resize":
+                    //cflorioluis - limitar que un cajeado se expanda mas que la pieza
+                    if (selectedElements[0].getAttribute("nameMecanizado")) {
+                        //console.log(selectedElements[0]);
+                        tempWidth = parseInt(selectedElements[0].getAttribute("tempWidth"));
+                        tempHeight = parseInt(selectedElements[0].getAttribute("tempHeight"));
+                        widthX = parseInt(selectedElements[0].getAttribute("widthX"));
+                        heightY = parseInt(selectedElements[0].getAttribute("heightY"));
+
+                        selectedElements[0].setAttribute("widthX", tempWidth);
+                        selectedElements[0].setAttribute("heightY", tempHeight);
+                    }
                 case "multiselect":
                     if (rubberBox != null) {
                         rubberBox.setAttribute("display", "none");
@@ -3575,6 +3637,20 @@ $.SvgCanvas = function(container, config) {
                                 });
                             }
                         }
+                    }
+
+                    //cflorioluis - limitar que un cajeado se expanda mas que la pieza
+                    if (selectedElements[0] != null && selectedElements[0].getAttribute("nameMecanizado") != "undefined") {
+                        newWidthX = parseInt(selectedElements[0].getAttribute("widthX"));
+                        newHeightY = parseInt(selectedElements[0].getAttribute("heightY"));
+
+                        side = selectedElements[0].getAttribute("side");
+                        w = newWidthX.toString();
+                        h = newHeightY.toString();
+                        r = selectedElements[0].getAttribute("radio");
+                        d = createRoundedCajeadoSide(w, h, r, side);
+
+                        selectedElements[0].setAttribute("d", d);
                     }
                     return;
                     break;
@@ -3708,6 +3784,7 @@ $.SvgCanvas = function(container, config) {
                     break;
                 default:
                     // This could occur in an extension
+
                     break;
             }
 
@@ -3803,6 +3880,7 @@ $.SvgCanvas = function(container, config) {
             }
 
             start_transform = null;
+
         };
 
         var dblClick = function(evt) {
@@ -3810,6 +3888,13 @@ $.SvgCanvas = function(container, config) {
             var parent = evt_target.parentNode;
             var mouse_target = getMouseTarget(evt);
             var tagName = mouse_target.tagName;
+
+            /*console.log(mouse_target);
+
+            //cforioluis - si el objeto que se le hace doble click es un mecanizado, no hacer nada
+            if (!(mouse_target.getAttribute("nameMecanizado") != null)) {
+                return;
+            }*/
 
             if (parent === current_group) return;
 
@@ -8466,20 +8551,18 @@ $.SvgCanvas = function(container, config) {
             var batchCmd = new BatchCommand("Convert element to Path");
         }
 
-        var attrs = getBBox ?
-            {} :
-            {
-                fill: cur_shape.fill,
-                "fill-opacity": cur_shape.fill_opacity,
-                stroke: cur_shape.stroke,
-                "stroke-width": cur_shape.stroke_width,
-                "stroke-dasharray": cur_shape.stroke_dasharray,
-                "stroke-linejoin": cur_shape.stroke_linejoin,
-                "stroke-linecap": cur_shape.stroke_linecap,
-                "stroke-opacity": cur_shape.stroke_opacity,
-                opacity: cur_shape.opacity,
-                visibility: "hidden",
-            };
+        var attrs = getBBox ? {} : {
+            fill: cur_shape.fill,
+            "fill-opacity": cur_shape.fill_opacity,
+            stroke: cur_shape.stroke,
+            "stroke-width": cur_shape.stroke_width,
+            "stroke-dasharray": cur_shape.stroke_dasharray,
+            "stroke-linejoin": cur_shape.stroke_linejoin,
+            "stroke-linecap": cur_shape.stroke_linecap,
+            "stroke-opacity": cur_shape.stroke_opacity,
+            opacity: cur_shape.opacity,
+            visibility: "hidden",
+        };
 
         // any attribute on the element not covered by the above
         // TODO: make this list global so that we can properly maintain it
@@ -9727,57 +9810,68 @@ $.SvgCanvas = function(container, config) {
 
     //cflorioluis - Nuevas Funciones para el Mecanizado de Piezas
 
-    var cajeado = (this.cajeado = function(side, widthX, heightY) {
-        console.log(" " + widthX + " " + heightY);
-
-        var cajeadoX1, cajeadoY1, cajeadoJoin1, cajeadoJoin2, cajeadoX2, cajeadoY2;
+    var createRoundedCajeadoSide = (this.createRoundedCajeadoSide = function(widthX, heightY, radio, side) {
         switch (side) {
             case "1":
-                /*cajeadoX1 = 0;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY1 = dimensions[1] - heightY;
+                return "M" + "0" + "," + (dimensions[1] - heightY) +
+                    " h" + (widthX - radio) +
+                    " a" + radio + "," + radio + " 0 0 1 " + radio + "," + radio +
+                    " v" + (heightY - radio) +
+                    " h-" + widthX +
+                    " z"
+            case "2":
+                return "M" + (dimensions[0] - widthX) + "," + (dimensions[1] - (heightY - radio)) +
+                    " a" + radio + "," + radio + " 0 0 1 " + radio + ",-" + radio +
+                    " h" + (widthX - radio) +
+                    " v" + heightY +
+                    " h-" + widthX +
+                    " z"
+            case "3":
+                return "M" + (dimensions[0] - widthX) + ", 0" +
+                    " h" + widthX +
+                    " v" + heightY +
+                    " h" + (radio - widthX) +
+                    " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + -radio +
+                    " z"
+            case "4":
+                return "M" + radio + ",0" +
+                    " h" + (widthX - radio) +
+                    " v" + (heightY - radio) +
+                    " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + radio +
+                    " h" + (radio - widthX) +
+                    " v-" + (heightY) +
+                    " z"
+            default:
+                break;
+        }
 
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin1 = widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin2 = dimensions[1] - heightY;
+    });
 
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoX2 = widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY2 = dimensions[1];*/
+    var cajeado = (this.cajeado = function(
+        side,
+        widthX,
+        heightY,
+        maxWidth,
+        maxHeight,
+        radio
+    ) {
+        //console.log(" " + widthX + " " + heightY);
 
+        var cajeadoX1, cajeadoY1, d;
+        switch (side) {
+            case "1":
                 cajeadoX1 = 0;
                 cajeadoY1 = dimensions[1] - heightY;
                 break;
             case "2":
-                /*cajeadoX1 = dimensions[0] - widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY1 = dimensions[1];
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin1 = dimensions[0] - widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin2 = dimensions[1] - heightY;
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoX2 = dimensions[0];
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY2 = dimensions[1] - heightY;*/
                 cajeadoX1 = dimensions[0] - widthX;
                 cajeadoY1 = dimensions[1] - heightY;
                 break;
             case "3":
-                /*cajeadoX1 = dimensions[0];
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY1 = heightY;
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin1 = dimensions[0] - widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin2 = heightY;
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoX2 = dimensions[0] - widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY2 = 0;*/
                 cajeadoX1 = dimensions[0] - widthX;
                 cajeadoY1 = 0;
                 break;
             case "4":
-                /*cajeadoX1 = 0;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY1 = heightY;
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin1 = widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoJoin2 = heightY;
-
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoX2 = widthX;
-                                                                                                                                                                                                                                                                                                                                                                                cajeadoY2 = 0;*/
                 cajeadoX1 = 0;
                 cajeadoY1 = 0;
                 break;
@@ -9786,8 +9880,7 @@ $.SvgCanvas = function(container, config) {
                 break;
         }
         //started = true;
-
-        addSvgElementFromJson({
+        /*addSvgElementFromJson({
             element: "rect",
             curStyles: true,
             attr: {
@@ -9797,18 +9890,58 @@ $.SvgCanvas = function(container, config) {
                 height: heightY,
                 id: getNextId(),
                 stroke: "#000",
-                "stroke-width": 1.5,
-                "stroke-dasharray": "none",
-                "stroke-linejoin": undefined,
-                "stroke-linecap": undefined,
-                "stroke-opacity": 1,
                 fill: "#333",
-                opacity: 0.5,
-                style: "pointer-events:none",
                 nameMecanizado: "cajeado_" + side,
+                side: side,
+                maxWidth: maxWidth,
+                maxHeight: maxHeight,
+            },
+        });*/
+
+        /*d = "M" + (cajeadoX1 + radio) + "," + cajeadoY1 +
+            " h" + (widthX - radio) +
+            //"a" + radius + "," + radio + " 0 0 1 " + radio + "," + radio +
+            " v" + (heightY - radio) +
+            " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + radio +
+            " h" + (radio - widthX) +
+            " v-" + (heightY) +
+            " z"*/
+
+
+
+        addSvgElementFromJson({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: createRoundedCajeadoSide(widthX, heightY, radio, side),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#333",
+                nameMecanizado: "cajeado_" + side,
+                side: side,
+                radio: radio,
+                tempWidth: widthX,
+                tempHeight: heightY,
+                widthX: widthX,
+                heightY: heightY,
+                maxWidth: maxWidth,
+                maxHeight: maxHeight,
             },
         });
+
+
+        /*assignAttributes(
+                                                                                                                                                                                                                                                                                    getElem(getId()), {
+                                                                                                                                                                                                                                                                                        width: 50,
+                                                                                                                                                                                                                                                                                        height: 50,
+                                                                                                                                                                                                                                                                                        x: cajeadoX1,
+                                                                                                                                                                                                                                                                                        y: cajeadoY1,
+                                                                                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                                                                                    1000
+                                                                                                                                                                                                                                                                                );*/
+        //started = false;
         this.setMode("select");
+
         //selectAllInCurrentLayer();
         //this.addToSelection([getElem(getId())], false);
         //this.clearSelection();
@@ -9816,53 +9949,15 @@ $.SvgCanvas = function(container, config) {
         //clearSelection();
         //recalculateAllSelectedDimensions();
         //getCurrentDrawing().releaseId(getId());
+
         selectOnly([getElem(getId())], true);
+
         //svgCanvas.alignSelectedElements("m", "page");
         //alignSelectedElements("c", "page");
         //cleanupElement(getElem(getId()));
 
-        /*svgCanvas.addSvgElementFromJson({
-                                                                                                                                                                                            element: "line",
-                                                                                                                                                                                            curStyles: true,
-                                                                                                                                                                                            attr: {
-                                                                                                                                                                                                x1: cajeadoX1,
-                                                                                                                                                                                                y1: cajeadoY1,
-                                                                                                                                                                                                x2: cajeadoJoin1,
-                                                                                                                                                                                                y2: cajeadoJoin2,
-                                                                                                                                                                                                id: svgCanvas.getNextId(),
-                                                                                                                                                                                                stroke: "#000",
-                                                                                                                                                                                                "stroke-width": 1.5,
-                                                                                                                                                                                                "stroke-dasharray": "none",
-                                                                                                                                                                                                "stroke-linejoin": undefined,
-                                                                                                                                                                                                "stroke-linecap": undefined,
-                                                                                                                                                                                                "stroke-opacity": 1,
-                                                                                                                                                                                                fill: "none",
-                                                                                                                                                                                                opacity: 0.5,
-                                                                                                                                                                                                style: "pointer-events:none",
-                                                                                                                                                                                                nameMecanizado: "cajeado_L1_" + side,
-                                                                                                                                                                                            },
-                                                                                                                                                                                        });
+        //console.clear();
 
-                                                                                                                                                                                        svgCanvas.addSvgElementFromJson({
-                                                                                                                                                                                            element: "line",
-                                                                                                                                                                                            curStyles: true,
-                                                                                                                                                                                            attr: {
-                                                                                                                                                                                                x1: cajeadoJoin1,
-                                                                                                                                                                                                y1: cajeadoJoin2,
-                                                                                                                                                                                                x2: cajeadoX2,
-                                                                                                                                                                                                y2: cajeadoY2,
-                                                                                                                                                                                                id: svgCanvas.getNextId(),
-                                                                                                                                                                                                stroke: "#000",
-                                                                                                                                                                                                "stroke-width": 1.5,
-                                                                                                                                                                                                "stroke-dasharray": "none",
-                                                                                                                                                                                                "stroke-linejoin": undefined,
-                                                                                                                                                                                                "stroke-linecap": undefined,
-                                                                                                                                                                                                "stroke-opacity": 1,
-                                                                                                                                                                                                fill: "none",
-                                                                                                                                                                                                opacity: 0.5,
-                                                                                                                                                                                                style: "pointer-events:none",
-                                                                                                                                                                                                nameMecanizado: "cajeado_L2_" + side,
-                                                                                                                                                                                            },
-                                                                                                                                                                                        });*/
+
     });
 };

@@ -6282,9 +6282,7 @@ svgedit = svgedit || {};
                 e = svgedit.browser.isTouch() ? 15 : 2.5;
             svgedit.utilities.assignAttributes(
                 this.ptgrip,
-                this.ptgrip.nodeName == "rect" ?
-                { x: k.x - e, y: k.y - e } :
-                { cx: k.x, cy: k.y }
+                this.ptgrip.nodeName == "rect" ? { x: k.x - e, y: k.y - e } : { cx: k.x, cy: k.y }
             );
             svgedit.path.getSegSelector(this, true);
             if (this.ctrlpts) {
@@ -6299,9 +6297,7 @@ svgedit = svgedit || {};
     svgedit.path.Segment.prototype.move = function(b, k) {
         var e = this.item;
         e = $.extend({}, e);
-        e = this.ctrlpts ?
-            [(e.x += b), (e.y += k), e.x1, e.y1, (e.x2 += b), (e.y2 += k)] :
-            [(e.x += b), (e.y += k)];
+        e = this.ctrlpts ? [(e.x += b), (e.y += k), e.x1, e.y1, (e.x2 += b), (e.y2 += k)] : [(e.x += b), (e.y += k)];
         svgedit.path.replacePathSeg(this.type, this.index, e);
         if (this.next && this.next.ctrlpts) {
             e = this.next.item;
@@ -9476,9 +9472,7 @@ $.SvgCanvas = function(a, n) {
                             };
                             u = { x: o.item["x" + g], y: o.item["y" + g] };
                             g =
-                                g == 2 ?
-                                { x: o.item.x, y: o.item.y } :
-                                { x: s.item.x, y: s.item.y };
+                                g == 2 ? { x: o.item.x, y: o.item.y } : { x: s.item.x, y: s.item.y };
                             o = { x: s.item["x" + w], y: s.item["y" + w] };
                             s = D(u, g);
                             D = D(o, g);
@@ -9650,13 +9644,9 @@ $.SvgCanvas = function(a, n) {
                 mouseUp: function(D, u, E, J) {
                     var g = pa("ctrlpointgrip_1c1"),
                         o = pa("ctrlpointgrip_0c2");
-                    this.lastCtrlPoint = g ?
-                        [g.getAttribute("cx"), g.getAttribute("cy")] :
-                        [E, J];
+                    this.lastCtrlPoint = g ? [g.getAttribute("cx"), g.getAttribute("cy")] : [E, J];
                     if (!svgedit.path.first_grip)
-                        svgedit.path.first_grip = o ?
-                        [o.getAttribute("cx"), o.getAttribute("cy")] :
-                        [E, J];
+                        svgedit.path.first_grip = o ? [o.getAttribute("cx"), o.getAttribute("cy")] : [E, J];
                     if (ya === "path") {
                         m = null;
                         if (!z) {
@@ -10744,9 +10734,7 @@ $.SvgCanvas = function(a, n) {
             B[f.tagName] = f;
         } else
             B =
-            f.indexOf("#") === 0 ?
-            { alpha: h, solidColor: f.substr(1) } :
-            { alpha: h, solidColor: "none" };
+            f.indexOf("#") === 0 ? { alpha: h, solidColor: f.substr(1) } : { alpha: h, solidColor: "none" };
         return new $.jGraduate.Paint(B);
     };
     this.importSvgString = function(f) {
@@ -11629,20 +11617,18 @@ $.SvgCanvas = function(a, n) {
             });
         else {
             if (!h) var m = new za("Convert element to Path");
-            var B = h ?
-                {} :
-                {
-                    fill: L.fill,
-                    "fill-opacity": L.fill_opacity,
-                    stroke: L.stroke,
-                    "stroke-width": L.stroke_width,
-                    "stroke-dasharray": L.stroke_dasharray,
-                    "stroke-linejoin": L.stroke_linejoin,
-                    "stroke-linecap": L.stroke_linecap,
-                    "stroke-opacity": L.stroke_opacity,
-                    opacity: L.opacity,
-                    visibility: "hidden",
-                };
+            var B = h ? {} : {
+                fill: L.fill,
+                "fill-opacity": L.fill_opacity,
+                stroke: L.stroke,
+                "stroke-width": L.stroke_width,
+                "stroke-dasharray": L.stroke_dasharray,
+                "stroke-linejoin": L.stroke_linejoin,
+                "stroke-linecap": L.stroke_linecap,
+                "stroke-opacity": L.stroke_opacity,
+                opacity: L.opacity,
+                visibility: "hidden",
+            };
             $.each(
                 ["marker-start", "marker-end", "marker-mid", "filter", "clip-path"],
                 function() {
@@ -12514,11 +12500,9 @@ $.SvgCanvas = function(a, n) {
                         "#logo .svg_icon": 15,
                         ".flyout_arrow_horiz .svg_icon": 5,
                         "#fill_bg .svg_icon, #stroke_bg .svg_icon": svgedit.browser.isTouch() ?
-                            24 :
-                            24,
+                            24 : 24,
                         ".palette_item:first .svg_icon": svgedit.browser.isTouch() ?
-                            30 :
-                            16,
+                            30 : 16,
                         "#zoomLabel .svg_icon": 16,
                         "#zoom_dropdown .svg_icon": 7,
                     },
@@ -12817,9 +12801,7 @@ $.SvgCanvas = function(a, n) {
                             w[g.tagName] = g;
                         } else
                             w =
-                            g.indexOf("#") === 0 ?
-                            { alpha: o, solidColor: g.substr(1) } :
-                            { alpha: o, solidColor: "none" };
+                            g.indexOf("#") === 0 ? { alpha: o, solidColor: g.substr(1) } : { alpha: o, solidColor: "none" };
                         return new a.jGraduate.Paint(w);
                     },
                     Ea = d.getResolution();
@@ -14295,8 +14277,7 @@ $.SvgCanvas = function(a, n) {
                                 w = 1;
                             w =
                                 typeof g == "number" ?
-                                g :
-                                { s: 0.75, m: 1, l: 1.25, xl: 1.5 }[g];
+                                g : { s: 0.75, m: 1, l: 1.25, xl: 1.5 }[g];
                             c.tool_scale = R = w;
                             pa();
                             var G = s.parents(":hidden");
@@ -17539,9 +17520,7 @@ svgedit = svgedit || {};
             this._clickOffset = !a(n.target)
                 .parents()
                 .andSelf()
-                .is(".ui-slider-handle") ?
-                { left: 0, top: 0 } :
-                {
+                .is(".ui-slider-handle") ? { left: 0, top: 0 } : {
                     left: n.pageX - d.left - q.width() / 2,
                     top: n.pageY -
                         d.top -
@@ -19489,25 +19468,18 @@ svgedit = svgedit || {};
                                 P.offset().left -
                                 530 -
                                 (Q.position.y == "center" ? 25 : 0) +
-                                "px" :
-                                Q.position.x == "center" ?
-                                P.offset().left - 260 + "px" :
-                                Q.position.x == "right" ?
+                                "px" : Q.position.x == "center" ?
+                                P.offset().left - 260 + "px" : Q.position.x == "right" ?
                                 P.offset().left -
                                 10 +
                                 (Q.position.y == "center" ? 25 : 0) +
-                                "px" :
-                                Q.position.x == "screenCenter" ?
-                                (a(document).width() >> 1) - 260 + "px" :
-                                P.offset().left + parseInt(Q.position.x) + "px",
+                                "px" : Q.position.x == "screenCenter" ?
+                                (a(document).width() >> 1) - 260 + "px" : P.offset().left + parseInt(Q.position.x) + "px",
                             position: "absolute",
                             top: Q.position.y == "top" ?
-                                P.offset().top - 312 + "px" :
-                                Q.position.y == "center" ?
-                                P.offset().top - 156 + "px" :
-                                Q.position.y == "bottom" ?
-                                P.offset().top + 25 + "px" :
-                                P.offset().top + parseInt(Q.position.y) + "px",
+                                P.offset().top - 312 + "px" : Q.position.y == "center" ?
+                                P.offset().top - 156 + "px" : Q.position.y == "bottom" ?
+                                P.offset().top + 25 + "px" : P.offset().top + parseInt(Q.position.y) + "px",
                         });
                     } else {
                         C = a(e);
@@ -19652,28 +19624,22 @@ svgedit = svgedit || {};
                         new c({
                             ahex:
                                 !p.window.alphaSupport && p.color.active ?
-                                p.color.active.substring(0, 6) + "ff" :
-                                p.color.active,
-                        }) :
-                        new c({
+                                p.color.active.substring(0, 6) + "ff" : p.color.active,
+                        }) : new c({
                             ahex:
                                 !p.window.alphaSupport && p.color.active.val("ahex") ?
-                                p.color.active.val("ahex").substring(0, 6) + "ff" :
-                                p.color.active.val("ahex"),
+                                p.color.active.val("ahex").substring(0, 6) + "ff" : p.color.active.val("ahex"),
                         }),
                     current:
                         (typeof p.color.active).toString().toLowerCase() == "string" ?
                         new c({
                             ahex:
                                 !p.window.alphaSupport && p.color.active ?
-                                p.color.active.substring(0, 6) + "ff" :
-                                p.color.active,
-                        }) :
-                        new c({
+                                p.color.active.substring(0, 6) + "ff" : p.color.active,
+                        }) : new c({
                             ahex:
                                 !p.window.alphaSupport && p.color.active.val("ahex") ?
-                                p.color.active.val("ahex").substring(0, 6) + "ff" :
-                                p.color.active.val("ahex"),
+                                p.color.active.val("ahex").substring(0, 6) + "ff" : p.color.active.val("ahex"),
                         }),
                     quickList: p.color.quickList,
                 };
@@ -19937,9 +19903,7 @@ methodDraw.addExtension("eyedropper", function(a) {
                 e[q.tagName] = q;
             } else
                 e =
-                q.indexOf("#") === 0 ?
-                { alpha: b, solidColor: q.substr(1) } :
-                { alpha: b, solidColor: "none" };
+                q.indexOf("#") === 0 ? { alpha: b, solidColor: q.substr(1) } : { alpha: b, solidColor: "none" };
             return new $.jGraduate.Paint(e);
         };
     return {
