@@ -2620,8 +2620,10 @@ $.SvgCanvas = function(container, config) {
             //console.log(current_mode + "current_mode")
             switch (current_mode) {
                 //add new toll - cflorioluis - add new Method svgcanvas DownMouse event
-                case "cajeadoToolCanvas":
-                    break;
+                /*case "cajeadoToolCanvas":
+                    console.log("cajeado selec");
+
+                    break;*/
 
                 case "select":
                     started = true;
@@ -3005,7 +3007,7 @@ $.SvgCanvas = function(container, config) {
                                 if (!selected.getAttribute("nameMecanizado")) {
                                     xform.setTranslate(dx, dy);
                                 } else {
-                                    selectorManager.releaseSelector(selected, "cajeado");
+                                    //selectorManager.releaseSelector(selected, "cajeado");
                                 }
                                 if (tlist.numberOfItems) {
                                     tlist.replaceItem(xform, 0);
@@ -3617,7 +3619,13 @@ $.SvgCanvas = function(container, config) {
                                 selectedElements[0].nodeName === "path" &&
                                 selectedElements[1] == null
                             ) {
-                                pathActions.select(selectedElements[0]);
+                                //cflorioluis - hacer que al dar el docle vlick no se selecciones los componente del 
+                                // del que esta formado el cajeado
+                                if (selectedElements[0].getAttribute("nameMecanizado") == null) {
+                                    pathActions.select(selectedElements[0]);
+                                }
+
+                                //////////////////////////////////////////////////////////////////
                             } // if it was a path
                             // else, if it was selected and this is a shift-click, remove it from selection
                             else if (evt.shiftKey) {
@@ -3640,7 +3648,7 @@ $.SvgCanvas = function(container, config) {
                     }
 
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-                    if (selectedElements[0] != null && selectedElements[0].getAttribute("nameMecanizado") != "undefined") {
+                    if (selectedElements[0] != null && selectedElements[0].getAttribute("nameMecanizado") != null) {
                         newWidthX = parseInt(selectedElements[0].getAttribute("widthX"));
                         newHeightY = parseInt(selectedElements[0].getAttribute("heightY"));
 
@@ -3884,17 +3892,19 @@ $.SvgCanvas = function(container, config) {
         };
 
         var dblClick = function(evt) {
+
             var evt_target = evt.target;
             var parent = evt_target.parentNode;
             var mouse_target = getMouseTarget(evt);
             var tagName = mouse_target.tagName;
 
-            /*console.log(mouse_target);
+            //console.log(mouse_target);
 
             //cforioluis - si el objeto que se le hace doble click es un mecanizado, no hacer nada
-            if (!(mouse_target.getAttribute("nameMecanizado") != null)) {
+            if (mouse_target.getAttribute("nameMecanizado") != null) {
+                svgCanvas.clickCajeadoTool(mouse_target);
                 return;
-            }*/
+            }
 
             if (parent === current_group) return;
 
@@ -9648,6 +9658,7 @@ $.SvgCanvas = function(container, config) {
         svgroot.setAttribute("width", w);
         svgroot.setAttribute("height", h);
         var bg = $("#canvasBackground")[0];
+        //var bg1 = $("#canvasBackground1")[0];
         var old_x = svgcontent.getAttribute("x");
         var old_y = svgcontent.getAttribute("y");
         var x = w / 2 - (this.contentW * current_zoom) / 2;
@@ -9667,6 +9678,13 @@ $.SvgCanvas = function(container, config) {
             x: x,
             y: y,
         });
+
+        /*assignAttributes(bg1, {
+            width: 50,
+            height: 50,
+            x: x - 50,
+            y: y - 50,
+        });*/
 
         var bg_img = getElem("background_image");
         if (bg_img) {
@@ -9847,17 +9865,8 @@ $.SvgCanvas = function(container, config) {
 
     });
 
-    var cajeado = (this.cajeado = function(
-        side,
-        widthX,
-        heightY,
-        maxWidth,
-        maxHeight,
-        radio
-    ) {
-        //console.log(" " + widthX + " " + heightY);
-
-        var cajeadoX1, cajeadoY1, d;
+    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio) {
+        var cajeadoX1, cajeadoY1;
         switch (side) {
             case "1":
                 cajeadoX1 = 0;
@@ -9879,35 +9888,6 @@ $.SvgCanvas = function(container, config) {
             default:
                 break;
         }
-        //started = true;
-        /*addSvgElementFromJson({
-            element: "rect",
-            curStyles: true,
-            attr: {
-                x: cajeadoX1,
-                y: cajeadoY1,
-                width: widthX,
-                height: heightY,
-                id: getNextId(),
-                stroke: "#000",
-                fill: "#333",
-                nameMecanizado: "cajeado_" + side,
-                side: side,
-                maxWidth: maxWidth,
-                maxHeight: maxHeight,
-            },
-        });*/
-
-        /*d = "M" + (cajeadoX1 + radio) + "," + cajeadoY1 +
-            " h" + (widthX - radio) +
-            //"a" + radius + "," + radio + " 0 0 1 " + radio + "," + radio +
-            " v" + (heightY - radio) +
-            " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + radio +
-            " h" + (radio - widthX) +
-            " v-" + (heightY) +
-            " z"*/
-
-
 
         addSvgElementFromJson({
             element: "path",
@@ -9917,7 +9897,8 @@ $.SvgCanvas = function(container, config) {
                 id: getNextId(),
                 stroke: "#000",
                 fill: "#333",
-                nameMecanizado: "cajeado_" + side,
+                "stroke-width": "0",
+                nameMecanizado: "cajeado" /*_" + side*/ ,
                 side: side,
                 radio: radio,
                 tempWidth: widthX,
@@ -9929,35 +9910,483 @@ $.SvgCanvas = function(container, config) {
             },
         });
 
-
-        /*assignAttributes(
-                                                                                                                                                                                                                                                                                    getElem(getId()), {
-                                                                                                                                                                                                                                                                                        width: 50,
-                                                                                                                                                                                                                                                                                        height: 50,
-                                                                                                                                                                                                                                                                                        x: cajeadoX1,
-                                                                                                                                                                                                                                                                                        y: cajeadoY1,
-                                                                                                                                                                                                                                                                                    },
-                                                                                                                                                                                                                                                                                    1000
-                                                                                                                                                                                                                                                                                );*/
-        //started = false;
         this.setMode("select");
-
-        //selectAllInCurrentLayer();
-        //this.addToSelection([getElem(getId())], false);
-        //this.clearSelection();
-
-        //clearSelection();
-        //recalculateAllSelectedDimensions();
-        //getCurrentDrawing().releaseId(getId());
-
         selectOnly([getElem(getId())], true);
 
-        //svgCanvas.alignSelectedElements("m", "page");
-        //alignSelectedElements("c", "page");
-        //cleanupElement(getElem(getId()));
+    });
 
-        //console.clear();
+    var editCajeado = (this.editCajeado = function(attrName, attrValue) {
+        /*var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
+        console.log(attrValue);*/
+
+        //if (element) {
+        //selectOnly([getElem(element)], true);
+        if (!selectedElements[0]) {
+            return;
+        }
+
+        var w, h, r, d, side;
+        w = selectedElements[0].getAttribute("widthX");
+        h = selectedElements[0].getAttribute("heightY");
+        r = selectedElements[0].getAttribute("radio");
+        side = selectedElements[0].getAttribute("side");
+        //console.log(w + " " + h + " " + r + " " + side);
+        switch (attrName) {
+            case "newWidthX":
+                w = attrValue
+                break;
+            case "newHeightY":
+                h = attrValue
+                break;
+            case "radio":
+                r = attrValue
+                break;
+        }
+        console.log(w + " " + h + " " + r + " " + side + " " + selectedElements[0].getAttribute("id"));
+
+        svgCanvas.deleteSelectedElements();
+
+        svgCanvas.cajeado(
+            side,
+            w,
+            h,
+            curConfig.dimensions[0],
+            curConfig.dimensions[1],
+            r
+        );
+        //d = createRoundedCajeadoSide(w, h, r, side);
+        //console.log(d);
+        //selectedElements[0].setAttribute("d", d);
+        //changeSelectedAttribute(attr, attrValue, selectedElements[0]);
+        //}
+    });
 
 
+
+    var selectCajeado = (this.selectCajeado = function(side) {
+        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
+        var element = $("[nameMecanizado*='cajeado'][side='" + side + "']").attr("id");
+
+        if (element) {
+            selectOnly([getElem(element)], true);
+            //console.log(selectedElements[0].getAttribute("widthX"));
+            $('#newWidthCajeado').val(selectedElements[0].getAttribute("widthX"));
+            $('#newHeightCajeado').val(selectedElements[0].getAttribute("heightY"));
+            $('#newRadioCajeado').val(selectedElements[0].getAttribute("radio"));
+        } else {
+            $('#newWidthCajeado').val("");
+            $('#newHeightCajeado').val("");
+            $('#newRadioCajeado').val("");
+            clearSelection();
+        }
+    });
+
+
+    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
+    var clickCajeadoTool = (this.clickCajeadoTool = function(elem) {
+
+        var side = elem.getAttribute("side"),
+            widthX = elem.getAttribute("widthX"),
+            heigthY = elem.getAttribute("heightY"),
+            radio = elem.getAttribute("radio");
+
+
+        //dimension mas pequeña para limitar el radio
+        var radioLimit = Math.min(curConfig.dimensions[0], curConfig.dimensions[1]);
+
+        var cajeadoReady1 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady2 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady3 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady4 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`;
+
+        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+        var cajeadoReady = $("path[nameMecanizado*='cajeado']");
+
+        if (cajeadoReady.length > 0) {
+            for (let i = 0; i < cajeadoReady.length; i++) {
+                const element = cajeadoReady[i];
+                switch (element.getAttribute("side")) {
+                    case "1":
+                        cajeadoReady1 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "2":
+                        cajeadoReady2 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "3":
+                        cajeadoReady3 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+                    case "4":
+                        cajeadoReady4 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+        switch (side) {
+            case "1":
+                cajeadoReady1 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`;
+                break;
+            case "2":
+                cajeadoReady2 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`;
+                break;
+            case "3":
+                cajeadoReady3 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`
+                break;
+            case "4":
+                cajeadoReady4 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`
+                break;
+
+            default:
+                break;
+        }
+
+
+        cajeadoBox = $.confirm(
+            `<strong><h2>Editar Cajeado</h2></strong>` +
+            `<form>
+                <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                    <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
+                    <div class="columnFromCajeado">
+                        <div class="tablero grid">
+                            <div class="columnCajeado">` +
+            cajeadoReady4 +
+            `<label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>` +
+            cajeadoReady1 +
+            `</div>
+                            
+                            <div class="columnCajeado">                       
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                            </div>
+                            
+                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+            cajeadoReady3 +
+            `<label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png">
+                                </label>` +
+            cajeadoReady2 +
+            `</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Ancho</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + widthX + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newWidthX', this.value);"/>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Fondo</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + heigthY + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newHeightY', this.value);"/>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Radio</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + radio + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('radio', this.value);"/>
+                    </div>
+                </div>
+            </form>
+            `,
+            function(ok) {
+                if (!ok) return;
+                //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                side = $("input[name=corner]:checked").val();
+                widthX = $("#newWidthCajeado").val();
+                heigthY = $("#newHeightCajeado").val();
+                radio = $("#newRadioCajeado").val();
+
+                svgCanvas.deleteSelectedElements();
+                svgCanvas.cajeado(
+                    side,
+                    widthX,
+                    heigthY,
+                    curConfig.dimensions[0],
+                    curConfig.dimensions[1],
+                    radio
+                );
+            },
+            350,
+            330,
+            true,
+            "cajeado"
+        );
+
+
+
+        /*if (toolButtonClick("#tool_cajeadoTool")) {
+            svgCanvas.setMode("cajeadoToolCanvas");
+        }*/
+    });
+
+
+    //cflorioluis - Editar Cajeado dinamicamente
+    var clickCajeadoToolDinamico = (this.clickCajeadoToolDinamico = function(elem) {
+        var side = elem.getAttribute("side"),
+            widthX = elem.getAttribute("widthX"),
+            heigthY = elem.getAttribute("heightY"),
+            radio = elem.getAttribute("radio");
+        var cajeadoReady1 =
+            `<label>
+                <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled>
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady2 =
+            `<label>
+                <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled>
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady3 =
+            `<label>
+                <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled>
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady4 =
+            `<label>
+                <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled>
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`;
+
+        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+        var cajeadoReady = $("path[nameMecanizado*='cajeado']");
+
+        if (cajeadoReady.length > 0) {
+            for (let i = 0; i < cajeadoReady.length; i++) {
+                const element = cajeadoReady[i];
+                switch (element.getAttribute("side")) {
+                    case "1":
+                        cajeadoReady1 =
+                            `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "2":
+                        cajeadoReady2 =
+                            `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "3":
+                        cajeadoReady3 =
+                            `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+                    case "4":
+                        cajeadoReady4 =
+                            `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+        switch (side) {
+            case "1":
+                cajeadoReady1 =
+                    `<label>
+                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled checked>
+                                <img src="images/mecanizado/cajeado_in_use.png">
+                            </label>`;
+                break;
+            case "2":
+                cajeadoReady2 =
+                    `<label>
+                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled checked>
+                                <img src="images/mecanizado/cajeado_in_use.png">
+                            </label>`;
+                break;
+            case "3":
+                cajeadoReady3 =
+                    `<label>
+                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled checked>
+                                <img src="images/mecanizado/cajeado_in_use.png">
+                            </label>`
+                break;
+            case "4":
+                cajeadoReady4 =
+                    `<label>
+                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled checked>
+                                <img src="images/mecanizado/cajeado_in_use.png">
+                            </label>`
+                break;
+
+            default:
+                break;
+        }
+
+
+        cajeadoBox = $.confirm(
+            `<strong><h2>Editar Cajeado</h2></strong>` +
+            `<form>
+                <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                    <div class="columnFromCajeado right"><h3>Side</h3></div>
+                    <div class="columnFromCajeado">
+                        <div class="tablero grid">
+                            <div class="columnCajeado">` +
+            cajeadoReady4 +
+            `<label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>` +
+            cajeadoReady1 +
+            `</div>
+                            
+                            <div class="columnCajeado">                       
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                            </div>
+                            
+                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+            cajeadoReady3 +
+            `<label>
+                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png">
+                                </label>` +
+            cajeadoReady2 +
+            `</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Width_X</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + widthX + `"` + `class="inputMecanizado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Heigth_Y</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + heigthY + `"` + `class="inputMecanizado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowFromCajeado">
+                    <div class="columnFromCajeado right"><h3>Radio</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + radio + `"` + `class="inputMecanizado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+            </form>
+            `,
+            function(ok) {
+                if (!ok) return;
+                //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                side = $("input[name=corner]:checked").val();
+                widthX = $("#newWidthCajeado").val();
+                heigthY = $("#newHeightCajeado").val();
+                radio = $("#newRadioCajeado").val();
+                console.log(" " + side + " " + widthX + " " + heigthY + " " + curConfig.dimensions[0] + " " + curConfig.dimensions[1] + " " + radio);
+
+                svgCanvas.deleteSelectedElements();
+
+                svgCanvas.cajeado(
+                    side,
+                    widthX,
+                    heigthY,
+                    curConfig.dimensions[0],
+                    curConfig.dimensions[1],
+                    radio
+                );
+            },
+            500,
+            330,
+            true
+        );
+
+
+
+        /*if (toolButtonClick("#tool_cajeadoTool")) {
+            svgCanvas.setMode("cajeadoToolCanvas");
+        }*/
     });
 };

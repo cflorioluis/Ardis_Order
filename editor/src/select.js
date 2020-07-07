@@ -137,6 +137,7 @@ var svgedit = svgedit || {};
     // Function: svgedit.select.Selector.resize
     // Updates the selector to match the element's size
     svgedit.select.Selector.prototype.resize = function() {
+
         var selectedBox = this.selectorRect,
             mgr = selectorManager_,
             selectedGrips = mgr.selectorGrips,
@@ -408,6 +409,8 @@ var svgedit = svgedit || {};
 
         if ($("#canvasBackground").length) return;
 
+        //if ($("#canvasBackground_1").length) return;
+
         var dims = config_.dimensions;
         var canvasbg = svgFactory_.createSVGElement({
             element: "svg",
@@ -421,6 +424,92 @@ var svgedit = svgedit || {};
                 style: "pointer-events:none",
             },
         });
+
+        console.log(dims[0]);
+        console.log(dims[1]);
+
+
+        //cflorioluis - Crear las caras de la pieza
+        /*var canvasbg1 = svgFactory_.createSVGElement({
+            element: "svg",
+            attr: {
+                id: "canvasBackground1",
+                width: 50,
+                height: 50,
+                x: 0,
+                y: 0,
+                overflow: svgedit.browser.isWebkit() ? "none" : "visible", // Chrome 7 has a problem with this when zooming out
+                style: "pointer-events:none",
+            },
+        });
+        var defs1 = svgFactory_.createSVGElement({
+            element: "defs",
+            attr: {
+                id: "placeholder_defs1",
+            },
+        });
+
+        var pattern1 = svgFactory_.createSVGElement({
+            element: "pattern",
+            attr: {
+                id: "checkerPattern1",
+                patternUnits: "userSpaceOnUse",
+                x: 0,
+                y: 0,
+                width: 20,
+                height: 20,
+                viewBox: "0 0 10 10",
+            },
+        });
+        var pattern_bg1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 0,
+                y: 0,
+                width: 10,
+                height: 10,
+                fill: "#fff",
+            },
+        });
+
+        var pattern_square1_1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 0,
+                y: 0,
+                width: 5,
+                height: 5,
+                fill: "#eee",
+            },
+        });
+
+        var pattern_square2_1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 5,
+                y: 5,
+                width: 5,
+                height: 5,
+                fill: "#eee",
+            },
+        });
+
+        var rect1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                width: "100%",
+                height: "100%",
+                x: 0,
+                y: 0,
+                "stroke-width": 1,
+                stroke: "#000",
+                fill: "url(#checkerPattern)",
+                style: "pointer-events:none",
+            },
+        });*/
+
+
+        ////////////
 
         var defs = svgFactory_.createSVGElement({
             element: "defs",
@@ -499,7 +588,15 @@ var svgedit = svgedit || {};
         pattern.appendChild(pattern_square2);
         canvasbg.appendChild(rect);
 
+        /*canvasbg1.appendChild(defs1);
+        defs1.appendChild(pattern1);
+        pattern1.appendChild(pattern_bg1);
+        pattern1.appendChild(pattern_square1_1);
+        pattern1.appendChild(pattern_square2_1);
+        canvasbg1.appendChild(rect1);*/
+
         svgFactory_.svgRoot().insertBefore(canvasbg, svgFactory_.svgContent());
+        //svgFactory_.svgRoot().insertBefore(canvasbg1, svgFactory_.svgContent());
     };
 
     // Function: svgedit.select.SelectorManager.requestSelector
@@ -542,7 +639,7 @@ var svgedit = svgedit || {};
         if (elem == null) return;
         var N = this.selectors.length,
             sel = this.selectorMap[elem.id];
-        console.log("mecaniozado" + mecanizado);
+        //console.log("mecaniozado" + mecanizado);
         for (var i = 0; i < N; ++i) {
             if (this.selectors[i] && this.selectors[i] == sel) {
                 //console.log(this.selectors[i]);
@@ -553,7 +650,7 @@ var svgedit = svgedit || {};
                         "WARNING! selector was released but was already unlocked"
                     );
                 }
-                console.log(this.selectorMap[elem.id]);
+                //console.log(this.selectorMap[elem.id]);
                 delete this.selectorMap[elem.id];
 
                 sel.locked = false;

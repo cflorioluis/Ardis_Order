@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <link rel="icon" type="image/png" href="images/logo.png" />
+    <!--<link rel="icon" type="image/png" href="images/logo.png" />-->
 
     <!--{if svg_edit_release}>
   <link rel="stylesheet" href="css/method-draw.compiled.css" type="text/css"/>
@@ -61,7 +61,7 @@
     <!--{endif}-->
 
 
-    <title>Method Draw</title>
+    <title>Ardis Order</title>
 </head>
 
 <body>
@@ -75,7 +75,8 @@
                     <canvas height="15"></canvas>
                 </div>
             </div>
-            <div id="ruler_y">
+            <!-- cflorioluis - hacer que la reglaY se expanda lo que se oculto de la barra de opciones de abajo-->
+            <div id="ruler_y" style="height: fit-content;">
                 <div id="ruler_y_cursor"></div>
                 <div>
                     <canvas width="15"></canvas>
@@ -221,15 +222,20 @@
                 <span class="icon_label">Height</span>
               </label>-->
                 <label>
-                  <input id="cajeado_Width_x" class="attr_changer" size="3" data-attr="width" type="text" pattern="[0-9]*" />
-                <span class="icon_label">Width_X</span>
+                  <input id="cajeado_widthX" class="attr_changer" size="3" data-attr="widthX" type="text" pattern="[0-9]*" />
+                <span class="icon_label">Ancho</span>
                 
               </label>
                 <label>
-                  <input id="cajeado_Height_y" class="attr_changer" size="3" data-attr="height" type="text" pattern="[0-9]*" />
-                <span class="icon_label">Height_Y</span>
+                  <input id="cajeado_heightY" class="attr_changer" size="3" data-attr="heightY" type="text" pattern="[0-9]*" />
+                <span class="icon_label">Fondo</span>
                 
               </label>
+                <label>
+                <input id="cajeado_radio" class="attr_changer" size="3" data-attr="radio" type="text" pattern="[0-9]*" />
+              <span class="icon_label">Fondo</span>
+              
+            </label>
 
             </div>
 
@@ -594,6 +600,7 @@
         </div>
         <!-- tools_left -->
 
+        <!-- cflorioluis ocultar barra de opciones abajo -->
         <div id="tools_bottom" class="tools_panel">
 
             <!-- Zoom buttons -->
@@ -625,6 +632,7 @@
                 <div id="palette" title="Click to change fill color, shift-click to change stroke color"></div>
             </div>
         </div>
+
 
         <!-- hidden divs -->
         <div id="color_picker"></div>
@@ -667,6 +675,11 @@
         <div id="dialog_container">
             <div id="dialog_content"></div>
             <div id="dialog_buttons"></div>
+        </div>
+
+        <div id="dialog_container_custom">
+            <div id="dialog_content_custom"></div>
+            <div id="dialog_buttons_custom"></div>
         </div>
     </div>
 
