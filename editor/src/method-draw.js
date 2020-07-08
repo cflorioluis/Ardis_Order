@@ -445,12 +445,20 @@
                         console.log(width);
                         console.log(height);
 
+
+
                         if (width !== undefined || height !== undefined) {
+                            var mousePosition;
+                            var offset = [0, 0];
+                            var div;
+                            var isDown = false;
+
                             $("#dialog_container_custom").css({
                                 "width": width + "px",
                                 "height": height + "px",
                                 "left": "",
-                                "right": "2%"
+                                "right": "2%",
+                                "position": "absolute"
                                     /*"margin-left": (width / 2) * -1 + "px !important",*/
                                     /*"margin-top:": (height / 2) * -1 + "px !important",*/
                             });
@@ -458,6 +466,38 @@
                             $("#dialog_content_custom").css({
                                 height: height - 65 + "px",
                             });
+
+                            div = document.getElementById("dialog_container_custom");
+                            document.getElementById("moveConfirm").addEventListener('mousedown', function(e) {
+                                isDown = true;
+                                offset = [
+                                    div.offsetLeft - e.clientX,
+                                    div.offsetTop - e.clientY
+                                ];
+                                //console.log(offset);
+
+                            }, true);
+
+                            document.addEventListener('mouseup', function() {
+                                isDown = false;
+                            }, true);
+
+                            document.addEventListener('mousemove', function(event) {
+
+                                event.preventDefault();
+                                if (isDown) {
+                                    mousePosition = {
+
+                                        x: event.clientX,
+                                        y: event.clientY
+
+                                    };
+                                    console.log(mousePosition);
+
+                                    div.style.left = (mousePosition.x + offset[0] + 150) + 'px';
+                                    div.style.top = (mousePosition.y + offset[1] + 80) + 'px';
+                                }
+                            }, true);
                             /*$("#dialog_container").css("background-color","");
                             $("#dialog_container").addClass("dialogRight")*/
                         } else {
@@ -2649,7 +2689,7 @@
                     }
 
                     cajeadoBox = $.confirm(
-                        `<strong><h2>Cajeado</h2></strong>` +
+                        `<strong><h2 id="moveConfirm" style="cursor: move;">Cajeado</h2></strong>` +
                         `<form>
 
                             <div class="rowFromCajeado" style="padding-bottom: 10px;">

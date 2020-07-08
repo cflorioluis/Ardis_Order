@@ -10295,7 +10295,7 @@ $.SvgCanvas = function(container, config) {
 
 
         cajeadoBox = $.confirm(
-            `<strong><h2>Editar Cajeado</h2></strong>` +
+            `<strong><h2 id="moveConfirm" style="cursor: move;" >Editar Cajeado</h2></strong>` +
             `<form>
                 <div class="rowFromCajeado" style="padding-bottom: 10px;">
                     <div class="columnFromCajeado right"><h3>Side</h3></div>
