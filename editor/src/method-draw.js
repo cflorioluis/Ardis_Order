@@ -17,6 +17,7 @@
 // 3) svgcanvas.js
 
 (function() {
+
     if (!window.methodDraw)
         window.methodDraw = (function($) {
             var svgCanvas;
@@ -25,7 +26,7 @@
             var curConfig = {
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
-                dimensions: [500, 400],
+                dimensions: [250, 200],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -389,6 +390,8 @@
                         $(this).text(text.split("⌘").join("Ctrl+"));
                     });
                 }
+
+
 
                 // This sets up alternative dialog boxes. They mostly work the same way as
                 // their UI counterparts, expect instead of returning the result, a callback
@@ -1976,6 +1979,8 @@
                 };
 
                 var changeZoom = function(ctl) {
+                    //console.log(ctl);
+
                     var zoomlevel = ctl.value / 100;
                     if (zoomlevel < 0.001) {
                         ctl.value = 0.1;
@@ -1994,6 +1999,18 @@
                         },
                         true
                     );
+                    console.log("w_area[0].scrollLeft");
+                    console.log(w_area[0].scrollLeft);
+                    console.log("w_area[0].scrollTop");
+                    console.log(w_area[0].scrollTop);
+                    console.log("w_area.width()");
+                    console.log(w_area.width());
+                    console.log("w_area.height()");
+                    console.log(w_area.height());
+
+                    console.log("zoom");
+                    console.log(zoom);
+
                 };
 
                 var changeBlur = function(ctl, completed) {
@@ -2064,16 +2081,15 @@
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
                     var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
+
+                    /*
+                                        if ((parseInt(r) > parseInt(w)) || (parseInt(r) > parseInt(h)) && (parseInt(w) > parseInt(h))) {
+                                            r = w;
+                                        } else {
+                                            r = h;
+                                        }*/
+
                     var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side);
-
-                    /*if (r > w || r > h) {
-                        if (w > h) {
-                            r = w;
-                        } else {
-                            r = h;
-                        }
-                    }*/
-
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
@@ -2926,7 +2942,11 @@
                             dy *= multi;
                         }
                         $("input").blur();
-                        svgCanvas.moveSelectedElements(dx, dy);
+                        //cflorioluis - evitar que un mecanizado se mueva con las flechas del techado
+                        if (!selectedElement.getAttribute("nameMecanizado")) {
+                            svgCanvas.moveSelectedElements(dx, dy);
+                        }
+
                     }
                 };
 
@@ -3115,6 +3135,8 @@
 
                 var zoomImage = function(multiplier) {
                     var res = svgCanvas.getResolution();
+                    console.log(res);
+
                     multiplier = multiplier ? res.zoom * multiplier : 1;
                     //    setResolution(res.w * multiplier, res.h * multiplier, true);
                     $("#zoom").val(multiplier * 100);
@@ -3929,6 +3951,8 @@
                     changeZoom(this);
                 });
 
+
+
                 //Prevent browser from erroneously repopulating fields
                 $("input,select").attr("autocomplete", "off");
 
@@ -4674,7 +4698,7 @@
                     cursor: true,
                 });
                 $("#cajeado_radio").dragInput({
-                    min: 1,
+                    min: 0,
                     max: lowDimension,
                     step: 1,
                     callback: changeAttributeCajeado,
@@ -5414,9 +5438,15 @@
                 });
             };
 
+
+
             return Editor;
         })(jQuery);
 
+
+
     // Run init once DOM is loaded
     $(methodDraw.init);
+
+
 })();

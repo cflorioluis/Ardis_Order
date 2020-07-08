@@ -425,8 +425,8 @@ var svgedit = svgedit || {};
             },
         });
 
-        console.log(dims[0]);
-        console.log(dims[1]);
+        /*console.log(dims[0]);
+        console.log(dims[1]);*/
 
 
         //cflorioluis - Crear las caras de la pieza

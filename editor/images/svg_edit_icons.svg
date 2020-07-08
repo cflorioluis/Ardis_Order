@@ -20,9 +20,6 @@
 
 
 
-
-
-
 <g id="logo">
 <svg viewBox="0 0 16 16" version="1.1">
   <path id="svg_7" d="m-0.0965,16.1043l16.10001,-16.06917l-0.00001,16.06917l-16.1,0z" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="1.5" fill="#cccccc"/>
@@ -32,6 +29,33 @@
 
 
 <g id="select">
+<svg viewBox="0 0 24 24" version="1.1">
+	<g>
+	<path fill="#2F2F2C" d="M0,0v24h24V0H0z M17.147,20.757l-2.941,1.501l-3.677-6.005l-4.411,3.003V1.241l12.5,12.01l-4.412,1.501
+		L17.147,20.757z"/>
+	</g>
+</svg>
+</g>
+
+<g id="cajeadoTool">
+<svg viewBox="0 0 24 24" version="1.1">
+	<g>
+	<path d="M0 235 l0 -45 75 0 75 0 0 -35 0 -35 65 0 65 0 0 80 0 80 -140 0
+-140 0 0 -45z"/>
+	</g>
+</svg>
+</g>
+
+<g id="cremalleraTool">
+<svg viewBox="0 0 24 24" version="1.1">
+	<g>
+	<path fill="#2F2F2C" d="M0,0v24h24V0H0z M17.147,20.757l-2.941,1.501l-3.677-6.005l-4.411,3.003V1.241l12.5,12.01l-4.412,1.501
+		L17.147,20.757z"/>
+	</g>
+</svg>
+</g>
+
+<g id="taladroTool">
 <svg viewBox="0 0 24 24" version="1.1">
 	<g>
 	<path fill="#2F2F2C" d="M0,0v24h24V0H0z M17.147,20.757l-2.941,1.501l-3.677-6.005l-4.411,3.003V1.241l12.5,12.01l-4.412,1.501
