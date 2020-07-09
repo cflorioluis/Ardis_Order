@@ -9639,6 +9639,8 @@ $.SvgCanvas = function(container, config) {
     this.contentW = getResolution().w;
     this.contentH = getResolution().h;
 
+
+
     // Function: updateCanvas
     // Updates the editor canvas width/height/position after a zoom has occurred
     //
@@ -9658,7 +9660,7 @@ $.SvgCanvas = function(container, config) {
         svgroot.setAttribute("width", w);
         svgroot.setAttribute("height", h);
         var bg = $("#canvasBackground")[0];
-        //var bg1 = $("#canvasBackground1")[0];
+        var bg1 = $("#canvasBackground1")[0];
         var old_x = svgcontent.getAttribute("x");
         var old_y = svgcontent.getAttribute("y");
         var x = w / 2 - (this.contentW * current_zoom) / 2;
@@ -9679,12 +9681,15 @@ $.SvgCanvas = function(container, config) {
             y: y,
         });
 
-        /*assignAttributes(bg1, {
-            width: 50,
-            height: 50,
-            x: x - 50,
+        console.log("updatecanvas");
+
+
+        assignAttributes(bg1, {
+            width: svgcontent.getAttribute("width"),
+            height: 20,
+            x: x,
             y: y - 50,
-        });*/
+        });
 
         var bg_img = getElem("background_image");
         if (bg_img) {
@@ -9736,6 +9741,30 @@ $.SvgCanvas = function(container, config) {
         } else if (bg_img) {
             bg_img.parentNode.removeChild(bg_img);
         }
+
+
+        //
+
+        /*var bg = getElem("canvasBackground1");
+        var border = $(bg).find("rect1")[0];
+        var bg_img = getElem("background_image");
+        border.setAttribute("fill", color);
+        if (url) {
+            if (!bg_img) {
+                bg_img = svgdoc.createElementNS(svgns, "image");
+                assignAttributes(bg_img, {
+                    id: "background_image",
+                    width: "100%",
+                    height: "100%",
+                    preserveAspectRatio: "xMinYMin",
+                    style: "pointer-events:none",
+                });
+            }
+            setHref(bg_img, url);
+            bg.appendChild(bg_img);
+        } else if (bg_img) {
+            bg_img.parentNode.removeChild(bg_img);
+        }*/
     };
 
     // Function: cycleElement
@@ -10094,7 +10123,7 @@ $.SvgCanvas = function(container, config) {
 
 
         cajeadoBox = $.confirm(
-            `<strong><h2>Editar Cajeado</h2></strong>` +
+            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Cajeado</h2></strong>` +
             `<form>
                 <div class="rowFromCajeado" style="padding-bottom: 10px;">
                     <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
@@ -10176,7 +10205,7 @@ $.SvgCanvas = function(container, config) {
                 );
             },
             350,
-            330,
+            340,
             true,
             "cajeado"
         );

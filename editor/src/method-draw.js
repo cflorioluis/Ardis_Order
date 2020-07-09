@@ -26,7 +26,7 @@
             var curConfig = {
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
-                dimensions: [250, 200],
+                dimensions: [1500, 500],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -52,10 +52,6 @@
             var customHandlers = {};
             Editor.curConfig = curConfig;
             Editor.tool_scale = 1;
-
-            //cflorioluis - guardar el popup de creacion de cajeado para luego editar un cajeado
-            var cajeadoBox;
-
 
             Editor.setConfig = function(opts) {
                 $.extend(true, curConfig, opts);
@@ -118,6 +114,10 @@
                 if (curConfig.dimensions[0] < curConfig.dimensions[1]) {
                     lowDimension = curConfig.dimensions[0];
                 }
+
+
+
+
 
 
                 var extFunc = function() {
@@ -409,10 +409,6 @@
                     //cflorioluis - editando dialogo para validaciones de los mecanizados
                     var dbox = function(type, msg, callback, width, height, custom, mecanizadoType, defText) {
                         //cflorioluis - custom dialog
-                        /*console.log("custom");*/
-                        console.log(custom);
-
-
                         if (custom !== undefined) {
                             btn_holder = $("#dialog_buttons_custom");
                             $("#dialog_container").draggable({
@@ -441,12 +437,7 @@
                         }
 
 
-                        //Center dialog to windows - cflorioluis
-                        console.log(width);
-                        console.log(height);
-
-
-
+                        //cflorioluis - Colocar la ventana a un lado, igual se puede mover con el mouse
                         if (width !== undefined || height !== undefined) {
                             var mousePosition;
                             var offset = [0, 0];
@@ -467,6 +458,7 @@
                                 height: height - 65 + "px",
                             });
 
+                            //cflorioluis - hacer que la ventana se mueva con el mouse
                             div = document.getElementById("dialog_container_custom");
                             document.getElementById("moveConfirm").addEventListener('mousedown', function(e) {
                                 isDown = true;
@@ -474,8 +466,6 @@
                                     div.offsetLeft - e.clientX,
                                     div.offsetTop - e.clientY
                                 ];
-                                //console.log(offset);
-
                             }, true);
 
                             document.addEventListener('mouseup', function() {
@@ -483,21 +473,18 @@
                             }, true);
 
                             document.addEventListener('mousemove', function(event) {
-
                                 event.preventDefault();
                                 if (isDown) {
                                     mousePosition = {
-
                                         x: event.clientX,
                                         y: event.clientY
-
                                     };
-                                    console.log(mousePosition);
 
                                     div.style.left = (mousePosition.x + offset[0] + 150) + 'px';
                                     div.style.top = (mousePosition.y + offset[1] + 80) + 'px';
                                 }
                             }, true);
+                            ///////////////////////////////////////////////////////////////////
                             /*$("#dialog_container").css("background-color","");
                             $("#dialog_container").addClass("dialogRight")*/
                         } else {
@@ -519,7 +506,7 @@
 
                         var ok = $('<input type="button" value="OK">').appendTo(btn_holder);
 
-                        //cflorioluis - validare formulario con boton ok
+                        //cflorioluis - validar formulario con boton ok
                         switch (mecanizadoType) {
                             case "cajeado":
                                 var cajeadoInputs = 0;
@@ -544,13 +531,7 @@
                                         box.hide();
                                         var resp = type == "prompt" ? input.val() : true;
                                         if (callback) callback(resp);
-                                    } else {
-                                        /*$("#dialog_container").css({
-                                            width: (parseInt(width) + 100) + "px"
-                                        });*/
                                     }
-
-
                                 });
                                 break;
                             default:
@@ -584,9 +565,7 @@
                         //cflorioluis - ocultar evento callback original si se trata de un cajeado
                         switch (mecanizadoType) {
                             case "cajeado":
-
                                 break;
-
                             default:
                                 ok.on("click touchstart", function() {
                                     box.hide();
@@ -595,16 +574,7 @@
                                 }).focus();
                                 break;
                         }
-
-
                         if (type == "prompt") input.focus();
-
-                        //cflorioluis - desactivar botn ok dialogos custom
-                        if (width != null || height != null) {
-                            //ok.hide();
-                            //$('#dialog_buttons').children().first().prop("disabled", false);
-                            // ok.prop("disabled", true);
-                        }
                     };
 
                     $.alert = function(msg, cb) {
@@ -891,6 +861,64 @@
 
                     zoomDone();
                 };
+
+                //cflorioluis - cambiar zoom respecto al tamaño de la pieza
+                var changeZoomPiece = async function() {
+                    var w_area = workarea;
+                    var zoomValue = 0;
+                    //cflorioluis - Calcular el zoom optimo para que las piezas siempre se vean a un tamaño similar
+
+
+                    if (curConfig.dimensions[0] > curConfig.dimensions[1]) {
+                        zoomValue = ((w_area.width() / curConfig.dimensions[0]) / 1.5) * 100
+                    } else {
+                        zoomValue = ((w_area.height() / curConfig.dimensions[1]) / 1.5) * 100
+                    }
+
+                    var zoomlevel = zoomValue / 100;
+                    if (zoomlevel < 0.001) {
+                        zoomValue = 0.1;
+                        return;
+                    }
+                    var zoom = await svgCanvas.getZoom();
+
+                    zoomChanged(
+                        window, {
+                            width: 0,
+                            height: 0,
+                            // center pt of scroll position
+                            x: (w_area[0].scrollLeft + w_area.width() / 2) / zoom,
+                            y: (w_area[0].scrollTop + w_area.height() / 2) / zoom,
+                            zoom: zoomlevel,
+                        },
+                        true
+                    );
+                    console.log("w_area[0].scrollLeft");
+                    console.log(w_area[0].scrollLeft);
+                    console.log("w_area[0].scrollTop");
+                    console.log(w_area[0].scrollTop);
+                    console.log("w_area.width()");
+                    console.log(w_area.width());
+                    console.log("w_area.height()");
+                    console.log(w_area.height());
+
+                    console.log("zoom");
+                    console.log(zoom);
+
+                };
+
+
+
+                changeZoomPiece();
+
+
+
+
+
+
+
+
+
 
                 $("#cur_context_panel").delegate("a", "click", function() {
                     var link = $(this);
@@ -2770,7 +2798,7 @@
                             );
                         },
                         350,
-                        330,
+                        340,
                         true,
                         "cajeado"
                     );
@@ -5487,6 +5515,8 @@
 
     // Run init once DOM is loaded
     $(methodDraw.init);
+
+
 
 
 })();
