@@ -1563,24 +1563,44 @@
                     res.h = svgedit.units.convertUnit(res.h) + curConfig.baseUnit;
                 }
 
+                //cflorioluis - Cambiar la funcion para que cree tyodos los fondos de todos los elementos
                 var createBackground = function(fill) {
                     svgCanvas.createLayer("background");
                     cur_shape = svgCanvas.addSvgElementFromJson({
                         element: "rect",
                         attr: {
-                            x: -1,
-                            y: -1,
-                            width: res.w + 2,
-                            height: res.h + 2,
+                            x: 0, //-1
+                            y: 0, //-1
+                            width: res.w, //res.w + 2
+                            height: res.h, //res.h + 2
                             stroke: "none",
                             id: "canvas_background",
                             opacity: 1,
-                            fill: fill || "#fff",
+                            fill: fill || "url(#imgCanvasBackground)", //"#0ff",
                             style: "pointer-events:none",
                         },
                     });
                     svgCanvas.setCurrentLayer("Layer 1");
                     svgCanvas.setCurrentLayerPosition("1");
+
+                    //cflorioluis - crear fondo para las otras caras de la pieza
+                    /*svgCanvas.createLayer("background1");
+                    cur_shape = svgCanvas.addSvgElementFromJson({
+                        element: "rect",
+                        attr: {
+                            x: 0,
+                            y: -50,
+                            width: svgcontent.getAttribute("width"),
+                            height: 20,
+                            stroke: "none",
+                            id: "canvas_background1",
+                            opacity: 1,
+                            fill: fill || "#fff",
+                            style: "pointer-events:none !important",
+                        },
+                    });*/
+                    /*svgCanvas.setCurrentLayer("Layer 2");
+                    svgCanvas.setCurrentLayerPosition("2");*/
                 };
 
                 // create a new layer background if it doesn't exist

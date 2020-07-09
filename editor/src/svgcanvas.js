@@ -9660,7 +9660,7 @@ $.SvgCanvas = function(container, config) {
         svgroot.setAttribute("width", w);
         svgroot.setAttribute("height", h);
         var bg = $("#canvasBackground")[0];
-        var bg1 = $("#canvasBackground1")[0];
+        var bg1 = $("#canvasBackground1")[0]; //crear cara 1 dela pieza
         var old_x = svgcontent.getAttribute("x");
         var old_y = svgcontent.getAttribute("y");
         var x = w / 2 - (this.contentW * current_zoom) / 2;
@@ -9925,7 +9925,7 @@ $.SvgCanvas = function(container, config) {
                 d: createRoundedCajeadoSide(widthX, heightY, radio, side),
                 id: getNextId(),
                 stroke: "#000",
-                fill: "#333",
+                fill: "#3F3F3F",
                 "stroke-width": "0",
                 nameMecanizado: "cajeado" /*_" + side*/ ,
                 side: side,
@@ -9936,6 +9936,7 @@ $.SvgCanvas = function(container, config) {
                 heightY: heightY,
                 maxWidth: maxWidth,
                 maxHeight: maxHeight,
+                opacity: "1"
             },
         });
 

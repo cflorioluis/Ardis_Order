@@ -511,14 +511,60 @@ var svgedit = svgedit || {};
             element: "svg",
             attr: {
                 id: "canvasBackground1",
-                width: 50,
-                height: 50,
+                width: 0,
+                height: 0,
                 x: 0,
                 y: 0,
                 overflow: svgedit.browser.isWebkit() ? "none" : "visible", // Chrome 7 has a problem with this when zooming out
                 style: "pointer-events:none",
             },
         });
+
+        /* <defs>
+        <pattern id="img1" patternUnits="userSpaceOnUse" width="100" height="100">
+            <image xlink:href="wall.jpg" x="0" y="0" width="100" height="100" />
+        </pattern>
+    </defs>*/
+
+
+
+
+        //cflorioluis - creando imagen de fondo
+        var defsImg = svgFactory_.createSVGElement({
+            element: "defs",
+            attr: {
+
+            },
+        });
+
+        var patternImg = svgFactory_.createSVGElement({
+            element: "pattern",
+            attr: {
+                id: "imgCanvasBackground",
+                patternUnits: "userSpaceOnUse",
+                width: 1106,
+                height: 1106,
+            },
+        });
+
+        var imageImg = svgFactory_.createSVGElement({
+            element: "image",
+            attr: {
+                "xlink:href": "images/texturas/H1887.jpg",
+                x: "0",
+                y: "0",
+                width: 1106,
+                height: 1106
+            },
+        });
+
+        canvasbg1.appendChild(defsImg);
+        defsImg.appendChild(patternImg);
+        patternImg.appendChild(imageImg);
+
+
+
+
 
         var defs1 = svgFactory_.createSVGElement({
             element: "defs",
