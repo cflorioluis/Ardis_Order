@@ -27,6 +27,7 @@
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
                 dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
+                cantos: [0, 1, 0, 1],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -3060,6 +3061,12 @@
                             updateContextPanel();
                             prepPaints();
                             svgCanvas.runExtensions("onNewDocument");
+
+                            //crear divisiones
+                            svgCanvas.createDivs(curConfig.cantos);
+
+                            changeZoomPiece();
+
                         }
                     );
                 };
@@ -5306,265 +5313,7 @@
                     }
                 }
 
-                //cflorioluis - crear divisiones pieza
-                /*svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 1300 + 100,
-                        y: 500 + 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg_1",
-                        "stroke-dasharray": "none",
-                        opacity: "1",
-                    },
-                });*/
 
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 61,
-                        y: 0,
-                        width: 40,
-                        height: curConfig.dimensions[1],
-                        id: "svg__1",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 101,
-                        y: 0,
-                        width: 40,
-                        height: curConfig.dimensions[1],
-                        id: "svg__2",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 0,
-                        y: 61,
-                        width: curConfig.dimensions[0],
-                        height: 40,
-                        id: "svg__3",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 0,
-                        y: curConfig.dimensions[1] - 101,
-                        width: curConfig.dimensions[0],
-                        height: 40,
-                        id: "svg__4",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 0,
-                        y: 0,
-                        width: 100,
-                        height: 100,
-                        id: "svg__5",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 100,
-                        y: 0,
-                        width: 100,
-                        height: 100,
-                        id: "svg__6",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 0,
-                        y: curConfig.dimensions[1] - 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg__7",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 100,
-                        y: curConfig.dimensions[1] - 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg__8",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-
-                //cflorioluis - sombrear en que lado hay canto
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#0f0",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: 100,
-                        y: 4,
-                        width: curConfig.dimensions[0] - 200,
-                        height: 58,
-                        id: "svg__9",
-                        "stroke-dasharray": "none",
-                        opacity: "0.3",
-                        "ignore": true,
-                    },
-                });
-                /*svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 100,
-                        y: curConfig.dimensions[1] - 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg__8",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 100,
-                        y: curConfig.dimensions[1] - 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg__8",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });
-                svgCanvas.addSvgElementFromJson({
-                    element: "rect",
-                    curStyles: true,
-                    attr: {
-                        fill: "#3F3F3F",
-                        stroke: "#000",
-                        "stroke-width": 0,
-                        "stroke-opacity": "null",
-                        "fill-opacity": "null",
-                        x: curConfig.dimensions[0] - 100,
-                        y: curConfig.dimensions[1] - 100,
-                        width: 100,
-                        height: 100,
-                        id: "svg__8",
-                        "stroke-dasharray": "none",
-                        opacity: 1,
-                        "ignore": true,
-                    },
-                });*/
-
-                svgCanvas.undoMgr.resetUndoStack();
                 //      $(function() {
                 updateCanvas(true);
                 //      });
@@ -5636,6 +5385,9 @@
                 $(function() {
                     window.svgCanvas = svgCanvas;
                     svgCanvas.ready = methodDraw.ready;
+
+                    svgCanvas.createDivs(curConfig.cantos); //crear divisiones originales para ver los cantos
+
                 });
 
                 Editor.setLang = function(lang, allStrings) {
