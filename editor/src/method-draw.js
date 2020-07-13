@@ -26,7 +26,7 @@
             var curConfig = {
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
-                dimensions: [1500, 500],
+                dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -106,8 +106,8 @@
                 })();
 
                 $("body").toggleClass("touch", svgedit.browser.isTouch());
-                $("#canvas_width").val(curConfig.dimensions[0]);
-                $("#canvas_height").val(curConfig.dimensions[1]);
+                $("#canvas_width").val(curConfig.dimensions[0] - 200); //cflorioluis ajustar que las opciones de la pieza den la medida real
+                $("#canvas_height").val(curConfig.dimensions[1] - 200);
 
                 //cflorioluis - calcular la cordenada menor de l apieza
                 lowDimension = curConfig.dimensions[1];
@@ -870,9 +870,9 @@
 
 
                     if (curConfig.dimensions[0] > curConfig.dimensions[1]) {
-                        zoomValue = ((w_area.width() / curConfig.dimensions[0]) / 1.5) * 100
+                        zoomValue = ((w_area.width() / curConfig.dimensions[0]) / 1.25) * 100
                     } else {
-                        zoomValue = ((w_area.height() / curConfig.dimensions[1]) / 1.5) * 100
+                        zoomValue = ((w_area.height() / curConfig.dimensions[1]) / 1.25) * 100
                     }
 
                     var zoomlevel = zoomValue / 100;
@@ -1563,16 +1563,16 @@
                     res.h = svgedit.units.convertUnit(res.h) + curConfig.baseUnit;
                 }
 
-                //cflorioluis - Cambiar la funcion para que cree tyodos los fondos de todos los elementos
+                //cflorioluis - Cambiar la funcion para que cree todos los fondos de todos los elementos
                 var createBackground = function(fill) {
                     svgCanvas.createLayer("background");
                     cur_shape = svgCanvas.addSvgElementFromJson({
                         element: "rect",
                         attr: {
-                            x: 0, //-1
-                            y: 0, //-1
-                            width: res.w, //res.w + 2
-                            height: res.h, //res.h + 2
+                            x: 4, //-1
+                            y: 4, //-1
+                            width: res.w - 8, //res.w + 2
+                            height: res.h - 8, //res.h + 2
                             stroke: "none",
                             id: "canvas_background",
                             opacity: 1,
@@ -1590,17 +1590,19 @@
                         attr: {
                             x: 0,
                             y: -50,
-                            width: svgcontent.getAttribute("width"),
+                            width: res.w,
                             height: 20,
                             stroke: "none",
                             id: "canvas_background1",
                             opacity: 1,
-                            fill: fill || "#fff",
-                            style: "pointer-events:none !important",
+                            fill: "url(#imgCanvasBackground)",
+                            style: "pointer-events:none",
                         },
                     });*/
                     /*svgCanvas.setCurrentLayer("Layer 2");
                     svgCanvas.setCurrentLayerPosition("2");*/
+
+                    $()
                 };
 
                 // create a new layer background if it doesn't exist
@@ -2169,6 +2171,8 @@
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
                     var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
+                    var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
+
 
                     /*
                                         if ((parseInt(r) > parseInt(w)) || (parseInt(r) > parseInt(h)) && (parseInt(w) > parseInt(h))) {
@@ -2180,9 +2184,54 @@
                     var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side);
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
 
+                    switch (side) {
+                        case "1":
+                            var line1 = svgCanvas.getElem(id + "_line1");
+                            line1.setAttribute("x1", (parseInt(w) + 100));
+                            line1.setAttribute("x2", (parseInt(w) + 100));
+
+                            var line2 = svgCanvas.getElem(id + "_line2");
+                            line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                            line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                            break;
+                        case "2":
+                            var line1 = svgCanvas.getElem(id + "_line1");
+                            line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                            line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                            var line2 = svgCanvas.getElem(id + "_line2");
+                            line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                            line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                            break;
+                        case "3":
+                            var line1 = svgCanvas.getElem(id + "_line1");
+                            line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                            line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                            var line2 = svgCanvas.getElem(id + "_line2");
+                            line2.setAttribute("y1", (parseInt(h) + 100));
+                            line2.setAttribute("y2", (parseInt(h) + 100));
+                            break;
+                        case "4":
+                            var line1 = svgCanvas.getElem(id + "_line1");
+                            line1.setAttribute("x1", (parseInt(w) + 100));
+                            line1.setAttribute("x2", (parseInt(w) + 100));
+
+                            var line2 = svgCanvas.getElem(id + "_line2");
+                            line2.setAttribute("y1", (parseInt(h) + 100));
+                            line2.setAttribute("y2", (parseInt(h) + 100));
+                            break;
+
+                        default:
+                            break;
+                    }
+
+
+
+
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                     //en caso de ser un cajeado alinear a la esquina correspondiente //cflorioluis
-                    if (svgCanvas.getSelectedElems()[0].getAttribute("nameMecanizado")) {
+                    /*if (svgCanvas.getSelectedElems()[0].getAttribute("nameMecanizado")) {
                         //console.log(svgCanvas.getSelectedElems()[0].getAttribute("side"))
                         switch (svgCanvas.getSelectedElems()[0].getAttribute("side")) {
                             case "1":
@@ -2205,7 +2254,7 @@
                             default:
                                 break;
                         }
-                    }
+                    }*/
                 };
 
                 changeAttribute = function(el, completed) {
@@ -3722,8 +3771,8 @@
                                 res = svgCanvas.getResolution();
                                 background.setAttribute("x", -1);
                                 background.setAttribute("y", -1);
-                                background.setAttribute("width", res.w + 2);
-                                background.setAttribute("height", res.h + 2);
+                                background.setAttribute("width", res.w);
+                                background.setAttribute("height", res.h);
                                 if (fillAttr.indexOf("url") == -1)
                                     background.setAttribute("fill", fillAttr);
                             } else createBackground(fillAttr);
@@ -4599,8 +4648,8 @@
                 });
                 //cflorioluis - ver el tamaño de la pieza pero no editarlo
                 $("#canvas_height").dragInput({
-                    min: 10,
-                    max: null,
+                    min: curConfig.dimensions[1] - 200,
+                    max: curConfig.dimensions[1] - 200,
                     step: 0,
                     //callback: changeCanvasSize,
                     cursor: false,
@@ -4609,8 +4658,8 @@
                 $("#canvas_height").prop("readonly", true);
                 //cflorioluis - ver el tamaño de la pieza pero no editarlo
                 $("#canvas_width").dragInput({
-                    min: 10,
-                    max: null,
+                    min: curConfig.dimensions[0] - 200, //cflorioluis ajustar que las opciones de la pieza den la medida real
+                    max: curConfig.dimensions[0] - 200,
                     step: 0,
                     //callback: changeCanvasSize,
                     cursor: false,
@@ -4773,14 +4822,14 @@
                 //cflorioluis - agregar funciones al cajeado
                 $("#cajeado_widthX").dragInput({
                     min: 1,
-                    max: curConfig.dimensions[0],
+                    max: curConfig.dimensions[0] - 200,
                     step: 1,
                     callback: changeAttributeCajeado,
                     cursor: true,
                 });
                 $("#cajeado_heightY").dragInput({
                     min: 1,
-                    max: curConfig.dimensions[1],
+                    max: curConfig.dimensions[1] - 200,
                     step: 1,
                     callback: changeAttributeCajeado,
                     cursor: true,
@@ -5257,20 +5306,26 @@
                         // Calculate the main number interval
                         var raw_m = 50 / u_multi;
                         var multi = 1;
+
                         for (var i = 0; i < r_intervals.length; i++) {
                             var num = r_intervals[i];
                             multi = num;
+
                             if (raw_m <= num) {
                                 break;
                             }
                         }
 
                         var big_int = multi * u_multi;
+
+
                         ctx.font = "normal 9px 'Lucida Grande', sans-serif";
                         ctx.fillStyle = "#777";
 
                         var ruler_d = ((content_d / u_multi) % multi) * u_multi;
+
                         var label_pos = ruler_d - big_int;
+
                         for (; ruler_d < total_len; ruler_d += big_int) {
                             label_pos += big_int;
                             var real_d = ruler_d - content_d;
@@ -5287,7 +5342,7 @@
                             var num = (label_pos - content_d) / u_multi;
                             var label;
                             if (multi >= 1) {
-                                label = Math.round(num);
+                                label = Math.round(num) - 100; //cflorioluis reducir tamaño de la regla
                             } else {
                                 var decs = (multi + "").split(".")[1].length;
                                 label = num.toFixed(decs) - 0;
@@ -5344,6 +5399,265 @@
                     }
                 }
 
+                //cflorioluis - crear divisiones pieza
+                /*svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 1300 + 100,
+                        y: 500 + 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg_1",
+                        "stroke-dasharray": "none",
+                        opacity: "1",
+                    },
+                });*/
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 61,
+                        y: 0,
+                        width: 40,
+                        height: curConfig.dimensions[1],
+                        id: "svg__1",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 101,
+                        y: 0,
+                        width: 40,
+                        height: curConfig.dimensions[1],
+                        id: "svg__2",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 0,
+                        y: 61,
+                        width: curConfig.dimensions[0],
+                        height: 40,
+                        id: "svg__3",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 0,
+                        y: curConfig.dimensions[1] - 101,
+                        width: curConfig.dimensions[0],
+                        height: 40,
+                        id: "svg__4",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 0,
+                        y: 0,
+                        width: 100,
+                        height: 100,
+                        id: "svg__5",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 100,
+                        y: 0,
+                        width: 100,
+                        height: 100,
+                        id: "svg__6",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 0,
+                        y: curConfig.dimensions[1] - 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg__7",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 100,
+                        y: curConfig.dimensions[1] - 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg__8",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+
+                //cflorioluis - sombrear en que lado hay canto
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#0f0",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: 100,
+                        y: 4,
+                        width: curConfig.dimensions[0] - 200,
+                        height: 58,
+                        id: "svg__9",
+                        "stroke-dasharray": "none",
+                        opacity: "0.3",
+                        "ignore": true,
+                    },
+                });
+                /*svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 100,
+                        y: curConfig.dimensions[1] - 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg__8",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 100,
+                        y: curConfig.dimensions[1] - 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg__8",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });
+                svgCanvas.addSvgElementFromJson({
+                    element: "rect",
+                    curStyles: true,
+                    attr: {
+                        fill: "#3F3F3F",
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        "stroke-opacity": "null",
+                        "fill-opacity": "null",
+                        x: curConfig.dimensions[0] - 100,
+                        y: curConfig.dimensions[1] - 100,
+                        width: 100,
+                        height: 100,
+                        id: "svg__8",
+                        "stroke-dasharray": "none",
+                        opacity: 1,
+                        "ignore": true,
+                    },
+                });*/
+
+                svgCanvas.undoMgr.resetUndoStack();
                 //      $(function() {
                 updateCanvas(true);
                 //      });
@@ -5525,6 +5839,7 @@
                     if (svgCanvas) svgCanvas.addExtension.apply(this, args);
                 });
             };
+
 
 
 

@@ -136,14 +136,16 @@ $.SvgCanvas = function(container, config) {
 
     // This is a container for the document being edited, not the document itself.
     var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svgroot.setAttribute("width", dimensions[0]);
-    svgroot.setAttribute("height", dimensions[1]);
+    svgroot.setAttribute("width", dimensions[0] - 1);
+    svgroot.setAttribute("height", dimensions[1] - 1);
     svgroot.id = "svgroot";
     svgroot.setAttribute("xlinkns", xlinkns);
     container.appendChild(svgroot);
 
     // The actual element that represents the final output SVG element
     var svgcontent = svgdoc.createElementNS(svgns, "svg");
+
+    //var svgcontent1 = svgdoc.createElementNS(svgns, "svg");
 
     // This function resets the svgcontent element while keeping it in the DOM.
     var clearSvgContentElement = (canvas.clearSvgContentElement = function() {
@@ -165,6 +167,22 @@ $.SvgCanvas = function(container, config) {
                 "xmlns:xlink": xlinkns,
             })
             .appendTo(svgroot);
+
+        /*$(svgcontent1)
+            .attr({
+                id: "svgcontent1",
+                width: dimensions[0],
+                height: dimensions[1],
+                x: dimensions[0],
+                y: dimensions[1],
+                overflow: curConfig.show_outside_canvas ? "visible" : "hidden",
+                xmlns: svgns,
+                "xmlns:se": se_ns,
+                "xmlns:xlink": xlinkns,
+            })
+            .appendTo(svgroot);*/
+
+
 
         // TODO: make this string optional and set by the client
         var comment = svgdoc.createComment(
@@ -246,15 +264,19 @@ $.SvgCanvas = function(container, config) {
     // * curStyles - Boolean indicating that current style attributes should be applied first
     //
     // Returns: The new element
-    var addSvgElementFromJson = (this.addSvgElementFromJson = function(data) {
+    var addSvgElementFromJson = (this.addSvgElementFromJson = function(data /*, test*/ ) {
         var shape = svgedit.utilities.getElem(data.attr.id);
+        //console.log(shape);
         // if shape is a path but we need to create a rect/ellipse, then remove the path
         var current_layer = getCurrentDrawing().getCurrentLayer();
         if (shape && data.element != shape.tagName) {
             current_layer.removeChild(shape);
             shape = null;
         }
+
+
         if (!shape) {
+            //console.log(shape);
             shape = svgdoc.createElementNS(svgns, data.element);
             if (current_layer) {
                 (current_group || current_layer).appendChild(shape);
@@ -277,6 +299,11 @@ $.SvgCanvas = function(container, config) {
         }
         svgedit.utilities.assignAttributes(shape, data.attr, 100);
         svgedit.utilities.cleanupElement(shape);
+        console.log(shape);
+
+        /*if (test)
+            svgroot.insertBefore(shape, svgcontent);*/
+
         return shape;
     });
 
@@ -2459,7 +2486,9 @@ $.SvgCanvas = function(container, config) {
             return null;
         }
         var mouse_target = evt.target;
+        console.log(mouse_target);
 
+        //return mouse_target;
         // if it was a <use>, Opera and WebKit return the SVGElementInstance
         if (mouse_target.correspondingUseElement)
             mouse_target = mouse_target.correspondingUseElement;
@@ -2562,6 +2591,8 @@ $.SvgCanvas = function(container, config) {
                 mouse_x = pt.x * current_zoom,
                 mouse_y = pt.y * current_zoom;
 
+
+
             evt.preventDefault();
 
             if (right_click) {
@@ -2573,7 +2604,9 @@ $.SvgCanvas = function(container, config) {
             var y = mouse_y / current_zoom;
             var mouse_target = getMouseTarget(evt);
 
-            //console.log(mouse_target)
+
+
+            console.log(evt)
 
             if (
                 mouse_target.tagName === "a" &&
@@ -2592,6 +2625,10 @@ $.SvgCanvas = function(container, config) {
                 start_x = snapToGrid(start_x);
                 start_y = snapToGrid(start_y);
             }
+
+            /*console.log(mouse_x);
+            console.log(mouse_y);*/
+
 
             // if it is a selector grip, then it must be a single element selected,
             // set the mouse_target to that and update the mode to rotate/resize
@@ -2614,8 +2651,9 @@ $.SvgCanvas = function(container, config) {
                 }
                 mouse_target = selectedElements[0];
             }
-
+            console.log(mouse_target);
             start_transform = mouse_target.getAttribute("transform");
+            console.log(start_transform);
             var tlist = getTransformList(mouse_target);
             //console.log(current_mode + "current_mode")
             switch (current_mode) {
@@ -2626,11 +2664,18 @@ $.SvgCanvas = function(container, config) {
                     break;*/
 
                 case "select":
+                    //cflorioluis - ignorar elementos divisorios
+                    if (mouse_target.getAttribute("ignore"))
+                        return
+
                     started = true;
                     current_resize_mode = "none";
                     if (right_click) started = false;
 
+
                     if (mouse_target != svgroot) {
+                        console.log("svgroot");
+
                         // if this element is not yet selected, clear selection and select it
                         if (selectedElements.indexOf(mouse_target) == -1) {
                             // only clear selection if shift is not pressed (otherwise, add
@@ -2659,6 +2704,8 @@ $.SvgCanvas = function(container, config) {
                             }
                         }
                     } else if (!right_click) {
+                        console.log("else");
+
                         clearSelection();
                         current_mode = "multiselect";
                         if (rubberBox == null) {
@@ -2923,6 +2970,9 @@ $.SvgCanvas = function(container, config) {
                 true
             );
 
+            console.log(selectedElements);
+
+
             $.each(ext_result, function(i, r) {
                 if (r && r.started) {
                     started = true;
@@ -3043,6 +3093,7 @@ $.SvgCanvas = function(container, config) {
                     }
                     break;
                 case "multiselect":
+                    //return;
                     real_x *= current_zoom;
                     real_y *= current_zoom;
                     assignAttributes(
@@ -3075,7 +3126,8 @@ $.SvgCanvas = function(container, config) {
 
                     len = newList.length;
                     for (i = 0; i < len; ++i) {
-                        if (newList[i]) elemsToAdd.push(newList[i]);
+                        //cflorioluis - hacer que el multiselect no seleccione los elementos divisorios
+                        if (newList[i] && !newList[i].getAttribute("ignore")) elemsToAdd.push(newList[i]);
                     }
 
                     if (elemsToRemove.length > 0)
@@ -3167,13 +3219,15 @@ $.SvgCanvas = function(container, config) {
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
 
 
-                    if (!selectedElements[0].getAttribute("nameMecanizado")) {
+                    if (!selected.getAttribute("nameMecanizado")) {
                         scale.setScale(sx, sy);
                     } else {
-                        var widthX = parseInt(selectedElements[0].getAttribute("widthX"));
-                        var maxWidth = parseInt(selectedElements[0].getAttribute("maxWidth"));
-                        var heightY = parseInt(selectedElements[0].getAttribute("heightY"));
-                        var maxHeight = parseInt(selectedElements[0].getAttribute("maxHeight"));
+                        var widthX = parseInt(selected.getAttribute("widthX"));
+                        var maxWidth = parseInt(selected.getAttribute("maxWidth"));
+                        var heightY = parseInt(selected.getAttribute("heightY"));
+                        var maxHeight = parseInt(selected.getAttribute("maxHeight"));
+                        var side = selected.getAttribute("side");
+                        var id = selected.id;
 
                         if (widthX * sx < maxWidth && heightY * sy < maxHeight) {
                             scale.setScale(sx, sy);
@@ -3188,8 +3242,54 @@ $.SvgCanvas = function(container, config) {
                             sy = maxHeight / heightY;
                             scale.setScale(sx, sy);
                         }
-                        selectedElements[0].setAttribute("tempWidth", (sx * widthX).toString());
-                        selectedElements[0].setAttribute("tempHeight", (sy * heightY).toString());
+                        selected.setAttribute("tempWidth", (sx * widthX).toString());
+                        selected.setAttribute("tempHeight", (sy * heightY).toString());
+
+
+                        var tempWidth = selected.getAttribute("tempWidth");
+                        var tempHeight = selected.getAttribute("tempHeight");
+
+                        switch (side) {
+                            case "1":
+                                var line1 = svgCanvas.getElem(id + "_line1");
+                                line1.setAttribute("x1", (parseInt(tempWidth) + 100));
+                                line1.setAttribute("x2", (parseInt(tempWidth) + 100));
+
+                                var line2 = svgCanvas.getElem(id + "_line2");
+                                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
+                                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
+                                break;
+                            case "2":
+                                var line1 = svgCanvas.getElem(id + "_line1");
+                                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
+                                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
+
+                                var line2 = svgCanvas.getElem(id + "_line2");
+                                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
+                                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
+                                break;
+                            case "3":
+                                var line1 = svgCanvas.getElem(id + "_line1");
+                                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
+                                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
+
+                                var line2 = svgCanvas.getElem(id + "_line2");
+                                line2.setAttribute("y1", (parseInt(tempHeight) + 100));
+                                line2.setAttribute("y2", (parseInt(tempHeight) + 100));
+                                break;
+                            case "4":
+                                var line1 = svgCanvas.getElem(id + "_line1");
+                                line1.setAttribute("x1", (parseInt(tempWidth) + 100));
+                                line1.setAttribute("x2", (parseInt(tempWidth) + 100));
+
+                                var line2 = svgCanvas.getElem(id + "_line2");
+                                line2.setAttribute("y1", (parseInt(tempHeight) + 100));
+                                line2.setAttribute("y2", (parseInt(tempHeight) + 100));
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
 
 
@@ -7586,8 +7686,8 @@ $.SvgCanvas = function(container, config) {
             if (background) {
                 background.setAttribute("x", -1);
                 background.setAttribute("y", -1);
-                background.setAttribute("width", x + 2);
-                background.setAttribute("height", y + 2);
+                background.setAttribute("width", x - 2);
+                background.setAttribute("height", y - 2);
             }
             call("changed", [svgcontent]);
         }
@@ -8883,6 +8983,7 @@ $.SvgCanvas = function(container, config) {
         var len = selectedElements.length;
         var selectedCopy = []; //selectedElements is being deleted
         for (var i = 0; i < len; ++i) {
+
             var selected = selectedElements[i];
             if (selected == null) break;
 
@@ -8908,10 +9009,20 @@ $.SvgCanvas = function(container, config) {
             batchCmd.addSubCommand(
                 new RemoveElementCommand(elem, nextSibling, parent)
             );
+
+            //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
+            if (selected.getAttribute("nameMecanizado") == "cajeado") {
+                getElem(selected.getAttribute("id") + "_line")
+                deleteSelectedElements();
+            }
+
         }
         if (!batchCmd.isEmpty()) addCommandToHistory(batchCmd);
         call("changed", selectedCopy);
         clearSelection();
+
+
+
     };
 
     // Function: cutSelectedElements
@@ -9667,29 +9778,76 @@ $.SvgCanvas = function(container, config) {
         var y = h / 2 - (this.contentH * current_zoom) / 2;
 
         assignAttributes(svgcontent, {
-            width: this.contentW * current_zoom,
-            height: this.contentH * current_zoom,
+            width: (this.contentW * current_zoom),
+            height: (this.contentH * current_zoom),
             x: x,
             y: y,
-            viewBox: "0 0 " + this.contentW + " " + this.contentH,
+            viewBox: "0 0 " + (this.contentW) + " " + (this.contentH),
         });
 
-        assignAttributes(bg, {
-            width: svgcontent.getAttribute("width"),
-            height: svgcontent.getAttribute("height"),
-            x: x,
-            y: y,
-        });
-
-        console.log("updatecanvas");
-
-
-        assignAttributes(bg1, {
+        /*assignAttributes(svgcontent1, {
             width: svgcontent.getAttribute("width"),
             height: 20,
             x: x,
             y: y - 50,
+            viewBox: "0 0 " + this.contentW + " " + this.contentH,
+        });*/
+
+
+
+        assignAttributes(bg, {
+            width: parseFloat(svgcontent.getAttribute("width")),
+            height: parseFloat(svgcontent.getAttribute("height")),
+            x: x,
+            y: y,
         });
+        /*
+                assignAttributes(bg, {
+                    width: 100,
+                    height: 100,
+                    x: 0,
+                    y: 0,
+                });*/
+
+        /*var svgContent1 = $("#svgcontent")[0];
+        assignAttributes(svgContent1, {
+            width: "100%",
+            height: "100%",
+            x: 0,
+            y: 0,
+        });*/
+        console.log("updatecanvas");
+
+        //cflorioluis - actualizar todos loa mecanizados fuera de la pieza
+        /* for (let index = 0; index < $('path[nameMecanizado]').size(); index++) {
+             var mec = $('path[nameMecanizado]')[index];
+
+             console.log($('path[nameMecanizado]')[index]);
+
+             assignAttributes(mec, {
+                 d: createRoundedCajeadoSide(svgcontent.getAttribute("width"), svgcontent.getAttribute("height"), mec.getAttribute("radio"), mec.getAttribute("side")),
+             });
+
+         }*/
+
+
+        /*assignAttributes(bg1, {
+            width: svgcontent.getAttribute("width"),
+            height: 20,
+            x: x,
+            y: y - 50,
+        });*/
+        /* assignAttributes(bg1, {
+             width: svgcontent.getAttribute("width"),
+             height: svgcontent.getAttribute("width"),
+             x: x,
+             y: y - 50,
+         });*/
+
+
+
+
+
 
         var bg_img = getElem("background_image");
         if (bg_img) {
@@ -9703,6 +9861,8 @@ $.SvgCanvas = function(container, config) {
             "transform",
             "translate(" + x + "," + y + ")"
         );
+
+
 
         return {
             x: x,
@@ -9860,29 +10020,29 @@ $.SvgCanvas = function(container, config) {
     var createRoundedCajeadoSide = (this.createRoundedCajeadoSide = function(widthX, heightY, radio, side) {
         switch (side) {
             case "1":
-                return "M" + "0" + "," + (dimensions[1] - heightY) +
+                return "M" + "100" + "," + (dimensions[1] - heightY - 100) +
                     " h" + (widthX - radio) +
                     " a" + radio + "," + radio + " 0 0 1 " + radio + "," + radio +
                     " v" + (heightY - radio) +
                     " h-" + widthX +
                     " z"
             case "2":
-                return "M" + (dimensions[0] - widthX) + "," + (dimensions[1] - (heightY - radio)) +
+                return "M" + (dimensions[0] - widthX - 100) + "," + (dimensions[1] - (heightY - radio) - 100) +
                     " a" + radio + "," + radio + " 0 0 1 " + radio + ",-" + radio +
                     " h" + (widthX - radio) +
                     " v" + heightY +
                     " h-" + widthX +
                     " z"
             case "3":
-                return "M" + (dimensions[0] - widthX) + ", 0" +
+                return "M" + (dimensions[0] - widthX - 100) + ", 100" +
                     " h" + widthX +
                     " v" + heightY +
                     " h" + (radio - widthX) +
                     " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + -radio +
                     " z"
             case "4":
-                return "M" + radio + ",0" +
-                    " h" + (widthX - radio) +
+                return "M" + (parseInt(radio) + 100) + ",100" +
+                    " h" + (parseInt(widthX - radio)) +
                     " v" + (heightY - radio) +
                     " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + radio +
                     " h" + (radio - widthX) +
@@ -9894,31 +10054,176 @@ $.SvgCanvas = function(container, config) {
 
     });
 
-    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio) {
-        var cajeadoX1, cajeadoY1;
+    var createLineCajeado = (this.createLineCajeado = function(side, widthX, heightY, id) {
+
+        //crear linea que se vera en el canto
         switch (side) {
             case "1":
-                cajeadoX1 = 0;
-                cajeadoY1 = dimensions[1] - heightY;
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: (parseInt(widthX) + 100),
+                        y1: (curConfig.dimensions[1] - 62),
+                        x2: (parseInt(widthX) + 100),
+                        y2: (curConfig.dimensions[1] - 2),
+                        id: id + "_line1",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
+
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: 2,
+                        y1: (curConfig.dimensions[1] - 100 - heightY),
+                        x2: 62,
+                        y2: (curConfig.dimensions[1] - 100 - heightY),
+                        id: id + "_line2",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
                 break;
             case "2":
-                cajeadoX1 = dimensions[0] - widthX;
-                cajeadoY1 = dimensions[1] - heightY;
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: (curConfig.dimensions[0] - 100 - widthX),
+                        y1: (curConfig.dimensions[1] - 62),
+                        x2: (curConfig.dimensions[0] - 100 - widthX),
+                        y2: (curConfig.dimensions[1] - 2),
+                        id: id + "_line1",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
+
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: curConfig.dimensions[0] - 62,
+                        y1: (curConfig.dimensions[1] - 100 - heightY),
+                        x2: curConfig.dimensions[0] - 2,
+                        y2: (curConfig.dimensions[1] - 100 - heightY),
+                        id: id + "_line2",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
                 break;
             case "3":
-                cajeadoX1 = dimensions[0] - widthX;
-                cajeadoY1 = 0;
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: (curConfig.dimensions[0] - 100 - widthX),
+                        y1: 4,
+                        x2: (curConfig.dimensions[0] - 100 - widthX),
+                        y2: 62,
+                        id: id + "_line1",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
+
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: curConfig.dimensions[0] - 62,
+                        y1: (parseInt(heightY) + 100),
+                        x2: curConfig.dimensions[0] - 2,
+                        y2: (parseInt(heightY) + 100),
+                        id: id + "_line2",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
                 break;
             case "4":
-                cajeadoX1 = 0;
-                cajeadoY1 = 0;
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: (parseInt(widthX) + 100),
+                        y1: 4,
+                        x2: (parseInt(widthX) + 100),
+                        y2: 62,
+                        id: id + "_line1",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
+
+                var lineCajeadoCreated = addSvgElementFromJson({
+                    element: "line",
+                    curStyles: true,
+                    attr: {
+                        fill: "none",
+                        stroke: "#000",
+                        "stroke-width": "2",
+                        style: "pointer-events:inherit",
+                        x1: 2,
+                        y1: (parseInt(heightY) + 100),
+                        x2: 62,
+                        y2: (parseInt(heightY) + 100),
+                        id: id + "_line2",
+                        "stroke-linejoin": "undefined",
+                        "stroke-linecap": "undefined",
+                        "stroke-dasharray": "none",
+                    },
+                });
                 break;
 
             default:
                 break;
         }
 
-        addSvgElementFromJson({
+        //cajeadoCreated.appendChild(lineCajeadoCreated);
+    });
+
+    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio) {
+        var cajeadoCreated = addSvgElementFromJson({
             element: "path",
             curStyles: true,
             attr: {
@@ -9934,11 +10239,13 @@ $.SvgCanvas = function(container, config) {
                 tempHeight: heightY,
                 widthX: widthX,
                 heightY: heightY,
-                maxWidth: maxWidth,
-                maxHeight: maxHeight,
+                maxWidth: maxWidth - 200,
+                maxHeight: maxHeight - 200,
                 opacity: "1"
             },
         });
+
+        createLineCajeado(side, widthX, heightY, cajeadoCreated.id);
 
         this.setMode("select");
         selectOnly([getElem(getId())], true);
@@ -9946,21 +10253,13 @@ $.SvgCanvas = function(container, config) {
     });
 
     var editCajeado = (this.editCajeado = function(attrName, attrValue) {
-        /*var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
-        console.log(attrValue);*/
-
-        //if (element) {
-        //selectOnly([getElem(element)], true);
-        if (!selectedElements[0]) {
-            return;
-        }
+        if (!selectedElements[0]) return;
 
         var w, h, r, d, side;
         w = selectedElements[0].getAttribute("widthX");
         h = selectedElements[0].getAttribute("heightY");
         r = selectedElements[0].getAttribute("radio");
         side = selectedElements[0].getAttribute("side");
-        //console.log(w + " " + h + " " + r + " " + side);
         switch (attrName) {
             case "newWidthX":
                 w = attrValue
@@ -9974,7 +10273,7 @@ $.SvgCanvas = function(container, config) {
         }
         console.log(w + " " + h + " " + r + " " + side + " " + selectedElements[0].getAttribute("id"));
 
-        svgCanvas.deleteSelectedElements();
+        //svgCanvas.deleteSelectedElements();
 
         svgCanvas.cajeado(
             side,
@@ -9984,11 +10283,6 @@ $.SvgCanvas = function(container, config) {
             curConfig.dimensions[1],
             r
         );
-        //d = createRoundedCajeadoSide(w, h, r, side);
-        //console.log(d);
-        //selectedElements[0].setAttribute("d", d);
-        //changeSelectedAttribute(attr, attrValue, selectedElements[0]);
-        //}
     });
 
 

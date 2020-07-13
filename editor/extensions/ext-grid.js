@@ -37,6 +37,7 @@ methodDraw.addExtension("view_grid", function(s) {
         });
 
         var canvBG = $('#canvas_background');
+
         canvBG.after(canvasgrid);
 
 

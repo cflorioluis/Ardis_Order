@@ -452,7 +452,7 @@ var svgedit = svgedit || {};
                 y: 0,
                 width: 10,
                 height: 10,
-                fill: "#fff",
+                fill: "#3f3f3f",
             },
         });
 
@@ -463,7 +463,7 @@ var svgedit = svgedit || {};
                 y: 0,
                 width: 5,
                 height: 5,
-                fill: "#eee",
+                fill: "#3f3f3f",
             },
         });
 
@@ -474,19 +474,20 @@ var svgedit = svgedit || {};
                 y: 5,
                 width: 5,
                 height: 5,
-                fill: "#eee",
+                fill: "#3f3f3f",
             },
         });
 
+        //cflorioluis - quitar linea borde
         var rect = svgFactory_.createSVGElement({
             element: "rect",
             attr: {
-                width: "100%",
-                height: "100%",
+                width: dims[0],
+                height: dims[1],
                 x: 0,
                 y: 0,
                 "stroke-width": 1,
-                stroke: "#000",
+                stroke: "#3f3f3f",
                 fill: "url(#checkerPattern)",
                 style: "pointer-events:none",
             },
@@ -501,32 +502,6 @@ var svgedit = svgedit || {};
         pattern.appendChild(pattern_square1);
         pattern.appendChild(pattern_square2);
         canvasbg.appendChild(rect);
-
-        svgFactory_.svgRoot().insertBefore(canvasbg, svgFactory_.svgContent());
-
-        /*console.log(dims[0]);
-        console.log(dims[1]);*/
-        //cflorioluis - Crear las caras de la pieza
-        var canvasbg1 = svgFactory_.createSVGElement({
-            element: "svg",
-            attr: {
-                id: "canvasBackground1",
-                width: 0,
-                height: 0,
-                x: 0,
-                y: 0,
-                overflow: svgedit.browser.isWebkit() ? "none" : "visible", // Chrome 7 has a problem with this when zooming out
-                style: "pointer-events:none",
-            },
-        });
-
-        /* <defs>
-        <pattern id="img1" patternUnits="userSpaceOnUse" width="100" height="100">
-            <image xlink:href="wall.jpg" x="0" y="0" width="100" height="100" />
-        </pattern>
-    </defs>*/
-
-
 
 
         //cflorioluis - creando imagen de fondo
@@ -554,17 +529,210 @@ var svgedit = svgedit || {};
                 x: "0",
                 y: "0",
                 width: 1106,
-                height: 1106
+                height: 1106,
+                "stroke-width": 2,
+                "stroke-color": "#3f3f3f",
+
+
             },
         });
 
-        canvasbg1.appendChild(defsImg);
+        canvasbg.appendChild(defsImg);
         defsImg.appendChild(patternImg);
         patternImg.appendChild(imageImg);
 
 
 
+        /*console.log(dims[0]);
+        console.log(dims[1]);*/
+        //cflorioluis - Crear las caras de la pieza
+        var canvasbg1 = svgFactory_.createSVGElement({
+            element: "svg",
+            attr: {
+                id: "canvasBackground1",
+                width: 0,
+                height: 0,
+                x: 0,
+                y: 0,
+                overflow: svgedit.browser.isWebkit() ? "none" : "visible", // Chrome 7 has a problem with this when zooming out
+                style: "pointer-events:none",
+            },
+        });
 
+        var defs1 = svgFactory_.createSVGElement({
+            element: "defs",
+            attr: {
+                id: "placeholder_defs1",
+            },
+        });
+
+        var pattern1 = svgFactory_.createSVGElement({
+            element: "pattern",
+            attr: {
+                id: "checkerPattern1",
+                patternUnits: "userSpaceOnUse",
+                x: 0,
+                y: 0,
+                width: 20,
+                height: 20,
+                viewBox: "0 0 10 10",
+            },
+        });
+        var pattern_bg1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 0,
+                y: 0,
+                width: 10,
+                height: 10,
+                fill: "#fff",
+            },
+        });
+
+        var pattern_square1_1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 0,
+                y: 0,
+                width: 5,
+                height: 5,
+                fill: "#eee",
+            },
+        });
+
+        var pattern_square2_1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                x: 5,
+                y: 5,
+                width: 5,
+                height: 5,
+                fill: "#eee",
+            },
+        });
+
+        var rect1 = svgFactory_.createSVGElement({
+            element: "rect",
+            attr: {
+                width: dims[0],
+                height: 20,
+                x: 0,
+                y: 0,
+                "stroke-width": 1,
+                stroke: "#000",
+                fill: "#0F0",
+                style: "pointer-events:none",
+            },
+
+        });
+
+
+        canvasbg1.appendChild(defs1);
+        defs1.appendChild(pattern1);
+        pattern1.appendChild(pattern_bg1);
+        pattern1.appendChild(pattern_square1_1);
+        pattern1.appendChild(pattern_square2_1);
+        canvasbg1.appendChild(rect1);
+
+
+        svgFactory_.svgRoot().insertBefore(canvasbg, svgFactory_.svgContent());
+        svgFactory_.svgRoot().insertBefore(canvasbg1, svgFactory_.svgContent());
+        /*var g = svgFactory_.createSVGElement({
+            element: "g",
+            attr: {
+                style: "pointer-events:all",
+            },
+        });
+
+        var test = svgFactory_.createSVGElement({
+            element: "rect",
+            curStyles: true,
+            attr: {
+                fill: "#fff",
+                stroke: "#000",
+                "stroke-width": "1.5",
+                x: "-213.11441784797967",
+                y: "43.03287325734175",
+                width: "75.40981342959137",
+                height: "67.21309457854886",
+                id: "svg_100",
+                "stroke-dasharray": "none",
+            },
+        });
+
+        g.appendChild(test);*/
+
+        /*var test = svgFactory_.createSVGElement({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: "M150,150 h56 v40 a150,150 0 0 1 -150,150 h-56 v-190 z",
+                id: "svg_100",
+                stroke: "#000",
+                fill: "#4B252D",
+                "stroke-width": "0",
+                "stroke-opacity": "null",
+                "stroke-dasharray": "none",
+                nameMecanizado: "cajeado",
+                side: "4",
+                radio: "150",
+                tempWidth: "206.89655172413796",
+                tempHeight: "190.3448275862069",
+                widthX: 206,
+                heightY: 190,
+                maxWidth: 1500,
+                maxHeight: 500,
+                opacity: "1"
+            },
+        });*/
+
+        /*var test1 = svgFactory_.createSVGElement({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: "M15,15 h56 v40 a150,150 0 0 1 -150,150 h-56 v-190 z",
+                id: "svg_101",
+                stroke: "#000",
+                fill: "#4B252D",
+                "stroke-width": "0",
+                "stroke-opacity": "null",
+                "stroke-dasharray": "none",
+                nameMecanizado: "cajeado",
+                side: "4",
+                radio: "150",
+                tempWidth: "206.89655172413796",
+                tempHeight: "190.3448275862069",
+                widthX: 206,
+                heightY: 190,
+                maxWidth: 1500,
+                maxHeight: 500,
+                opacity: "1"
+            },
+        });*/
+
+        //crear elemento fuera del workarea
+
+
+
+        //svgFactory_.svgRoot().insertBefore(g, svgFactory_.svgContent());
+        //svgFactory_.svgRoot().insertBefore(test1, svgFactory_.svgContent());
+
+
+
+
+        //cflorioluis - crear canto 2
+        /*var canvasbg2 = svgFactory_.createSVGElement({
+            element: "svg",
+            attr: {
+                id: "canvasBackground1",
+                width: 0,
+                height: 0,
+                x: 0,
+                y: 0,
+                overflow: svgedit.browser.isWebkit() ? "none" : "visible", // Chrome 7 has a problem with this when zooming out
+                style: "pointer-events:none",
+            },
+        });
 
         var defs1 = svgFactory_.createSVGElement({
             element: "defs",
@@ -627,7 +795,7 @@ var svgedit = svgedit || {};
                 y: 0,
                 "stroke-width": 1,
                 stroke: "#000",
-                fill: "url(#checkerPattern)",
+                fill: "#0F0",
                 style: "pointer-events:none",
             },
 
@@ -642,7 +810,7 @@ var svgedit = svgedit || {};
         canvasbg1.appendChild(rect1);
 
 
-        svgFactory_.svgRoot().insertBefore(canvasbg1, svgFactory_.svgContent());
+        svgFactory_.svgRoot().insertBefore(canvasbg1, svgFactory_.svgContent());*/
     };
 
     // Function: svgedit.select.SelectorManager.requestSelector
