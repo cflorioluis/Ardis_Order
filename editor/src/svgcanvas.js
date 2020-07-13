@@ -299,7 +299,7 @@ $.SvgCanvas = function(container, config) {
         }
         svgedit.utilities.assignAttributes(shape, data.attr, 100);
         svgedit.utilities.cleanupElement(shape);
-        console.log(shape);
+        //console.log(shape);
 
         /*if (test)
             svgroot.insertBefore(shape, svgcontent);*/
@@ -2486,7 +2486,7 @@ $.SvgCanvas = function(container, config) {
             return null;
         }
         var mouse_target = evt.target;
-        console.log(mouse_target);
+        //console.log(mouse_target);
 
         //return mouse_target;
         // if it was a <use>, Opera and WebKit return the SVGElementInstance
@@ -2606,7 +2606,7 @@ $.SvgCanvas = function(container, config) {
 
 
 
-            console.log(evt)
+            //console.log(evt)
 
             if (
                 mouse_target.tagName === "a" &&
@@ -2651,9 +2651,9 @@ $.SvgCanvas = function(container, config) {
                 }
                 mouse_target = selectedElements[0];
             }
-            console.log(mouse_target);
+            //console.log(mouse_target);
             start_transform = mouse_target.getAttribute("transform");
-            console.log(start_transform);
+            //console.log(start_transform);
             var tlist = getTransformList(mouse_target);
             //console.log(current_mode + "current_mode")
             switch (current_mode) {
@@ -2704,7 +2704,7 @@ $.SvgCanvas = function(container, config) {
                             }
                         }
                     } else if (!right_click) {
-                        console.log("else");
+                        //console.log("else");
 
                         clearSelection();
                         current_mode = "multiselect";
@@ -2970,7 +2970,7 @@ $.SvgCanvas = function(container, config) {
                 true
             );
 
-            console.log(selectedElements);
+            //console.log(selectedElements);
 
 
             $.each(ext_result, function(i, r) {
@@ -3242,54 +3242,14 @@ $.SvgCanvas = function(container, config) {
                             sy = maxHeight / heightY;
                             scale.setScale(sx, sy);
                         }
-                        selected.setAttribute("tempWidth", (sx * widthX).toString());
-                        selected.setAttribute("tempHeight", (sy * heightY).toString());
+                        selected.setAttribute("tempWidth", Math.floor(sx * widthX));
+                        selected.setAttribute("tempHeight", Math.floor(sy * heightY));
 
 
                         var tempWidth = selected.getAttribute("tempWidth");
                         var tempHeight = selected.getAttribute("tempHeight");
 
-                        switch (side) {
-                            case "1":
-                                var line1 = svgCanvas.getElem(id + "_line1");
-                                line1.setAttribute("x1", (parseInt(tempWidth) + 100));
-                                line1.setAttribute("x2", (parseInt(tempWidth) + 100));
-
-                                var line2 = svgCanvas.getElem(id + "_line2");
-                                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
-                                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
-                                break;
-                            case "2":
-                                var line1 = svgCanvas.getElem(id + "_line1");
-                                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
-                                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
-
-                                var line2 = svgCanvas.getElem(id + "_line2");
-                                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
-                                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(tempHeight)));
-                                break;
-                            case "3":
-                                var line1 = svgCanvas.getElem(id + "_line1");
-                                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
-                                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(tempWidth)));
-
-                                var line2 = svgCanvas.getElem(id + "_line2");
-                                line2.setAttribute("y1", (parseInt(tempHeight) + 100));
-                                line2.setAttribute("y2", (parseInt(tempHeight) + 100));
-                                break;
-                            case "4":
-                                var line1 = svgCanvas.getElem(id + "_line1");
-                                line1.setAttribute("x1", (parseInt(tempWidth) + 100));
-                                line1.setAttribute("x2", (parseInt(tempWidth) + 100));
-
-                                var line2 = svgCanvas.getElem(id + "_line2");
-                                line2.setAttribute("y1", (parseInt(tempHeight) + 100));
-                                line2.setAttribute("y2", (parseInt(tempHeight) + 100));
-                                break;
-
-                            default:
-                                break;
-                        }
+                        editLinesCantoCajeado(side, tempWidth, tempHeight, id);
                     }
 
 
@@ -9012,8 +8972,8 @@ $.SvgCanvas = function(container, config) {
 
             //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
             if (selected.getAttribute("nameMecanizado") == "cajeado") {
-                getElem(selected.getAttribute("id") + "_line")
-                deleteSelectedElements();
+                getElem(selected.id + "_line1").remove()
+                getElem(selected.id + "_line2").remove()
             }
 
         }
@@ -9816,7 +9776,7 @@ $.SvgCanvas = function(container, config) {
             x: 0,
             y: 0,
         });*/
-        console.log("updatecanvas");
+        //console.log("updatecanvas");
 
         //cflorioluis - actualizar todos loa mecanizados fuera de la pieza
         /* for (let index = 0; index < $('path[nameMecanizado]').size(); index++) {
@@ -10075,6 +10035,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
 
@@ -10094,6 +10055,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
                 break;
@@ -10114,6 +10076,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
 
@@ -10133,6 +10096,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
                 break;
@@ -10153,6 +10117,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
 
@@ -10172,6 +10137,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
                 break;
@@ -10192,6 +10158,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
 
@@ -10211,6 +10178,7 @@ $.SvgCanvas = function(container, config) {
                         "stroke-linejoin": "undefined",
                         "stroke-linecap": "undefined",
                         "stroke-dasharray": "none",
+                        "ignore": true,
                     },
                 });
                 break;
@@ -10252,6 +10220,50 @@ $.SvgCanvas = function(container, config) {
 
     });
 
+    var editLinesCantoCajeado = (this.editLinesCantoCajeado = function(side, w, h, id) {
+        switch (side) {
+            case "1":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (parseInt(w) + 100));
+                line1.setAttribute("x2", (parseInt(w) + 100));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                break;
+            case "2":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                break;
+            case "3":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (parseInt(h) + 100));
+                line2.setAttribute("y2", (parseInt(h) + 100));
+                break;
+            case "4":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (parseInt(w) + 100));
+                line1.setAttribute("x2", (parseInt(w) + 100));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (parseInt(h) + 100));
+                line2.setAttribute("y2", (parseInt(h) + 100));
+                break;
+
+            default:
+                break;
+        }
+    });
+
     var editCajeado = (this.editCajeado = function(attrName, attrValue) {
         if (!selectedElements[0]) return;
 
@@ -10262,19 +10274,29 @@ $.SvgCanvas = function(container, config) {
         side = selectedElements[0].getAttribute("side");
         switch (attrName) {
             case "newWidthX":
-                w = attrValue
+                w = attrValue;
+                selectedElements[0].setAttribute("widthX", w);
+                $("#newWidthCajeado").val(w);
                 break;
             case "newHeightY":
-                h = attrValue
+                h = attrValue;
+                selectedElements[0].setAttribute("heightY", h);
+                $("#newHeightCajeado").val(h);
                 break;
             case "radio":
-                r = attrValue
+                r = attrValue;
+                selectedElements[0].setAttribute("radio", radio);
+                $("#newRadioCajeado").val(radio);
                 break;
         }
-        console.log(w + " " + h + " " + r + " " + side + " " + selectedElements[0].getAttribute("id"));
+        d = createRoundedCajeadoSide(w, h, r, side);
+        selectedElements[0].setAttribute("d", d);
 
-        //svgCanvas.deleteSelectedElements();
+        selectorManager.requestSelector(selectedElements[0]).resize();
+        var id = selectedElements[0].id;
+        editLinesCantoCajeado(side, w, h, id);
 
+        /*svgCanvas.deleteSelectedElements();
         svgCanvas.cajeado(
             side,
             w,
@@ -10282,7 +10304,7 @@ $.SvgCanvas = function(container, config) {
             curConfig.dimensions[0],
             curConfig.dimensions[1],
             r
-        );
+        );*/
     });
 
 
@@ -10313,7 +10335,6 @@ $.SvgCanvas = function(container, config) {
             widthX = elem.getAttribute("widthX"),
             heigthY = elem.getAttribute("heightY"),
             radio = elem.getAttribute("radio");
-
 
         //dimension mas pequeña para limitar el radio
         var radioLimit = Math.min(curConfig.dimensions[0], curConfig.dimensions[1]);
@@ -10489,15 +10510,41 @@ $.SvgCanvas = function(container, config) {
                 heigthY = $("#newHeightCajeado").val();
                 radio = $("#newRadioCajeado").val();
 
-                svgCanvas.deleteSelectedElements();
-                svgCanvas.cajeado(
-                    side,
-                    widthX,
-                    heigthY,
-                    curConfig.dimensions[0],
-                    curConfig.dimensions[1],
-                    radio
-                );
+                if (selectedElements[0] == null) {
+                    svgCanvas.cajeado(
+                        side,
+                        widthX,
+                        heigthY,
+                        curConfig.dimensions[0],
+                        curConfig.dimensions[1],
+                        radio
+                    );
+                } else {
+                    var d = createRoundedCajeadoSide(widthX, heigthY, radio, side);
+                    selectedElements[0].setAttribute("d", d);
+                    var id = selectedElements[0].id,
+                        w = widthX,
+                        h = heigthY;
+
+                    /*tempWidth = parseInt(selectedElements[0].getAttribute("tempWidth")),
+                        tempHeight = parseInt(selectedElements[0].getAttribute("tempHeight"));
+
+                    selectedElements[0].setAttribute("widthX", tempWidth);
+                    selectedElements[0].setAttribute("heightY", tempHeight);*/
+
+
+                    editLinesCantoCajeado(side, w, h, id);
+                    selectorManager.requestSelector(selectedElements[0]).resize();
+                }
+                /*svgCanvas.deleteSelectedElements();
+                 svgCanvas.cajeado(
+                        side,
+                        widthX,
+                        heigthY,
+                        curConfig.dimensions[0],
+                        curConfig.dimensions[1],
+                        radio
+                    );*/
             },
             350,
             340,

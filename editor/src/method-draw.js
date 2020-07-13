@@ -893,7 +893,7 @@
                         },
                         true
                     );
-                    console.log("w_area[0].scrollLeft");
+                    /*console.log("w_area[0].scrollLeft");
                     console.log(w_area[0].scrollLeft);
                     console.log("w_area[0].scrollTop");
                     console.log(w_area[0].scrollTop);
@@ -903,7 +903,7 @@
                     console.log(w_area.height());
 
                     console.log("zoom");
-                    console.log(zoom);
+                    console.log(zoom);*/
 
                 };
 
@@ -2154,18 +2154,6 @@
                         el.value = selectedElement.getAttribute(attr);
                         return false;
                     }
-                    /*console.log("attr");
-                    console.log(attr);
-                    console.log("multiplier");
-                    console.log(multiplier);
-                    console.log("el");
-                    console.log(el);
-                    console.log("completed");
-                    console.log(completed);
-
-                    console.log("val");
-                    console.log(val);*/
-
 
                     var side = svgCanvas.getSelectedElems()[0].getAttribute("side");
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
@@ -2173,88 +2161,12 @@
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
                     var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
 
-
-                    /*
-                                        if ((parseInt(r) > parseInt(w)) || (parseInt(r) > parseInt(h)) && (parseInt(w) > parseInt(h))) {
-                                            r = w;
-                                        } else {
-                                            r = h;
-                                        }*/
-
                     var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side);
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
+                    svgCanvas.editLinesCantoCajeado(side, w, h, id);
 
-                    switch (side) {
-                        case "1":
-                            var line1 = svgCanvas.getElem(id + "_line1");
-                            line1.setAttribute("x1", (parseInt(w) + 100));
-                            line1.setAttribute("x2", (parseInt(w) + 100));
-
-                            var line2 = svgCanvas.getElem(id + "_line2");
-                            line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                            line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                            break;
-                        case "2":
-                            var line1 = svgCanvas.getElem(id + "_line1");
-                            line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
-                            line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
-
-                            var line2 = svgCanvas.getElem(id + "_line2");
-                            line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                            line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                            break;
-                        case "3":
-                            var line1 = svgCanvas.getElem(id + "_line1");
-                            line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
-                            line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
-
-                            var line2 = svgCanvas.getElem(id + "_line2");
-                            line2.setAttribute("y1", (parseInt(h) + 100));
-                            line2.setAttribute("y2", (parseInt(h) + 100));
-                            break;
-                        case "4":
-                            var line1 = svgCanvas.getElem(id + "_line1");
-                            line1.setAttribute("x1", (parseInt(w) + 100));
-                            line1.setAttribute("x2", (parseInt(w) + 100));
-
-                            var line2 = svgCanvas.getElem(id + "_line2");
-                            line2.setAttribute("y1", (parseInt(h) + 100));
-                            line2.setAttribute("y2", (parseInt(h) + 100));
-                            break;
-
-                        default:
-                            break;
-                    }
-
-
-
-
+                    svgCanvas.selectorManager.requestSelector(selectedElement).resize();
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
-                    //en caso de ser un cajeado alinear a la esquina correspondiente //cflorioluis
-                    /*if (svgCanvas.getSelectedElems()[0].getAttribute("nameMecanizado")) {
-                        //console.log(svgCanvas.getSelectedElems()[0].getAttribute("side"))
-                        switch (svgCanvas.getSelectedElems()[0].getAttribute("side")) {
-                            case "1":
-                                svgCanvas.alignSelectedElements("b", "page");
-                                svgCanvas.alignSelectedElements("l", "page");
-                                break;
-                            case "2":
-                                svgCanvas.alignSelectedElements("b", "page");
-                                svgCanvas.alignSelectedElements("r", "page");
-                                break;
-                            case "3":
-                                svgCanvas.alignSelectedElements("t", "page");
-                                svgCanvas.alignSelectedElements("r", "page");
-                                break;
-                            case "4":
-                                svgCanvas.alignSelectedElements("t", "page");
-                                svgCanvas.alignSelectedElements("l", "page");
-                                break;
-
-                            default:
-                                break;
-                        }
-                    }*/
                 };
 
                 changeAttribute = function(el, completed) {
@@ -2269,13 +2181,8 @@
                         return false;
                     }
 
-                    //if (!noUndo) svgCanvas.changeSelectedAttribute(attr, val);
-                    /*console.log("attr");
-                                                                      console.log(attr);
-                                                                      console.log("val");
-                                                                      console.log(val);*/
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
-                    //en caso de ser un cajeado alinear a la esquina correspondiente //cflorioluis
+                    /*//en caso de ser un cajeado alinear a la esquina correspondiente //cflorioluis
                     if (svgCanvas.getSelectedElems()[0].getAttribute("nameMecanizado")) {
                         //console.log(svgCanvas.getSelectedElems()[0].getAttribute("side"))
                         switch (svgCanvas.getSelectedElems()[0].getAttribute("side")) {
@@ -2299,7 +2206,7 @@
                             default:
                                 break;
                         }
-                    }
+                    }*/
                 };
 
                 picking = false;
