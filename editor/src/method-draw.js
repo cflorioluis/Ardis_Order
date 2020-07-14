@@ -2881,7 +2881,43 @@
                 // an element has been selected
                 var deleteSelected = function() {
                     if (selectedElement != null || multiselected) {
+
+                        //mantener los id de la seleccion para ver si son mecanizados y borrar 
+                        //sus relacionados de manera correcta para que queden en el historial Ctrl-Z
+                        var tempMultiSelected = multiselected;
+                        var tempSelected = selectedElement;
+                        var isMulti = false;
+
                         svgCanvas.deleteSelectedElements();
+
+                        for (let ii = 0; ii < tempMultiSelected.length; ii++) {
+                            isMulti = true;
+
+                            const element = tempMultiSelected[ii];
+
+                            //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
+                            if (element.getAttribute("nameMecanizado") == "cajeado") {
+
+                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
+                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
+
+                                svgCanvas.deleteSelectedElements();
+                            }
+                        }
+
+                        if (!isMulti) {
+                            if (tempSelected.getAttribute("nameMecanizado") == "cajeado") {
+
+                                svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line1")], true);
+                                svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line2")], true);
+
+                                svgCanvas.deleteSelectedElements();
+                            }
+                        }
+
+
+
+
                     }
                     if (path.getNodePoint()) {
                         path.deletePathNode();
@@ -3067,7 +3103,7 @@
 
                             changeZoomPiece();
 
-                        }
+                        }, 350, 250, true
                     );
                 };
 
@@ -3305,7 +3341,10 @@
                             function(ok) {
                                 if (!ok) return false;
                                 saveChanges();
-                            }
+                            },
+                            350,
+                            250,
+                            true
                         );
                     } else {
                         saveChanges();
@@ -3482,8 +3521,9 @@
                     if (editingsource) {
                         if (orig_source !== $("#svg_source_textarea").val()) {
                             $.confirm("Ignore changes made to SVG source?", function(ok) {
-                                if (ok) hideSourceEditor();
-                            });
+                                    if (ok) hideSourceEditor();
+                                },
+                                350, 250, true);
                         } else {
                             hideSourceEditor();
                         }
@@ -4942,7 +4982,7 @@
                     } else {
                         $.confirm(
                             "Do you want to open a new file?\nThis will also erase your undo history",
-                            func
+                            func, 350, 250, true
                         );
                     }
                 };

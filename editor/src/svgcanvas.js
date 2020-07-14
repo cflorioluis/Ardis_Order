@@ -8971,10 +8971,10 @@ $.SvgCanvas = function(container, config) {
             );
 
             //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
-            if (selected.getAttribute("nameMecanizado") == "cajeado") {
+            /*if (selected.getAttribute("nameMecanizado") == "cajeado") {
                 getElem(selected.id + "_line1").remove()
                 getElem(selected.id + "_line2").remove()
-            }
+            }*/
 
         }
         if (!batchCmd.isEmpty()) addCommandToHistory(batchCmd);
