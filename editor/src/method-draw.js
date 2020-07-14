@@ -27,7 +27,7 @@
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
                 dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
-                cantos: [0, 1, 0, 1],
+                cantos: [1, 1, 0, 1],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -2156,17 +2156,33 @@
                         return false;
                     }
 
+
+                    var minValue = parseInt($("#cajeado_heightY").val());
+
+                    if (parseInt($("#cajeado_widthX").val()) < minValue) {
+                        minValue = parseInt($("#cajeado_widthX").val());
+                    }
+
+                    if (parseInt($("#cajeado_radio").val()) > minValue) {
+                        r = minValue;
+                        $("#cajeado_radio").val(minValue);
+                    }
+
+                    svgCanvas.getSelectedElems()[0].setAttribute("widthX", $("#cajeado_widthX").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("heightY", $("#cajeado_heightY").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("radio", $("#cajeado_radio").val());
+
                     var side = svgCanvas.getSelectedElems()[0].getAttribute("side");
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
                     var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
                     var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
-
                     var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side);
+
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
                     svgCanvas.editLinesCantoCajeado(side, w, h, id);
-
                     svgCanvas.selectorManager.requestSelector(selectedElement).resize();
+
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
 
@@ -2914,9 +2930,6 @@
                                 svgCanvas.deleteSelectedElements();
                             }
                         }
-
-
-
 
                     }
                     if (path.getNodePoint()) {
@@ -4790,11 +4803,90 @@
                 });
                 $("#cajeado_radio").dragInput({
                     min: 0,
-                    max: lowDimension,
+                    max: lowDimension - 200,
                     step: 1,
                     callback: changeAttributeCajeado,
                     cursor: true,
                 });
+
+                /*$("#cajeado_radio").mousemove(function(e) {
+
+
+                    if ($(this).val() > 100) {
+                        $(this).val(100)
+                    }
+                });
+
+                $("#cajeado_radio").bind("mousewheel", function() {
+
+
+                    if ($(this).val() > 100) {
+                        $(this).val(100)
+                    }
+                });*/
+
+                /*$("#cajeado_radio").bind("mousewheel mousemove.draginput touchmove.draginput mouseup.draginput touchend.draginput", function() {
+
+                    var minValue = $("#cajeado_heightY").val();
+                    if ($("#cajeado_widthX").val() < minValue) {
+                        minValue = $("#cajeado_widthX").val();
+                    }
+                    if ($(this).val() > minValue) {
+                        $(this).val(minValue - 10);
+                    }
+
+                });*/
+
+                /*$("#cajeado_radio").bind("mousewheel", function() {
+
+                    var minValue = $("#cajeado_heightY").val();
+                    if ($("#cajeado_widthX").val() < minValue) {
+                        minValue = $("#cajeado_widthX").val();
+                    }
+                    if ($(this).val() > minValue) {
+                        $(this).val(minValue);
+                    }
+
+                });*/
+
+
+
+                /*$("#cajeado_radio").on('dragover', false).on('drop', function(e) {
+                    console.log($(this).val());
+                    return false;
+                });*/
+                /*.change(function() {
+                    console.log("Handler for .change() called.");
+                });*/
+
+                /*$("#cajeado_radio").draggable({
+                    start: function() {
+                        console.log("start");
+                    },
+                    drag: function() {
+                        console.log("aa");
+                    },
+                    stop: function() {
+
+                    }
+                });*/
+                /*.mousedown(function() {
+                    isDragging = false;
+                })
+                .mousemove(function() {
+                    isDragging = true;
+                    console.log("aa");
+
+                })*/
+
+
+
+                /*select(function() {
+                    alert("Handler for .select() called.");
+                });*/
+                /*.change(function() {
+                                    alert("Handler for .change() called.");
+                                });*/
 
                 $("#rect_x").dragInput({
                     min: null,
