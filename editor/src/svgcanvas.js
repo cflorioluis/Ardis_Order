@@ -3248,7 +3248,7 @@ $.SvgCanvas = function(container, config) {
 
                         editLinesCantoCajeado(side, tempWidth, tempHeight, id);
                     }
-                    //cflorioluis - fin
+                    //cflorioluis - fin 
 
                     translateBack.setTranslate(left + tx, top + ty);
                     if (hasMatrix) {
