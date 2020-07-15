@@ -512,9 +512,7 @@ var svgedit = svgedit || {};
         //cflorioluis - creando imagen de fondo
         var defsImg = svgFactory_.createSVGElement({
             element: "defs",
-            attr: {
-
-            },
+            attr: {},
         });
 
         var patternImg = svgFactory_.createSVGElement({
@@ -545,8 +543,6 @@ var svgedit = svgedit || {};
         canvasbg.appendChild(defsImg);
         defsImg.appendChild(patternImg);
         patternImg.appendChild(imageImg);
-
-
 
         /*console.log(dims[0]);
         console.log(dims[1]);*/

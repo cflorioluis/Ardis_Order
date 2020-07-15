@@ -1816,19 +1816,19 @@ button.cancel {
 }
 
 #workarea.ne-resize * {
-    cursor: se-resize !important;
-}
-
-#workarea.se-resize * {
     cursor: ne-resize !important;
 }
 
+#workarea.se-resize * {
+    cursor: se-resize !important;
+}
+
 #workarea.nw-resize * {
-    cursor: sw-resize !important;
+    cursor: nw-resize !important;
 }
 
 #workarea.sw-resize * {
-    cursor: nw-resize !important;
+    cursor: sw-resize !important;
 }
 
 #workarea.copy {
@@ -2302,7 +2302,7 @@ input[readonly=readonly]:focus {
 
 /* HIDE RADIO */
 
-[type=radio] {
+[type=radio][hiddenRadio] {
     position: absolute;
     opacity: 0;
     width: 0;
@@ -2320,16 +2320,31 @@ input[readonly=readonly]:focus {
     cursor: default;
 }
 
+[type=radio][hiddenRadio]:disabled+img {
+    cursor: default;
+}
+
+[type=radio][name="BroachDrill"] {
+    -ms-transform: scale(1.5);
+    -moz-transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+    -o-transform: scale(1.5);
+    transform: scale(1.5);
+    margin-top: 17px;
+    width: 20px !important;
+}
+
 
 /* CHECKED STYLES */
 
-[type=radio][name="corner"]:checked+img {
-    outline: 2px solid #f00;
+[type=radio][name="corner"]:checked+img,
+[type=radio][name="face"]:checked+img {
+    outline: 2px solid #f00 !important;
     overflow: hidden;
 }
 
 [type=radio][mecanizadoOption="cajeado"]:checked+img {
-    outline: 2px solid #f00;
+    outline: 2px solid #f00 !important;
     overflow: hidden;
 }
 
@@ -2356,11 +2371,29 @@ input[readonly=readonly]:focus {
     width: 32px;
 }
 
+.gridDrill {
+    width: 35px;
+    height: 62px;
+    display: grid;
+    /*grid-gap: 1px;*/
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.columnDrill.wide {
+    width: 98px;
+    padding-left: 1px;
+}
+
+.columnDrill {
+    width: 12px;
+}
+
 .grid>div {
     padding: 0px;
 }
 
 .columnFromCajeado {
+    /*display: block;*/
     float: left;
     width: 40%;
     /*padding-right: 50px;*/
@@ -2373,13 +2406,23 @@ input[readonly=readonly]:focus {
 
 /* Clear floats after the columns */
 
-.rowFromCajeado:after {
+.rowForm:after {
     content: "";
     display: table;
     clear: both;
 }
 
 .columnFromCajeado.right {
+    text-align: right;
+    padding-right: 5%;
+}
+
+.columnFromDrill {
+    float: left;
+    width: 40%;
+}
+
+.columnFromDrill.right {
     text-align: right;
     padding-right: 5%;
 }
@@ -2391,6 +2434,13 @@ input[readonly=readonly]:focus {
     width: 100px !important;
 }
 
+.inputMecanizadoXY {
+    font-size: 17px;
+    vertical-align: middle;
+    margin-block-start: 10px;
+    width: 50px !important;
+}
+
 .input-error {
     background: #fff;
     border: 1px solid red;
@@ -2399,4 +2449,18 @@ input[readonly=readonly]:focus {
 
 .dialogRight {
     right: 5% !important;
+}
+
+input[type=checkbox] {
+    /* Double-sized Checkboxes */
+    -ms-transform: scale(1.5);
+    /* IE */
+    -moz-transform: scale(1.5);
+    /* FF */
+    -webkit-transform: scale(1.5);
+    /* Safari and Chrome */
+    -o-transform: scale(1.5);
+    /* Opera */
+    transform: scale(1.5);
+    margin-top: 17px;
 }

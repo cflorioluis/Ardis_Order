@@ -3055,10 +3055,8 @@ $.SvgCanvas = function(container, config) {
                                 }
                                 //cflorioluis - Hacer que los mecanizados no se muevan y eliminar sus selectores
                                 //console.log(selected)
-                                if (!selected.getAttribute("nameMecanizado")) {
+                                if (selected.getAttribute("nameMecanizado") != "cajeado") {
                                     xform.setTranslate(dx, dy);
-                                } else {
-                                    //selectorManager.releaseSelector(selected, "cajeado");
                                 }
                                 if (tlist.numberOfItems) {
                                     tlist.replaceItem(xform, 0);
@@ -3218,9 +3216,7 @@ $.SvgCanvas = function(container, config) {
                     }
 
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-
-
-                    if (!selected.getAttribute("nameMecanizado")) {
+                    if (selected.getAttribute("nameMecanizado") != "cajeado") {
                         scale.setScale(sx, sy);
                     } else {
                         var widthX = parseInt(selected.getAttribute("widthX"));
@@ -3252,9 +3248,7 @@ $.SvgCanvas = function(container, config) {
 
                         editLinesCantoCajeado(side, tempWidth, tempHeight, id);
                     }
-
-
-                    //cflorioluis
+                    //cflorioluis - fin
 
                     translateBack.setTranslate(left + tx, top + ty);
                     if (hasMatrix) {
@@ -3682,7 +3676,7 @@ $.SvgCanvas = function(container, config) {
                                 selectedElements[0].nodeName === "path" &&
                                 selectedElements[1] == null
                             ) {
-                                //cflorioluis - hacer que al dar el docle vlick no se selecciones los componente del 
+                                //cflorioluis - hacer que al dar el docle click no se selecciones los componente del 
                                 // del que esta formado el cajeado
                                 if (selectedElements[0].getAttribute("nameMecanizado") == null) {
                                     pathActions.select(selectedElements[0]);
@@ -3964,9 +3958,21 @@ $.SvgCanvas = function(container, config) {
             //console.log(mouse_target);
 
             //cforioluis - si el objeto que se le hace doble click es un mecanizado, no hacer nada
+            //eventos de ventanas de editar cuando se selecciona doble click en un mecanizado
             if (mouse_target.getAttribute("nameMecanizado") != null) {
-                svgCanvas.clickCajeadoTool(mouse_target);
-                return;
+                switch (mouse_target.getAttribute("nameMecanizado")) {
+                    case "cajeado":
+                        svgCanvas.clickCajeadoTool(mouse_target);
+                        //console.log("editarCajeado");
+                        return;
+
+                    case "drill":
+                        svgCanvas.clickDrillTool(mouse_target);
+                        //console.log("editarCajeado");
+                        return;
+                    default:
+                        break;
+                }
             }
 
             if (parent === current_group) return;
@@ -10193,6 +10199,73 @@ $.SvgCanvas = function(container, config) {
         //cajeadoCreated.appendChild(lineCajeadoCreated);
     });
 
+    var drill = (this.drill = function(face, x, y, r, isPasante, depth, broachType) {
+
+        switch (face) {
+            case "1":
+                console.log("cara Principal");
+
+                var opacity = 1;
+
+                if (!isPasante)
+                    opacity = 0.35
+
+
+                addSvgElementFromJson({
+                    element: "circle",
+                    curStyles: true,
+                    attr: {
+                        cx: parseInt(x) + 100,
+                        cy: parseInt(y) + 100,
+                        r: r,
+                        id: getNextId(),
+                        opacity: opacity,
+                        nameMecanizado: "drill",
+                        face: face,
+                        stroke: "#000",
+                        fill: "#3F3F3F",
+                        "stroke-width": "0",
+                    },
+                });
+
+                break;
+            case "2":
+
+
+
+                break;
+            case "3":
+
+
+
+                break;
+            case "4":
+
+
+
+                break;
+            case "5":
+
+
+
+                break;
+            case "6":
+
+
+
+                break;
+
+
+
+            default:
+                break;
+        }
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+
+    });
+
     var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio) {
         var cajeadoCreated = addSvgElementFromJson({
             element: "path",
@@ -10344,22 +10417,22 @@ $.SvgCanvas = function(container, config) {
 
         var cajeadoReady1 =
             `<label>
-                <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1">
+                <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
                 <img src="images/mecanizado/cajeado_not_use.png">
             </label>`,
             cajeadoReady2 =
             `<label>
-                <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2">
+                <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
                 <img src="images/mecanizado/cajeado_not_use.png">
             </label>`,
             cajeadoReady3 =
             `<label>
-                <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3">
+                <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
                 <img src="images/mecanizado/cajeado_not_use.png">
             </label>`,
             cajeadoReady4 =
             `<label>
-                <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4">
+                <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
                 <img src="images/mecanizado/cajeado_not_use.png">
             </label>`;
 
@@ -10373,28 +10446,28 @@ $.SvgCanvas = function(container, config) {
                     case "1":
                         cajeadoReady1 =
                             `<label>
-                                            <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1">
+                                            <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
                                             <img src="images/mecanizado/cajeado_in_use.png">
                                         </label>`;
                         break;
                     case "2":
                         cajeadoReady2 =
                             `<label>
-                                            <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2">
+                                            <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
                                             <img src="images/mecanizado/cajeado_in_use.png">
                                         </label>`;
                         break;
                     case "3":
                         cajeadoReady3 =
                             `<label>
-                                            <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3">
+                                            <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
                                             <img src="images/mecanizado/cajeado_in_use.png">
                                         </label>`
                         break;
                     case "4":
                         cajeadoReady4 =
                             `<label>
-                                            <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4">
+                                            <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
                                             <img src="images/mecanizado/cajeado_in_use.png">
                                         </label>`
                         break;
@@ -10410,28 +10483,28 @@ $.SvgCanvas = function(container, config) {
             case "1":
                 cajeadoReady1 =
                     `<label>
-                                        <input onclick="svgCanvas.selectCajeado('1');" type="radio" name="corner" mecanizadoOption="cajeado" value="1" checked>
+                                        <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1" checked>
                                         <img src="images/mecanizado/cajeado_in_use.png">
                                     </label>`;
                 break;
             case "2":
                 cajeadoReady2 =
                     `<label>
-                                        <input onclick="svgCanvas.selectCajeado('2');" type="radio" name="corner" mecanizadoOption="cajeado" value="2" checked>
+                                        <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2" checked>
                                         <img src="images/mecanizado/cajeado_in_use.png">
                                     </label>`;
                 break;
             case "3":
                 cajeadoReady3 =
                     `<label>
-                                        <input onclick="svgCanvas.selectCajeado('3');" type="radio" name="corner" mecanizadoOption="cajeado" value="3" checked>
+                                        <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3" checked>
                                         <img src="images/mecanizado/cajeado_in_use.png">
                                     </label>`
                 break;
             case "4":
                 cajeadoReady4 =
                     `<label>
-                                        <input onclick="svgCanvas.selectCajeado('4');" type="radio" name="corner" mecanizadoOption="cajeado" value="4" checked>
+                                        <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4" checked>
                                         <img src="images/mecanizado/cajeado_in_use.png">
                                     </label>`
                 break;
@@ -10444,14 +10517,14 @@ $.SvgCanvas = function(container, config) {
         cajeadoBox = $.confirm(
             `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Cajeado</h2></strong>` +
             `<form>
-                <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                <div class="rowForm" style="padding-bottom: 10px;">
                     <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
                     <div class="columnFromCajeado">
                         <div class="tablero grid">
                             <div class="columnCajeado">` +
             cajeadoReady4 +
             `<label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
                                     <img src="images/mecanizado/cajeado_empty.png" >
                                 </label>` +
             cajeadoReady1 +
@@ -10459,17 +10532,17 @@ $.SvgCanvas = function(container, config) {
                             
                             <div class="columnCajeado">                       
                                 <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
                                     <img src="images/mecanizado/cajeado_empty.png" >
                                 </label>
                                 
                                 <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
                                     <img src="images/mecanizado/cajeado_empty.png" >
                                 </label>
                                 
                                 <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
                                     <img src="images/mecanizado/cajeado_empty.png" >
                                 </label>
                             </div>
@@ -10477,7 +10550,7 @@ $.SvgCanvas = function(container, config) {
                             <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
             cajeadoReady3 +
             `<label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
                                     <img src="images/mecanizado/cajeado_empty.png">
                                 </label>` +
             cajeadoReady2 +
@@ -10485,19 +10558,19 @@ $.SvgCanvas = function(container, config) {
                         </div>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Ancho</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + widthX + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newWidthX', this.value);"/>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Fondo</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + heigthY + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newHeightY', this.value);"/>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Radio</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + radio + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('radio', this.value);"/>
@@ -10970,7 +11043,7 @@ $.SvgCanvas = function(container, config) {
         cajeadoBox = $.confirm(
             `<strong><h2 id="moveConfirm" style="cursor: move;" >Editar Cajeado</h2></strong>` +
             `<form>
-                <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                <div class="rowForm" style="padding-bottom: 10px;">
                     <div class="columnFromCajeado right"><h3>Side</h3></div>
                     <div class="columnFromCajeado">
                         <div class="tablero grid">
@@ -11011,19 +11084,19 @@ $.SvgCanvas = function(container, config) {
                         </div>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Width_X</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + widthX + `"` + `class="inputMecanizado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Heigth_Y</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + heigthY + `"` + `class="inputMecanizado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
-                <div class="rowFromCajeado">
+                <div class="rowForm">
                     <div class="columnFromCajeado right"><h3>Radio</h3></div>
                     <div class="columnFromCajeado">
                         <input required value="` + radio + `"` + `class="inputMecanizado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
