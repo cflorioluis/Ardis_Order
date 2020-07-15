@@ -140,6 +140,7 @@ $.SvgCanvas = function(container, config) {
     svgroot.setAttribute("height", dimensions[1] - 1);
     svgroot.id = "svgroot";
     svgroot.setAttribute("xlinkns", xlinkns);
+    svgroot.setAttribute("style", "transform: rotateX(180deg);"); //cflorioluis invertir desde el principio para ajustar la coordenada (0,0) abajo a la izquierda
     container.appendChild(svgroot);
 
     // The actual element that represents the final output SVG element
@@ -3603,6 +3604,8 @@ $.SvgCanvas = function(container, config) {
 
                         selectedElements[0].setAttribute("widthX", tempWidth);
                         selectedElements[0].setAttribute("heightY", tempHeight);
+
+                        //svgCanvas.selectorManager.requestSelector(selectedElement).resize();
                     }
                 case "multiselect":
                     if (rubberBox != null) {
@@ -9979,28 +9982,28 @@ $.SvgCanvas = function(container, config) {
 
     var createRoundedCajeadoSide = (this.createRoundedCajeadoSide = function(widthX, heightY, radio, side) {
         switch (side) {
-            case "1":
+            case "4":
                 return "M" + "100" + "," + (dimensions[1] - heightY - 100) +
                     " h" + (widthX - radio) +
                     " a" + radio + "," + radio + " 0 0 1 " + radio + "," + radio +
                     " v" + (heightY - radio) +
                     " h-" + widthX +
                     " z"
-            case "2":
+            case "3":
                 return "M" + (dimensions[0] - widthX - 100) + "," + (dimensions[1] - (heightY - radio) - 100) +
                     " a" + radio + "," + radio + " 0 0 1 " + radio + ",-" + radio +
                     " h" + (widthX - radio) +
                     " v" + heightY +
                     " h-" + widthX +
                     " z"
-            case "3":
+            case "2":
                 return "M" + (dimensions[0] - widthX - 100) + ", 100" +
                     " h" + widthX +
                     " v" + heightY +
                     " h" + (radio - widthX) +
                     " a" + radio + "," + radio + " 0 0 1 " + -radio + "," + -radio +
                     " z"
-            case "4":
+            case "1":
                 return "M" + (parseInt(radio) + 100) + ",100" +
                     " h" + (parseInt(widthX - radio)) +
                     " v" + (heightY - radio) +
@@ -10018,7 +10021,7 @@ $.SvgCanvas = function(container, config) {
 
         //crear linea que se vera en el canto
         switch (side) {
-            case "1":
+            case "4":
                 var lineCajeadoCreated = addSvgElementFromJson({
                     element: "line",
                     curStyles: true,
@@ -10059,7 +10062,7 @@ $.SvgCanvas = function(container, config) {
                     },
                 });
                 break;
-            case "2":
+            case "3":
                 var lineCajeadoCreated = addSvgElementFromJson({
                     element: "line",
                     curStyles: true,
@@ -10100,7 +10103,7 @@ $.SvgCanvas = function(container, config) {
                     },
                 });
                 break;
-            case "3":
+            case "2":
                 var lineCajeadoCreated = addSvgElementFromJson({
                     element: "line",
                     curStyles: true,
@@ -10141,7 +10144,7 @@ $.SvgCanvas = function(container, config) {
                     },
                 });
                 break;
-            case "4":
+            case "1":
                 var lineCajeadoCreated = addSvgElementFromJson({
                     element: "line",
                     curStyles: true,
@@ -10222,19 +10225,10 @@ $.SvgCanvas = function(container, config) {
 
     var editLinesCantoCajeado = (this.editLinesCantoCajeado = function(side, w, h, id) {
         switch (side) {
-            case "1":
+            case "4":
                 var line1 = svgCanvas.getElem(id + "_line1");
                 line1.setAttribute("x1", (parseInt(w) + 100));
                 line1.setAttribute("x2", (parseInt(w) + 100));
-
-                var line2 = svgCanvas.getElem(id + "_line2");
-                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                break;
-            case "2":
-                var line1 = svgCanvas.getElem(id + "_line1");
-                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
-                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
 
                 var line2 = svgCanvas.getElem(id + "_line2");
                 line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
@@ -10246,10 +10240,19 @@ $.SvgCanvas = function(container, config) {
                 line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
 
                 var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                break;
+            case "2":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
                 line2.setAttribute("y1", (parseInt(h) + 100));
                 line2.setAttribute("y2", (parseInt(h) + 100));
                 break;
-            case "4":
+            case "1":
                 var line1 = svgCanvas.getElem(id + "_line1");
                 line1.setAttribute("x1", (parseInt(w) + 100));
                 line1.setAttribute("x2", (parseInt(w) + 100));
@@ -10526,41 +10529,18 @@ $.SvgCanvas = function(container, config) {
                         w = widthX,
                         h = heigthY;
 
-                    /*tempWidth = parseInt(selectedElements[0].getAttribute("tempWidth")),
-                        tempHeight = parseInt(selectedElements[0].getAttribute("tempHeight"));
-
-                    selectedElements[0].setAttribute("widthX", tempWidth);
-                    selectedElements[0].setAttribute("heightY", tempHeight);*/
-
-
                     editLinesCantoCajeado(side, w, h, id);
                     selectorManager.requestSelector(selectedElements[0]).resize();
                 }
-                /*svgCanvas.deleteSelectedElements();
-                 svgCanvas.cajeado(
-                        side,
-                        widthX,
-                        heigthY,
-                        curConfig.dimensions[0],
-                        curConfig.dimensions[1],
-                        radio
-                    );*/
             },
             350,
             340,
             true,
             "cajeado"
         );
-
-
-
-        /*if (toolButtonClick("#tool_cajeadoTool")) {
-            svgCanvas.setMode("cajeadoToolCanvas");
-        }*/
     });
     //cflorioluis - crear divisiones originales
     var createDivs = (this.createDivs = function(cantos) {
-
         svgCanvas.addSvgElementFromJson({
             element: "rect",
             curStyles: true,
@@ -10739,10 +10719,10 @@ $.SvgCanvas = function(container, config) {
                                 "stroke-opacity": "null",
                                 "fill-opacity": "null",
                                 x: 100,
-                                y: 4,
+                                y: curConfig.dimensions[1] - 62,
                                 width: curConfig.dimensions[0] - 200,
                                 height: 58,
-                                id: "svg__1_canto1",
+                                id: "svg__1_canto4",
                                 "stroke-dasharray": "none",
                                 opacity: "0.3",
                                 "ignore": true,
@@ -10759,11 +10739,11 @@ $.SvgCanvas = function(container, config) {
                                 "stroke-width": 0,
                                 "stroke-opacity": "null",
                                 "fill-opacity": "null",
-                                x: 100,
-                                y: curConfig.dimensions[1] - 62,
-                                width: curConfig.dimensions[0] - 200,
-                                height: 58,
-                                id: "svg__1_canto4",
+                                x: curConfig.dimensions[0] - 62,
+                                y: 100,
+                                width: 58,
+                                height: curConfig.dimensions[1] - 200,
+                                id: "svg__1_canto3",
                                 "stroke-dasharray": "none",
                                 opacity: "0.3",
                                 "ignore": true,
@@ -10780,11 +10760,11 @@ $.SvgCanvas = function(container, config) {
                                 "stroke-width": 0,
                                 "stroke-opacity": "null",
                                 "fill-opacity": "null",
-                                x: curConfig.dimensions[0] - 62,
-                                y: 100,
-                                width: 58,
-                                height: curConfig.dimensions[1] - 200,
-                                id: "svg__1_canto3",
+                                x: 100,
+                                y: 4,
+                                width: curConfig.dimensions[0] - 200,
+                                height: 58,
+                                id: "svg__1_canto1",
                                 "stroke-dasharray": "none",
                                 opacity: "0.3",
                                 "ignore": true,

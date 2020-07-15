@@ -109,6 +109,10 @@ var svgedit = svgedit || {};
             steps--;
         }
         var i = 0;
+        //cflorioluis - cambiar icono del cursor de resize
+        [dir_arr[0], dir_arr[6]] = [dir_arr[6], dir_arr[0]]; //nw - sw
+        [dir_arr[2], dir_arr[4]] = [dir_arr[4], dir_arr[2]]; //ne - se
+
         for (var dir in selectorManager_.selectorGrips) {
             selectorManager_.selectorGrips[dir].setAttribute(
                 "style",
@@ -116,6 +120,7 @@ var svgedit = svgedit || {};
             );
             i++;
         }
+
     };
 
     // Function: svgedit.select.Selector.showGrips

@@ -27,7 +27,7 @@
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
                 dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
-                cantos: [1, 1, 0, 1],
+                cantos: [1, 0, 0, 1],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -154,7 +154,7 @@
                         //add new toll - cflorioluis - se usa el mismo nombre que en el item de placement
                         cajeadoTool: "cajeadoTool.png",
                         cremalleraTool: "cremallera.png",
-                        taladroTool: "taladro.png",
+                        drillTool: "drill.png",
                         select_node: "select_node.png",
                         pencil: "pencil.png",
                         pen: "line.png",
@@ -182,7 +182,7 @@
                         //add new toll - cflorioluis - Elegir el nombre de la Herramienta, este se usara para elegir la imagen de la misma
                         "#tool_cajeadoTool": "cajeadoTool",
                         "#tool_cremalleraTool": "cremalleraTool",
-                        "#tool_taladroTool": "taladroTool",
+                        "#tool_drillTool": "drillTool",
                         //
                         "#tool_fhpath": "pencil",
                         "#tool_line": "pen",
@@ -2795,12 +2795,6 @@
                         true,
                         "cajeado"
                     );
-
-
-                    /*
-                                        if (toolButtonClick("#tool_cajeadoTool")) {
-                                            svgCanvas.setMode("cajeadoToolCanvas");
-                                        }*/
                 };
 
                 var clickCremalleraTool = function() {
@@ -2808,10 +2802,209 @@
                         svgCanvas.setMode("cremalleraToolCanvas");
                     }
                 };
-                var clickTaladroTool = function() {
-                    if (toolButtonClick("#tool_taladroTool")) {
-                        svgCanvas.setMode("taladroToolCanvas");
+                var clickDrillTool = function() {
+
+                    var side = null,
+                        widthX = null,
+                        heigthY = null,
+                        radio = null;
+
+                    $('#dialog_buttons').children().first().prop("disabled", true);
+
+                    var cajeadoReady1 =
+                        `<label>
+                            <input required type="radio" name="corner" mecanizadoOption="cajeado" value="1">
+                            <img src="images/mecanizado/cajeado_not_use.png">
+                        </label>`,
+                        cajeadoReady2 =
+                        `<label>
+                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="2">
+                            <img src="images/mecanizado/cajeado_not_use.png">
+                        </label>`,
+                        cajeadoReady3 =
+                        `<label>
+                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" >
+                            <img src="images/mecanizado/cajeado_not_use.png">
+                        </label>`,
+                        cajeadoReady4 =
+                        `<label>
+                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" >
+                            <img src="images/mecanizado/cajeado_not_use.png">
+                        </label>`;
+
+                    //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+                    var cajeadoReady = $("path[nameMecanizado*='cajeado']");
+
+                    if (cajeadoReady.length > 0) {
+                        for (let i = 0; i < cajeadoReady.length; i++) {
+                            const element = cajeadoReady[i];
+                            switch (element.getAttribute("side")) {
+                                case "1":
+                                    cajeadoReady1 =
+                                        `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                                    break;
+                                case "2":
+                                    cajeadoReady2 =
+                                        `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                                    break;
+                                case "3":
+                                    cajeadoReady3 =
+                                        `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                                    break;
+                                case "4":
+                                    cajeadoReady4 =
+                                        `<label>
+                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled>
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
                     }
+
+                    cajeadoBox = $.confirm(
+                        `<strong><h2 id="moveConfirm" style="cursor: move;">Taladro</h2></strong>` +
+                        `<form>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Posición X</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Posición Y</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Diametro</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Pasante</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Profundidad</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Broca</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+                            <div class="rowFromCajeado" style="padding-bottom: 10px;">
+                                <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
+                                <div class="columnFromCajeado">
+                                    <div class="tablero grid">
+                                        <div class="columnCajeado">` +
+                        cajeadoReady4 +
+                        `<label>
+                                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                                <img src="images/mecanizado/cajeado_empty.png" >
+                                            </label>` +
+                        cajeadoReady1 +
+                        `</div>
+                                        
+                                        <div class="columnCajeado">                       
+                                            <label>
+                                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
+                                            </label>
+                                            
+                                            <label>
+                                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
+                                            </label>
+                                            
+                                            <label>
+                                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
+                                            </label>
+                                        </div>
+                                        
+                                        <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+                        cajeadoReady3 +
+                        `<label>
+                                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                                <img src="images/mecanizado/cajeado_empty.png">
+                                            </label>` +
+                        cajeadoReady2 +
+                        `</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Ancho</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Fondo</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newHeightCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowFromCajeado">
+                                <div class="columnFromCajeado right"><h3>Radio</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newRadioCajeado" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                        `,
+                        function(ok) {
+                            if (!ok) return;
+                            //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                            side = $("input[name=corner]:checked").val();
+                            widthX = $("#newWidthCajeado").val();
+                            heigthY = $("#newHeightCajeado").val();
+                            radio = $("#newRadioCajeado").val();
+
+                            svgCanvas.cajeado(
+                                side,
+                                widthX,
+                                heigthY,
+                                curConfig.dimensions[0],
+                                curConfig.dimensions[1],
+                                radio
+                            );
+                        },
+                        350,
+                        440,
+                        true,
+                        "cajeado"
+                    );
+                    /*if (toolButtonClick("#tool_drillTool")) {
+                        svgCanvas.setMode("drillToolCanvas");
+                    }*/
                 };
 
                 var clickFHPath = function() {
@@ -4084,10 +4277,10 @@
                             key: ["O", true],
                         },
                         {
-                            sel: "#tool_taladroTool",
-                            fn: clickTaladroTool,
+                            sel: "#tool_drillTool",
+                            fn: clickDrillTool,
                             evt: "click",
-                            key: ["m", true],
+                            key: ["D", true],
                         },
                         {
                             sel: "#tool_fhpath",
@@ -4809,85 +5002,6 @@
                     cursor: true,
                 });
 
-                /*$("#cajeado_radio").mousemove(function(e) {
-
-
-                    if ($(this).val() > 100) {
-                        $(this).val(100)
-                    }
-                });
-
-                $("#cajeado_radio").bind("mousewheel", function() {
-
-
-                    if ($(this).val() > 100) {
-                        $(this).val(100)
-                    }
-                });*/
-
-                /*$("#cajeado_radio").bind("mousewheel mousemove.draginput touchmove.draginput mouseup.draginput touchend.draginput", function() {
-
-                    var minValue = $("#cajeado_heightY").val();
-                    if ($("#cajeado_widthX").val() < minValue) {
-                        minValue = $("#cajeado_widthX").val();
-                    }
-                    if ($(this).val() > minValue) {
-                        $(this).val(minValue - 10);
-                    }
-
-                });*/
-
-                /*$("#cajeado_radio").bind("mousewheel", function() {
-
-                    var minValue = $("#cajeado_heightY").val();
-                    if ($("#cajeado_widthX").val() < minValue) {
-                        minValue = $("#cajeado_widthX").val();
-                    }
-                    if ($(this).val() > minValue) {
-                        $(this).val(minValue);
-                    }
-
-                });*/
-
-
-
-                /*$("#cajeado_radio").on('dragover', false).on('drop', function(e) {
-                    console.log($(this).val());
-                    return false;
-                });*/
-                /*.change(function() {
-                    console.log("Handler for .change() called.");
-                });*/
-
-                /*$("#cajeado_radio").draggable({
-                    start: function() {
-                        console.log("start");
-                    },
-                    drag: function() {
-                        console.log("aa");
-                    },
-                    stop: function() {
-
-                    }
-                });*/
-                /*.mousedown(function() {
-                    isDragging = false;
-                })
-                .mousemove(function() {
-                    isDragging = true;
-                    console.log("aa");
-
-                })*/
-
-
-
-                /*select(function() {
-                    alert("Handler for .select() called.");
-                });*/
-                /*.change(function() {
-                                    alert("Handler for .change() called.");
-                                });*/
-
                 $("#rect_x").dragInput({
                     min: null,
                     max: null,
@@ -5282,6 +5396,13 @@
                     r_intervals.push(5 * i);
                 }
 
+
+                /* console.log(r_intervals);
+
+                 r_intervals.reverse();
+
+                 console.log(r_intervals);*/
+
                 function updateRulers(scanvas, zoom) {
                     var workarea = document.getElementById("workarea");
                     var title_show = document.getElementById("title_show");
@@ -5303,7 +5424,11 @@
                         var lentype = is_x ? "width" : "height";
                         var content_d = c_elem.getAttribute(dim) - 0;
 
+                        //console.log(c_elem);
+
+
                         var $hcanv_orig = $("#ruler_" + dim + " canvas:first");
+
 
                         // Bit of a hack to fully clear the canvas in Safari & IE9
                         $hcanv = $hcanv_orig.clone();
@@ -5314,6 +5439,9 @@
                         // Set the canvas size to the width of the container
                         var ruler_len = scanvas[lentype]() * 2;
                         var total_len = ruler_len;
+
+                        //console.log(ruler_len);
+                        //console.log(total_len);
                         hcanv.parentNode.style[lentype] = total_len + "px";
 
                         var canv_count = 1;
@@ -5344,7 +5472,6 @@
                             // set copy width to last
                             ruler_len = limit;
                         }
-
                         hcanv[lentype] = ruler_len;
 
                         var u_multi = unit * zoom;
@@ -5353,8 +5480,11 @@
                         var raw_m = 50 / u_multi;
                         var multi = 1;
 
+
+                        //console.log(total_len);
                         for (var i = 0; i < r_intervals.length; i++) {
                             var num = r_intervals[i];
+
                             multi = num;
 
                             if (raw_m <= num) {
@@ -5364,13 +5494,12 @@
 
                         var big_int = multi * u_multi;
 
-
                         ctx.font = "normal 9px 'Lucida Grande', sans-serif";
                         ctx.fillStyle = "#777";
 
                         var ruler_d = ((content_d / u_multi) % multi) * u_multi;
 
-                        var label_pos = ruler_d - big_int;
+                        var label_pos = (ruler_d - big_int);
 
                         for (; ruler_d < total_len; ruler_d += big_int) {
                             label_pos += big_int;
@@ -5385,10 +5514,15 @@
                                 ctx.lineTo(0, cur_d);
                             }
 
-                            var num = (label_pos - content_d) / u_multi;
+                            var num = ((label_pos - content_d) / u_multi);
                             var label;
-                            if (multi >= 1) {
-                                label = Math.round(num) - 100; //cflorioluis reducir tamaño de la regla
+                            if (multi >= 1) { //cflorioluis ajustar regla para que diga 0,0 abajo a la izquierda
+                                if (dim == "y") {
+                                    label = -1 * (Math.round(num) - curConfig.dimensions[1] + 100);
+                                } else {
+                                    label = Math.round(num) - 100;
+                                }
+
                             } else {
                                 var decs = (multi + "").split(".")[1].length;
                                 label = num.toFixed(decs) - 0;

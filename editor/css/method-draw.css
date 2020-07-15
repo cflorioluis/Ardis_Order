@@ -1816,19 +1816,19 @@ button.cancel {
 }
 
 #workarea.ne-resize * {
-    cursor: ne-resize !important;
-}
-
-#workarea.se-resize * {
     cursor: se-resize !important;
 }
 
+#workarea.se-resize * {
+    cursor: ne-resize !important;
+}
+
 #workarea.nw-resize * {
-    cursor: nw-resize !important;
+    cursor: sw-resize !important;
 }
 
 #workarea.sw-resize * {
-    cursor: sw-resize !important;
+    cursor: nw-resize !important;
 }
 
 #workarea.copy {
