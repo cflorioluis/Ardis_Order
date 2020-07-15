@@ -1903,7 +1903,7 @@
                             path: [],
                             //cforioluis - update cajeado contextual tools
                             cajeado: ["widthX", "heightY", "radio"],
-                            drill: ["widthX", "heightY", "radio"]
+                            drill: ["cx", "cy", "r"]
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
@@ -4975,21 +4975,21 @@
                     cursor: true,
                 });
                 //cflorioluis - agregar funciones al Taladro
-                $("#drill_widthX").dragInput({
+                $("#drill_cx").dragInput({
                     min: 1,
                     max: curConfig.dimensions[0] - 200,
                     step: 1,
                     callback: changeAttributeDrill,
                     cursor: true,
                 });
-                $("#drill_heightY").dragInput({
+                $("#drill_cy").dragInput({
                     min: 1,
                     max: curConfig.dimensions[1] - 200,
                     step: 1,
                     callback: changeAttributeDrill,
                     cursor: true,
                 });
-                $("#drill_radio").dragInput({
+                $("#drill_r").dragInput({
                     min: 0,
                     max: lowDimension - 200,
                     step: 1,
