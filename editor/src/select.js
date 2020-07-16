@@ -820,6 +820,7 @@ var svgedit = svgedit || {};
     // Parameters:
     // elem - DOM element to get the selector for
     svgedit.select.SelectorManager.prototype.requestSelector = function(elem) {
+
         if (elem == null) return null;
         var N = this.selectors.length;
         // If we've already acquired one for this element, return it.
@@ -837,6 +838,33 @@ var svgedit = svgedit || {};
         }
         // if we reached here, no available selectors were found, we create one
         this.selectors[N] = new svgedit.select.Selector(N, elem);
+        this.selectorParentGroup.appendChild(this.selectors[N].selectorGroup);
+        this.selectorMap[elem.id] = this.selectors[N];
+        return this.selectors[N];
+    };
+
+    //cflorioluis - Copy function for Drill tool
+    svgedit.select.SelectorManager.prototype.requestSelectorDrill = function(elem) {
+        console.log("holas");
+        if (elem == null) return null;
+        var N = this.selectors.length;
+        // If we've already acquired one for this element, return it.
+        if (typeof this.selectorMap[elem.id] == "object") {
+            this.selectorMap[elem.id].locked = true;
+            return this.selectorMap[elem.id];
+        }
+        for (var i = 0; i < N; ++i) {
+            if (this.selectors[i] && !this.selectors[i].locked) {
+                this.selectors[i].locked = true;
+                this.selectors[i].reset(elem);
+                this.selectorMap[elem.id] = this.selectors[i];
+                return this.selectors[i];
+            }
+        }
+        // if we reached here, no available selectors were found, we create one
+        this.selectors[N] = new svgedit.select.Selector(N, elem);
+
+
         this.selectorParentGroup.appendChild(this.selectors[N].selectorGroup);
         this.selectorMap[elem.id] = this.selectors[N];
         return this.selectors[N];

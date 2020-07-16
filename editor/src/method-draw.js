@@ -27,6 +27,7 @@
                 canvas_expansion: 1,
                 //cflorioluis aqui esta el tamaño de la pieza
                 dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
+                realDimensions: [1500, 700],
                 cantos: [1, 0, 0, 1],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
@@ -107,8 +108,8 @@
                 })();
 
                 $("body").toggleClass("touch", svgedit.browser.isTouch());
-                $("#canvas_width").val(curConfig.dimensions[0] - 200); //cflorioluis ajustar que las opciones de la pieza den la medida real
-                $("#canvas_height").val(curConfig.dimensions[1] - 200);
+                $("#canvas_width").val(curConfig.realDimensions[0]); //cflorioluis ajustar que las opciones de la pieza den la medida real
+                $("#canvas_height").val(curConfig.realDimensions[1]);
 
                 //cflorioluis - calcular la cordenada menor de la pieza
                 lowDimension = curConfig.dimensions[1];
@@ -1903,7 +1904,7 @@
                             path: [],
                             //cforioluis - update cajeado contextual tools
                             cajeado: ["widthX", "heightY", "radio"],
-                            drill: ["cx", "cy", "r"]
+                            drill: ["realX", "realY", "diameter", ]
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
@@ -2256,8 +2257,58 @@
                         el.value = selectedElement.getAttribute(attr);
                         return false;
                     }
+                    var realX = parseInt($("#drill_realX").val()),
+                        realY = parseInt($("#drill_realY").val()),
+                        diameter = parseInt($("#drill_diameter").val()),
+                        face = svgCanvas.getSelectedElems()[0].getAttribute("face");
+
+                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+                    svgCanvas.getSelectedElems()[0].setAttribute("r", diameter / 2);
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+
+                    var r = parseInt(svgCanvas.getSelectedElems()[0].getAttribute("r"));
+
+                    /*console.clear();
+                    console.log(curConfig.realDimensions[0]);
+                    console.log(parseInt($("#drill_realX").val()) + r);*/
+                    //hacer que no se exceda horizontalmente
+                    switch (face) {
+                        case "1":
+                            if (realX < 0) {
+                                $("#drill_realX").val(r);
+                            }
+                            if (realX > curConfig.realDimensions[0]) {
+                                $("#drill_realX").val(curConfig.realDimensions[0]);
+                            }
+                            //hacer que no se exceda verticalmente
+                            if (realY < 0) {
+                                $("#drill_realY").val(r);
+                            }
+                            if (realY > curConfig.realDimensions[1]) {
+                                $("#drill_realY").val(curConfig.realDimensions[1]);
+                            }
+                            break;
+                        case "2":
+
+                            break;
+                        case "3":
+
+                            break;
+                        case "4":
+
+                            break;
+                        case "5":
+
+                            break;
+
+                        default:
+                            break;
+                    }
+
+
+
                 };
 
                 changeAttribute = function(el, completed) {
@@ -2881,7 +2932,7 @@
                                                 <img src="images/drill/edge_sup_down.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1">
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1" checked>
                                                 <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                             </label>
 
@@ -2912,20 +2963,20 @@
                             <div class="rowForm">
                                 <div class="columnFromCajeado right"><h3>Posición (X,Y)</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input required class="inputMecanizadoXY" id="newWidthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input required class="inputMecanizadoXY" id="newHeightDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="150" required class="inputMecanizadoXY" id="newWidthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="150"required class="inputMecanizadoXY" id="newHeightDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div class="columnFromCajeado right"><h3>Diametro</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input required class="inputMecanizado" id="newDiameterDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="50"required class="inputMecanizado" id="newDiameterDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div class="columnFromCajeado right"><h3>Pasante</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input type="checkbox" id="cboxPasante" value="pasante">
+                                    <input type="checkbox" id="cboxPasante" value="pasante" checked>
                                 </div>
                             </div>
                             <div class="rowForm hidden">
@@ -2937,14 +2988,17 @@
 
                             <script>
                                 $('#cboxPasante').click(function() {
-                                    $('.hidden').slideToggle("fast");
+                                    if($(this).is(':checked'))
+                                        $('.hidden').slideToggle("fast");
+                                    else
+                                        $('.hidden').fadeIn( "slow", );
                                 });
                             </script>    
 
                             <div class="rowForm">
                                 <div class="columnFromCajeado right"><h3>Broca</h3></div>
                                 <div class="columnFromCajeado broachSelection" style="padding-bottom: 10px;">
-                                    <input type="radio" name="BroachDrill" value="flat">Plana 
+                                    <input type="radio" name="BroachDrill" value="flat"checked >Plana 
                                     <input type="radio" name="BroachDrill" value="lance">Lanza
                                 </div>
                             </div>
@@ -3206,6 +3260,23 @@
                         $("input").blur();
                         //cflorioluis - evitar que un mecanizado se mueva con las flechas del techado
                         if (selectedElement.getAttribute("nameMecanizado") == "cajeado") return;
+
+                        if (selectedElement.getAttribute("nameMecanizado") == "drill") {
+
+                            var posX = Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
+                                posY = Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
+
+                            if (posX < 0 || posX > curConfig.realDimensions[0])
+                                return;
+
+                            if (posY < 0 || posY > curConfig.realDimensions[1])
+                                return;
+
+                            selectedElement.setAttribute("realX", posX);
+                            selectedElement.setAttribute("realY", posY);
+
+                        }
+
                         svgCanvas.moveSelectedElements(dx, -dy); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
                     }
                 };
@@ -4781,8 +4852,8 @@
                 });
                 //cflorioluis - ver el tamaño de la pieza pero no editarlo
                 $("#canvas_height").dragInput({
-                    min: curConfig.dimensions[1] - 200,
-                    max: curConfig.dimensions[1] - 200,
+                    min: curConfig.realDimensions[1],
+                    max: curConfig.realDimensions[1],
                     step: 0,
                     //callback: changeCanvasSize,
                     cursor: false,
@@ -4791,8 +4862,8 @@
                 $("#canvas_height").prop("readonly", true);
                 //cflorioluis - ver el tamaño de la pieza pero no editarlo
                 $("#canvas_width").dragInput({
-                    min: curConfig.dimensions[0] - 200, //cflorioluis ajustar que las opciones de la pieza den la medida real
-                    max: curConfig.dimensions[0] - 200,
+                    min: curConfig.realDimensions[0], //cflorioluis ajustar que las opciones de la pieza den la medida real
+                    max: curConfig.realDimensions[0],
                     step: 0,
                     //callback: changeCanvasSize,
                     cursor: false,
@@ -4955,14 +5026,14 @@
                 //cflorioluis - agregar funciones al cajeado
                 $("#cajeado_widthX").dragInput({
                     min: 1,
-                    max: curConfig.dimensions[0] - 200,
+                    max: curConfig.realDimensions[0],
                     step: 1,
                     callback: changeAttributeCajeado,
                     cursor: true,
                 });
                 $("#cajeado_heightY").dragInput({
                     min: 1,
-                    max: curConfig.dimensions[1] - 200,
+                    max: curConfig.realDimensions[1],
                     step: 1,
                     callback: changeAttributeCajeado,
                     cursor: true,
@@ -4975,21 +5046,21 @@
                     cursor: true,
                 });
                 //cflorioluis - agregar funciones al Taladro
-                $("#drill_cx").dragInput({
-                    min: 1,
-                    max: curConfig.dimensions[0] - 200,
+                $("#drill_realX").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[0],
                     step: 1,
                     callback: changeAttributeDrill,
                     cursor: true,
                 });
-                $("#drill_cy").dragInput({
-                    min: 1,
-                    max: curConfig.dimensions[1] - 200,
+                $("#drill_realY").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[1],
                     step: 1,
                     callback: changeAttributeDrill,
                     cursor: true,
                 });
-                $("#drill_r").dragInput({
+                $("#drill_diameter").dragInput({
                     min: 0,
                     max: lowDimension - 200,
                     step: 1,

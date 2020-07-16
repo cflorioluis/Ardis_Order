@@ -2389,7 +2389,7 @@ $.SvgCanvas = function(container, config) {
                 // only the first selectedBBoxes element is ever used in the codebase these days
                 //      if (j == 0) selectedBBoxes[0] = svgedit.utilities.getBBox(elem);
                 j++;
-                var sel = selectorManager.requestSelector(elem);
+                var sel = selectorManager.requestSelectorDrill(elem);
 
                 if (selectedElements.length > 1) {
                     sel.showGrips(false);
@@ -2649,6 +2649,39 @@ $.SvgCanvas = function(container, config) {
                 else if (griptype == "resize") {
                     current_mode = "resize";
                     current_resize_mode = elData(grip, "dir");
+
+
+                    //cflorioluis-hacer que los cajeados no se expandan desde los selectores que dan al exterior
+                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado") {
+                        var nw = "selectorGrip_resize_nw",
+                            n = "selectorGrip_resize_n",
+                            ne = "selectorGrip_resize_ne",
+                            e = "selectorGrip_resize_e",
+                            se = "selectorGrip_resize_se",
+                            s = "selectorGrip_resize_s",
+                            sw = "selectorGrip_resize_sw",
+                            w = "selectorGrip_resize_w";
+
+                        switch ((selectedElements[0].getAttribute("side"))) {
+                            case "4":
+                                if (grip.id == nw || grip.id == se || grip.id == s || grip.id == sw || grip.id == w)
+                                    return;
+                                break;
+                            case "3":
+                                if (grip.id == ne || grip.id == e || grip.id == se || grip.id == s || grip.id == sw)
+                                    return;
+                                break;
+                            case "2":
+                                if (grip.id == nw || grip.id == n || grip.id == ne || grip.id == e || grip.id == se)
+                                    return;
+                                break;
+                            case "1":
+                                if (grip.id == nw || grip.id == n || grip.id == ne || grip.id == sw || grip.id == w)
+                                    return;
+                                break;
+                        }
+                    }
+
                 }
                 mouse_target = selectedElements[0];
             }
@@ -2685,6 +2718,7 @@ $.SvgCanvas = function(container, config) {
                                 // No need to do the call here as it will be done on addToSelection
                                 clearSelection(true);
                             }
+
                             addToSelection([mouse_target]);
                             justSelected = mouse_target;
                             pathActions.clear();
@@ -2755,11 +2789,14 @@ $.SvgCanvas = function(container, config) {
                     // Getting the BBox from the selection box, since we know we
                     // want to orient around it
                     init_bbox = svgedit.utilities.getBBox($("#selectedBox0")[0]);
+                    //console.log(init_bbox);
                     var bb = {};
                     $.each(init_bbox, function(key, val) {
                         bb[key] = val / current_zoom;
+
                     });
                     init_bbox = bb;
+                    console.log(mouse_target);
                     // append three dummy transforms to the tlist so that
                     // we can translate,scale,translate in mousemove
                     var pos = getRotationAngle(mouse_target) ? 1 : 0;
@@ -3053,11 +3090,85 @@ $.SvgCanvas = function(container, config) {
                                     dx = xya.x - start_x;
                                     dy = xya.y - start_y;
                                 }
+
+
+                                //hacer que dependiendo de la cara de la pieza, no se mueva mas alla de la cara
+                                if (selected.getAttribute("nameMecanizado") == "drill") {
+                                    //console.log("(" + dx + "," + dy + ")");
+                                    var faceDrill = selected.getAttribute("face");
+                                    var posX = Math.floor(selected.getAttribute("cx")) - 100 + dx,
+                                        posY = Math.floor(selected.getAttribute("cy")) - 100 + dy,
+                                        rx = parseInt(selected.getAttribute("realX")),
+                                        ry = parseInt(selected.getAttribute("realY")),
+                                        r = parseInt(selected.getAttribute("r"));
+
+
+
+                                    //console.clear();
+                                    //console.log("(" + posX + "," + dx + ")");
+                                    switch (faceDrill) {
+                                        case "1":
+                                            var limits = 0,
+                                                wX = -rx,
+                                                sY = -ry,
+                                                eX = curConfig.realDimensions[0] - rx,
+                                                nY = curConfig.realDimensions[1] - ry;
+
+                                            /*console.clear();
+                                            console.log("(" + posX + "," + posY + ")");*/
+
+                                            if (posX < r) {
+                                                xform.setTranslate(wX, dy);
+                                                limits++;
+                                            }
+                                            if (posX > curConfig.realDimensions[0] - r) {
+                                                xform.setTranslate(eX, dy);
+                                                limits++;
+                                            }
+                                            if (posY < r) {
+                                                xform.setTranslate(dx, sY);
+                                                limits++;
+                                            }
+                                            if (posY > curConfig.realDimensions[1] - r) {
+                                                xform.setTranslate(dx, nY);
+                                                limits++;
+                                            }
+                                            if ((posX < r) && (posY > curConfig.realDimensions[1] - r)) {
+                                                xform.setTranslate(wX, nY);
+                                                limits++;
+                                            }
+                                            if ((posX > curConfig.realDimensions[0] - r) && (posY > curConfig.realDimensions[1] - r)) {
+                                                xform.setTranslate(eX, nY);
+                                                limits++;
+                                            }
+                                            if ((posX > curConfig.realDimensions[0] - r) && (posY < 0)) {
+                                                xform.setTranslate(eX, sY);
+                                                limits++;
+                                            }
+                                            if ((posX < r) && (posY < 0)) {
+                                                xform.setTranslate(wX, sY);
+                                                limits++;
+                                            }
+                                            if (limits)
+                                                break;
+
+                                            xform.setTranslate(dx, dy);
+                                            break;
+
+                                        default:
+
+                                            break;
+                                    }
+
+                                }
+
                                 //cflorioluis - Hacer que los mecanizados no se muevan y eliminar sus selectores
                                 //console.log(selected)
-                                if (selected.getAttribute("nameMecanizado") != "cajeado") {
+                                if (selected.getAttribute("nameMecanizado") == null) {
                                     xform.setTranslate(dx, dy);
                                 }
+
+
                                 if (tlist.numberOfItems) {
                                     tlist.replaceItem(xform, 0);
                                 } else {
@@ -3219,12 +3330,23 @@ $.SvgCanvas = function(container, config) {
                     if (selected.getAttribute("nameMecanizado") != "cajeado") {
                         scale.setScale(sx, sy);
                     } else {
+
                         var widthX = parseInt(selected.getAttribute("widthX"));
                         var maxWidth = parseInt(selected.getAttribute("maxWidth"));
                         var heightY = parseInt(selected.getAttribute("heightY"));
                         var maxHeight = parseInt(selected.getAttribute("maxHeight"));
+                        var radio = parseInt(selected.getAttribute("radio"));
                         var side = selected.getAttribute("side");
                         var id = selected.id;
+
+                        console.log(widthX * sx);
+                        /*if (widthX * sx < radio)
+                            selected.setAttribute("radio", Math.floor((widthX * sx) - 1));
+
+                        if (heightY * sy < radio)
+                            selected.setAttribute("radio", Math.floor((heightY * sy) - 1));*/
+                        if (widthX * sx < 0) sx = sx * -1
+                        if (heightY * sy < 0) sy = sy * -1
 
                         if (widthX * sx < maxWidth && heightY * sy < maxHeight) {
                             scale.setScale(sx, sy);
@@ -3239,12 +3361,20 @@ $.SvgCanvas = function(container, config) {
                             sy = maxHeight / heightY;
                             scale.setScale(sx, sy);
                         }
+
+
+
+
                         selected.setAttribute("tempWidth", Math.floor(sx * widthX));
                         selected.setAttribute("tempHeight", Math.floor(sy * heightY));
 
 
+
+
                         var tempWidth = selected.getAttribute("tempWidth");
                         var tempHeight = selected.getAttribute("tempHeight");
+
+
 
                         editLinesCantoCajeado(side, tempWidth, tempHeight, id);
                     }
@@ -3589,17 +3719,26 @@ $.SvgCanvas = function(container, config) {
                     break;
                 case "resize":
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-                    if (selectedElements[0].getAttribute("nameMecanizado")) {
+                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado") {
                         //console.log(selectedElements[0]);
                         tempWidth = parseInt(selectedElements[0].getAttribute("tempWidth"));
                         tempHeight = parseInt(selectedElements[0].getAttribute("tempHeight"));
                         widthX = parseInt(selectedElements[0].getAttribute("widthX"));
                         heightY = parseInt(selectedElements[0].getAttribute("heightY"));
+                        /*side = selectedElements[0].getAttribute("side");
+                        r = parseInt(selectedElements[0].getAttribute("radio"));*/
+
 
                         selectedElements[0].setAttribute("widthX", tempWidth);
                         selectedElements[0].setAttribute("heightY", tempHeight);
 
-                        //svgCanvas.selectorManager.requestSelector(selectedElement).resize();
+
+                        /*d = createRoundedCajeadoSide(widthX, heightY, r, side);
+
+                        selectedElements[0].setAttribute("d", d);*/
+
+
+                        //svgCanvas.selectorManager.requestSelector(selectedElements);
                     }
                 case "multiselect":
                     if (rubberBox != null) {
@@ -3704,19 +3843,34 @@ $.SvgCanvas = function(container, config) {
                         }
                     }
 
-                    //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-                    if (selectedElements[0] != null && selectedElements[0].getAttribute("nameMecanizado") != null) {
-                        newWidthX = parseInt(selectedElements[0].getAttribute("widthX"));
-                        newHeightY = parseInt(selectedElements[0].getAttribute("heightY"));
 
-                        side = selectedElements[0].getAttribute("side");
-                        w = newWidthX.toString();
-                        h = newHeightY.toString();
-                        r = selectedElements[0].getAttribute("radio");
-                        d = createRoundedCajeadoSide(w, h, r, side);
+                    if (selectedElements[0] != null) {
+                        //cflorioluis - limitar que un cajeado se expanda mas que la pieza
+                        if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado") {
+                            newWidthX = parseInt(selectedElements[0].getAttribute("widthX"));
+                            newHeightY = parseInt(selectedElements[0].getAttribute("heightY"));
 
-                        selectedElements[0].setAttribute("d", d);
+                            side = selectedElements[0].getAttribute("side");
+                            w = newWidthX.toString();
+                            h = newHeightY.toString();
+                            r = selectedElements[0].getAttribute("radio");
+                            d = createRoundedCajeadoSide(w, h, r, side);
+
+                            selectedElements[0].setAttribute("d", d);
+                        }
+                        //cflorioluis - actualizar valor real de las cordenadas X,Y
+                        if (selectedElements[0].getAttribute("nameMecanizado") == "drill") {
+                            var posX = parseInt(selectedElements[0].getAttribute("cx") - 100),
+                                posY = parseInt(selectedElements[0].getAttribute("cy") - 100);
+
+                            selectedElements[0].setAttribute("realX", posX);
+                            selectedElements[0].setAttribute("realY", posY);
+
+                            $("#drill_realX").val(posX);
+                            $("#drill_realY").val(posY);
+                        }
                     }
+
                     return;
                     break;
                 case "zoom":
@@ -9507,10 +9661,10 @@ $.SvgCanvas = function(container, config) {
     this.moveSelectedElements = function(dx, dy, undoable) {
         // if undoable is not sent, default to true
         // if single values, scale them to the zoom
-        if (dx.constructor != Array) {
+        /*if (dx.constructor != Array) {  //cflorioluis - hacer que los mecanizados se muevan cantidades enteras en las cordenadas
             dx /= current_zoom;
             dy /= current_zoom;
-        }
+        }*/
         var undoable = undoable || true;
         var batchCmd = new BatchCommand("position");
         var i = selectedElements.length;
@@ -9826,10 +9980,15 @@ $.SvgCanvas = function(container, config) {
             });
         }
 
+        console.log("www");
+
+        //if(selectedElements[0].getAttribute)
         selectorManager.selectorParentGroup.setAttribute(
             "transform",
             "translate(" + x + "," + y + ")"
         );
+
+
 
 
 
@@ -10208,7 +10367,7 @@ $.SvgCanvas = function(container, config) {
                 var opacity = 1;
 
                 if (!isPasante)
-                    opacity = 0.35
+                    opacity = 0.5
 
 
                 addSvgElementFromJson({
@@ -10218,6 +10377,9 @@ $.SvgCanvas = function(container, config) {
                         cx: parseInt(x) + 100,
                         cy: parseInt(y) + 100,
                         r: r,
+                        realX: parseInt(x),
+                        realY: parseInt(y),
+                        diameter: r * 2,
                         id: getNextId(),
                         opacity: opacity,
                         nameMecanizado: "drill",
@@ -10793,7 +10955,7 @@ $.SvgCanvas = function(container, config) {
                                 "fill-opacity": "null",
                                 x: 100,
                                 y: curConfig.dimensions[1] - 62,
-                                width: curConfig.dimensions[0] - 200,
+                                width: curConfig.realDimensions[0],
                                 height: 58,
                                 id: "svg__1_canto4",
                                 "stroke-dasharray": "none",
@@ -10815,7 +10977,7 @@ $.SvgCanvas = function(container, config) {
                                 x: curConfig.dimensions[0] - 62,
                                 y: 100,
                                 width: 58,
-                                height: curConfig.dimensions[1] - 200,
+                                height: curConfig.realDimensions[1],
                                 id: "svg__1_canto3",
                                 "stroke-dasharray": "none",
                                 opacity: "0.3",
@@ -10835,7 +10997,7 @@ $.SvgCanvas = function(container, config) {
                                 "fill-opacity": "null",
                                 x: 100,
                                 y: 4,
-                                width: curConfig.dimensions[0] - 200,
+                                width: curConfig.realDimensions[0],
                                 height: 58,
                                 id: "svg__1_canto1",
                                 "stroke-dasharray": "none",
@@ -10857,7 +11019,7 @@ $.SvgCanvas = function(container, config) {
                                 x: 3,
                                 y: 100,
                                 width: 58,
-                                height: curConfig.dimensions[1] - 200,
+                                height: curConfig.realDimensions[1],
                                 id: "svg__1_canto2",
                                 "stroke-dasharray": "none",
                                 opacity: "0.3",
