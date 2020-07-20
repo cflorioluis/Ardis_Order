@@ -156,7 +156,7 @@
                         cajeadoTool: "cajeadoTool.png",
                         cremalleraTool: "cremallera.png",
                         drillTool: "drill.png",
-                        cabinetHingesTool: "cabinetHinges.png",
+                        hingesTool: "cabinetHinges.png",
                         select_node: "select_node.png",
                         pencil: "pencil.png",
                         pen: "line.png",
@@ -185,7 +185,7 @@
                         "#tool_cajeadoTool": "cajeadoTool",
                         "#tool_cremalleraTool": "cremalleraTool",
                         "#tool_drillTool": "drillTool",
-                        "#tool_cabinetHingesTool": "cabinetHingesTool",
+                        "#tool_hingesTool": "hingesTool",
                         //
                         "#tool_fhpath": "pencil",
                         "#tool_line": "pen",
@@ -375,7 +375,7 @@
                     ],
                     isMac = navigator.platform.indexOf("Mac") >= 0,
                     isWebkit = navigator.userAgent.indexOf("AppleWebKit") >= 0,
-                    modKey = isMac ? "meta+" : "ctrl+", // ⌘
+                    modKey = isMac ? "meta+" : "Ctrl+", // ⌘
                     path = svgCanvas.pathActions,
                     undoMgr = svgCanvas.undoMgr,
                     Utils = svgedit.utilities,
@@ -2818,7 +2818,7 @@
                         `<strong><h2 id="moveConfirm" style="cursor: move;">Cajeado</h2></strong>` +
                         `<form>
 
-                            <div class="rowForm" style="padding-bottom: 10px;">
+                            <div class="rowForm" style="padding-bottom: 0px;">
                                 <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
                                 <div class="columnFromCajeado">
                                     <div class="tablero grid">
@@ -2896,7 +2896,7 @@
                             );
                         },
                         350,
-                        340,
+                        320,
                         true,
                         "cajeado"
                     );
@@ -2918,7 +2918,7 @@
                         `<strong><h2 id="moveConfirm" style="cursor: move;">Taladro</h2></strong>` +
                         `<form>
 
-                        <div class="rowForm" style="padding-bottom: 10px;">
+                        <div class="rowForm" style="padding-bottom: 0px;">
                                 <div class="columnFromDrill right"><h3>Seleccionar Cara</h3></div>
                                 <div class="columnFromDrill FaceSelection" style="height: 69px;width: 121px;">
                                
@@ -3036,15 +3036,15 @@
                                 radio
                             );*/
                         },
-                        370,
-                        450,
+                        350,
+                        400,
                         true,
                         "drill"
                     );
                 };
 
-                var clickCabinetHingesTool = function() {
-                    if (toolButtonClick("#tool_cabinetHingesTool")) {
+                var clickHingesTool = function() {
+                    if (toolButtonClick("#tool_hingesTool")) {
                         svgCanvas.setMode("cabinetHinges");
                     }
 
@@ -3052,54 +3052,54 @@
                         `<strong><h2 id="moveConfirm" style="cursor: move;">Cazoleta</h2></strong>` +
                         `<form>
 
-                        <div class="rowForm" style="padding-bottom: 10px;">
-                                <div class="columnFromDrill right"><h3>Seleccionar Cara</h3></div>
+                        <div class="rowForm" style="padding-bottom: 0px;">
+                                <div class="columnFromDrill right"><h3>Origen</h3></div>
                                 <div class="columnFromDrill FaceSelection" style="height: 69px;width: 121px;">
                                
                                     <div class="gridDrill">
-                                        <div class="columnDrill">                                            
+                                        <div class="columnHinges">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="5">
-                                                <img src="images/drill/edge_left_right.png">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1"disabled>
+                                                <img src="images/drill/edge_left_right_white.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value=0" disabled>
-                                                <img src="images/drill/corner.png">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value=0">
+                                                <img src="images/drill/corner_left.svg">
                                             </label>                                    
                                         </div>
-                                        <div class="columnDrill wide">                                            
+                                        <div class="columnHinges wide">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2">
-                                                <img src="images/drill/edge_sup_down.png" >
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_sup_down_white.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1" checked>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
                                                 <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4">
-                                                <img src="images/drill/edge_sup_down.png">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_sup_down_white.png">
                                             </label>                                    
                                         </div>
-                                        <div class="columnDrill">                                            
+                                        <div class="columnHinges">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3"  >
-                                                <img src="images/drill/edge_left_right.png">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_left_right_white.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
-                                                <img src="images/drill/corner.png">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="1" >
+                                                <img src="images/drill/corner_right.svg">
                                             </label>                                    
                                         </div>
                                     </div>
@@ -3107,30 +3107,32 @@
                             </div>
 
                             <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Posición (X,Y)</h3></div>
+                                <div class="columnFromCajeado right"><h3>Dist. del Origen</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input value="150" required class="inputMecanizadoXY" id="newWidthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input value="150"required class="inputMecanizadoXY" id="newHeightDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input placeholder="Inicio" required class="inputMecanizadoXY" id="newDepartX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input placeholder="Fin" right required class="inputMecanizadoXY" id="newFinX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Diametro</h3></div>
+                                <div class="columnFromCajeado right"><h3>Cantidad de Cazoletas</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input value="50"required class="inputMecanizado" id="newDiameterDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="2" required class="inputMecanizado" id="newNombreCant" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Pasante</h3></div>
+                                <div  class="columnFromCajeado right"><h3>Distancia entre Ejes</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input type="checkbox" id="cboxPasante" value="pasante" checked>
+                                    <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
-                            <div class="rowForm hidden">
-                                <div  class="columnFromCajeado right"><h3>Profundidad</h3></div>
+                            <div class="rowForm">
+                                <div  class="columnFromCajeado right"><h3>Distancia entre Ejes</h3></div>
                                 <div class="columnFromCajeado">
-                                    <input required class="inputMecanizado" id="newDepthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
+
+
 
                             <script>
                                 $('#cboxPasante').click(function() {
@@ -3170,7 +3172,7 @@
                                 radio
                             );*/
                         },
-                        370,
+                        350,
                         450,
                         true,
                         "drill"
@@ -3623,16 +3625,24 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`
                                 opsideElement.append("2");
                                 sideElement.append("0");
                                 break;
+                            case "cabinetHinges":
+                                functNameElement.append("_Cazoleta");
+                                var param = `"Origine" VAR "0":"Depart_X" VAR "` + mecanizado.getAttribute("starX") + `":"Fin_X" VAR "` + mecanizado.getAttribute("endY") + `":"nombre" VAR "2":"entraxe" VAR "0":"Dia_insert" VAR "10":"Prof_insert" VAR "10":"Dia_charniere" VAR "35":"Prof_charn" VAR "13"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                sideElement.append("0");
+                                break;
+
                         }
 
                         doc.appendChild(drawElement);
-                        csv = csv + new XMLSerializer().serializeToString(doc);
+                        csv += new XMLSerializer().serializeToString(doc);
                     }
                     // Once we are done looping, download the .csv by creating a link
                     let link = document.createElement('a')
                     link.id = 'download-csv'
                     link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-                    link.setAttribute('download', curConfig.dimensions[0] + `x` + curConfig.dimensions[1] + `.csv`);
+                    link.setAttribute('download', curConfig.realDimensions[0] + `x` + curConfig.realDimensions[1] + `.csv`);
                     document.body.appendChild(link)
                     document.querySelector('#download-csv').click()
                 };
@@ -4554,32 +4564,32 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`
                             sel: "#tool_select",
                             fn: clickSelect,
                             evt: "click",
-                            key: ["V", true],
+                            key: [modKey + "Shift+1"],
                         },
                         //add new toll - cflorioluis
                         {
                             sel: "#tool_cajeadoTool",
                             fn: clickCajeadoTool,
                             evt: "click",
-                            key: ["K", true],
+                            key: [modKey + "Shift+2"],
                         },
                         {
                             sel: "#tool_cremalleraTool",
                             fn: clickCremalleraTool,
                             evt: "click",
-                            key: ["O", true],
+                            key: [modKey + "Shift+3"],
                         },
                         {
                             sel: "#tool_drillTool",
                             fn: clickDrillTool,
                             evt: "click",
-                            key: ["D", true],
+                            key: [modKey + "Shift+4"],
                         },
                         {
-                            sel: "#tool_cabinetHingesTool",
-                            fn: clickCabinetHingesTool,
+                            sel: "#tool_hingesTool",
+                            fn: clickHingesTool,
                             evt: "click",
-                            key: ["C", true],
+                            key: [modKey + "Shift+5"],
                         },
 
 

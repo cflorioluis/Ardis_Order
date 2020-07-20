@@ -1469,8 +1469,8 @@ button.cancel {
 
 #dialog_content_custom {
     height: 95px;
-    margin: 10px 10px 5px 10px;
-    overflow: auto;
+    margin: 0px 10px 5px 10px;
+    overflow: hidden;
     text-align: left;
     font-size: 13px;
 }
@@ -2337,7 +2337,23 @@ input[readonly=readonly]:focus {
 
 /* CHECKED STYLES */
 
+
+/*
+.class_checkbox {
+    width: 20px;  
+    height: 20px;
+    background-color: red;
+}
+.class_checkbox.checked {
+    background-color: green;
+}*/
+
+.arrowLeft {
+    src: "images/drill/corner_left_checked.svg"
+}
+
 [type=radio][name="corner"]:checked+img,
+[type=radio][name="origin"]:checked+img,
 [type=radio][name="face"]:checked+img {
     outline: 2px solid #f00 !important;
     overflow: hidden;
@@ -2388,6 +2404,15 @@ input[readonly=readonly]:focus {
     width: 12px;
 }
 
+.columnHinges.wide {
+    width: 98px;
+    padding-left: 1px;
+}
+
+.columnHinges {
+    width: 14px;
+}
+
 .grid>div {
     padding: 0px;
 }
@@ -2410,6 +2435,7 @@ input[readonly=readonly]:focus {
     content: "";
     display: table;
     clear: both;
+    /*height: 10px !important;*/
 }
 
 .columnFromCajeado.right {
@@ -2463,4 +2489,9 @@ input[type=checkbox] {
     /* Opera */
     transform: scale(1.5);
     margin-top: 17px;
+}
+
+input[right][type="text"]::placeholder {
+    /* Firefox, Chrome, Opera */
+    text-align: right;
 }
