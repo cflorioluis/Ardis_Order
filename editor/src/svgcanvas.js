@@ -10364,10 +10364,15 @@ $.SvgCanvas = function(container, config) {
             case "1":
                 console.log("cara Principal");
 
-                var opacity = 1;
+                var opacity = 1,
+                    cross = 1;
 
-                if (!isPasante)
-                    opacity = 0.5
+                if (!isPasante) {
+                    opacity = 0.5;
+                    cross = 0;
+                }
+
+
 
 
                 addSvgElementFromJson({
@@ -10387,6 +10392,9 @@ $.SvgCanvas = function(container, config) {
                         stroke: "#000",
                         fill: "#3F3F3F",
                         "stroke-width": "0",
+                        cross: cross,
+                        depth: depth,
+                        broachType: broachType,
                     },
                 });
 

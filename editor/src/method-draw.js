@@ -3333,7 +3333,7 @@
                 var clickClear = function() {
                     var dims = curConfig.dimensions;
                     $.confirm(
-                        "<strong>Do you want to clear the drawing?</strong>\nThis will also erase your undo history",
+                        `<strong> <h2 id="moveConfirm" style="cursor: move;line-height: normal;">Desea Borrar Todos los Mecanizados del Tablero?</h2></strong>\nEsta Opcion no se puede deshacer`,
                         function(ok) {
                             if (!ok) return;
                             //cflorioluis - dialogo para hacer el tablero nuevo
@@ -3386,6 +3386,110 @@
                             });
                         });
                     }
+                };
+
+                //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
+
+                var clickExportPartDraw = function() {
+                    let csv =
+                        `"partMat";"partDText";"partL";"partW";"partqty";"partRef";"partEdge1";"partEdge2";"partEdge3";"partEdge4";"PartFRef";"PartFDate";"partD";"partdraw"
+U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`
+                        /*let items = [
+                            { "name1": "Item 1", "color": "Green", "size": "X-Large" },
+                            { "name": "Item 2", "color": "Green", "size": "X-Large" },
+                            { "name": "Item 3", "color": "Green", "size": "X-Large" }
+                        ]
+
+                        // Loop the array of objects
+                        for (let row = 0; row < items.length; row++) {
+                            let keysAmount = Object.keys(items[row]).length
+                            let keysCounter = 0
+
+                            // If this is the first row, generate the headings
+                            if (row === 0) {
+
+                                // Loop each property of the object
+                                for (let key in items[row]) {
+
+                                    // This is to not add a comma at the last cell
+                                    // The '\n' adds a new line
+                                    csv += key + (keysCounter + 1 < keysAmount ? ';' : '\r\n')
+                                    keysCounter++
+                                }
+                            } else {
+                                for (let key in items[row]) {
+                                    csv += items[row][key] + (keysCounter + 1 < keysAmount ? ';' : '\r\n')
+                                    keysCounter++
+                                }
+                            }
+
+                            keysCounter = 0
+                        }*/
+                        /*console.log(csv)
+
+                        */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    var mecanizados = $("[nameMecanizado]");
+
+                    for (let ii = 0; ii < mecanizados.length; ii++) {
+                        const mecanizado = mecanizados[ii];
+
+                        var doc = document.implementation.createDocument("", "", null);
+
+                        var drawElement = doc.createElement("Draw");
+                        var functNameElement = doc.createElement("FUNCTNAME");
+                        var paramElement = doc.createElement("PARAM");
+                        var opsideElement = doc.createElement("OPSIDE");
+                        var sideElement = doc.createElement("SIDE");
+
+                        drawElement.appendChild(functNameElement);
+                        drawElement.appendChild(paramElement);
+                        drawElement.appendChild(opsideElement);
+                        drawElement.appendChild(sideElement);
+
+                        switch (mecanizado.getAttribute("nameMecanizado")) {
+                            case "cajeado":
+                                functNameElement.append("_Cajeado");
+                                var param = `"DiaFr" VAR "` + mecanizado.getAttribute("radio") + `":"Hoek" VAR "` + mecanizado.getAttribute("side") + `":"StartX" VAR "` + mecanizado.getAttribute("widthX") + `":"StartY" VAR "` + mecanizado.getAttribute("heightY") + `"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                sideElement.append("0");
+                                break;
+                            case "drill":
+                                functNameElement.append("_Taladro");
+                                var param = `"Origine" VAR "0":"Depart_X" VAR "` + mecanizado.getAttribute("realX") + `":"Depart_Y" VAR "` + mecanizado.getAttribute("realY") + `":"diametre" VAR "` + mecanizado.getAttribute("diameter") + `":"profondeur" VAR "` + mecanizado.getAttribute("depth") + `":"debouchant" VAR "` + mecanizado.getAttribute("cross") + `"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                sideElement.append("0");
+                                break;
+                        }
+
+                        doc.appendChild(drawElement);
+                        csv = csv + new XMLSerializer().serializeToString(doc);
+                    }
+                    // Once we are done looping, download the .csv by creating a link
+                    let link = document.createElement('a')
+                    link.id = 'download-csv'
+                    link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+                    link.setAttribute('download', curConfig.dimensions[0] + `x` + curConfig.dimensions[1] + `.csv`);
+                    document.body.appendChild(link)
+                    document.querySelector('#download-csv').click()
                 };
 
                 // by default, svgCanvas.open() is a no-op.
@@ -4388,6 +4492,9 @@
                             key: [modKey + "S", true],
                         },
                         { sel: "#tool_export", fn: clickExport, evt: "mouseup" },
+                        //cflorioluis - evento al seleccionar exportar a partDraw, definicion del evento
+                        { sel: "#tool_export_part_draw", fn: clickExportPartDraw, evt: "mouseup" },
+
                         { sel: "#tool_open", fn: clickOpen, evt: "mouseup" },
                         { sel: "#tool_import", fn: clickImport, evt: "mouseup" },
                         {
