@@ -3053,8 +3053,8 @@
                         `<form>
 
                         <div class="rowForm" style="padding-bottom: 0px;">
-                                <div class="columnFromDrill right"><h3>Origen</h3></div>
-                                <div class="columnFromDrill FaceSelection" style="height: 69px;width: 121px;">
+                                <div class="columnFromHinges right"><h3>Origen</h3></div>
+                                <div class="columnFromHinges FaceSelection" style="height: 69px;width: 121px;">
                                
                                     <div class="gridDrill">
                                         <div class="columnHinges">                                            
@@ -3107,27 +3107,27 @@
                             </div>
 
                             <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Dist. del Origen</h3></div>
-                                <div class="columnFromCajeado">
+                                <div class="columnFromHinges right"><h3>Dist. del Origen</h3></div>
+                                <div class="columnFromHinges">
                                     <input placeholder="Inicio" required class="inputMecanizadoXY" id="newDepartX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                     <input placeholder="Fin" right required class="inputMecanizadoXY" id="newFinX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Cantidad de Cazoletas</h3></div>
-                                <div class="columnFromCajeado">
+                                <div class="columnFromHinges right"><h3>Cantidad de Cazoletas</h3></div>
+                                <div class="columnFromHinges">
                                     <input value="2" required class="inputMecanizado" id="newNombreCant" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromCajeado right"><h3>Distancia entre Ejes</h3></div>
-                                <div class="columnFromCajeado">
+                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
+                                <div class="columnFromHinges">
                                     <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromCajeado right"><h3>Distancia entre Ejes</h3></div>
-                                <div class="columnFromCajeado">
+                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
+                                <div class="columnFromHinges">
                                     <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
@@ -3172,10 +3172,10 @@
                                 radio
                             );*/
                         },
-                        350,
+                        400,
                         450,
                         true,
-                        "drill"
+                        "hinges"
                     );
 
 
@@ -3540,65 +3540,14 @@
                 var clickExportPartDraw = function() {
                     let csv =
                         `"partMat";"partDText";"partL";"partW";"partqty";"partRef";"partEdge1";"partEdge2";"partEdge3";"partEdge4";"PartFRef";"PartFDate";"partD";"partdraw"
-U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`
-                        /*let items = [
-                            { "name1": "Item 1", "color": "Green", "size": "X-Large" },
-                            { "name": "Item 2", "color": "Green", "size": "X-Large" },
-                            { "name": "Item 3", "color": "Green", "size": "X-Large" }
-                        ]
-
-                        // Loop the array of objects
-                        for (let row = 0; row < items.length; row++) {
-                            let keysAmount = Object.keys(items[row]).length
-                            let keysCounter = 0
-
-                            // If this is the first row, generate the headings
-                            if (row === 0) {
-
-                                // Loop each property of the object
-                                for (let key in items[row]) {
-
-                                    // This is to not add a comma at the last cell
-                                    // The '\n' adds a new line
-                                    csv += key + (keysCounter + 1 < keysAmount ? ';' : '\r\n')
-                                    keysCounter++
-                                }
-                            } else {
-                                for (let key in items[row]) {
-                                    csv += items[row][key] + (keysCounter + 1 < keysAmount ? ';' : '\r\n')
-                                    keysCounter++
-                                }
-                            }
-
-                            keysCounter = 0
-                        }*/
-                        /*console.log(csv)
-
-                        */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     var mecanizados = $("[nameMecanizado]");
+                    //console.log(mecanizados);
+                    var doc = document.implementation.createDocument("", "", null);
 
                     for (let ii = 0; ii < mecanizados.length; ii++) {
                         const mecanizado = mecanizados[ii];
-
-                        var doc = document.implementation.createDocument("", "", null);
-
                         var drawElement = doc.createElement("Draw");
                         var functNameElement = doc.createElement("FUNCTNAME");
                         var paramElement = doc.createElement("PARAM");
@@ -3632,19 +3581,23 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`
                                 opsideElement.append("2");
                                 sideElement.append("0");
                                 break;
-
                         }
 
                         doc.appendChild(drawElement);
-                        csv += new XMLSerializer().serializeToString(doc);
+                        var draw = new XMLSerializer().serializeToString(doc);
+                        //console.log(draw);
+                        csv += draw;
+                        //console.log(csv);
+                        doc.removeChild(drawElement);
                     }
                     // Once we are done looping, download the .csv by creating a link
-                    let link = document.createElement('a')
-                    link.id = 'download-csv'
+                    let link = document.createElement('a');
+                    let idDownload = 'download-csv-' + (new Date().getTime());
+                    link.id = idDownload
                     link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
                     link.setAttribute('download', curConfig.realDimensions[0] + `x` + curConfig.realDimensions[1] + `.csv`);
                     document.body.appendChild(link)
-                    document.querySelector('#download-csv').click()
+                    document.querySelector('#' + idDownload).click()
                 };
 
                 // by default, svgCanvas.open() is a no-op.

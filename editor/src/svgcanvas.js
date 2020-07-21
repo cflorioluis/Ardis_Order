@@ -9952,11 +9952,6 @@ $.SvgCanvas = function(container, config) {
              y: y - 50,
          });*/
 
-
-
-
-
-
         var bg_img = getElem("background_image");
         if (bg_img) {
             assignAttributes(bg_img, {
@@ -9965,17 +9960,13 @@ $.SvgCanvas = function(container, config) {
             });
         }
 
-        console.log("www");
+        //console.log("www");
 
         //if(selectedElements[0].getAttribute)
         selectorManager.selectorParentGroup.setAttribute(
             "transform",
             "translate(" + x + "," + y + ")"
         );
-
-
-
-
 
         return {
             x: x,
@@ -10379,8 +10370,7 @@ $.SvgCanvas = function(container, config) {
 
         switch (face) {
             case "1":
-                console.log("cara Principal");
-
+                //console.log("cara Principal");
                 var opacity = 1,
                     cross = 1;
 

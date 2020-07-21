@@ -845,7 +845,7 @@ var svgedit = svgedit || {};
 
     //cflorioluis - Copy function for Drill tool
     svgedit.select.SelectorManager.prototype.requestSelectorDrill = function(elem) {
-        console.log("holas");
+        //console.log("holas");
         if (elem == null) return null;
         var N = this.selectors.length;
         // If we've already acquired one for this element, return it.

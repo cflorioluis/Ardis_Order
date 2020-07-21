@@ -2448,6 +2448,16 @@ input[readonly=readonly]:focus {
     width: 40%;
 }
 
+.columnFromHinges.right {
+    text-align: right;
+    padding-right: 5%;
+}
+
+.columnFromHinges {
+    float: left;
+    width: 45%;
+}
+
 .columnFromDrill.right {
     text-align: right;
     padding-right: 5%;
