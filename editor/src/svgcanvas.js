@@ -2699,6 +2699,8 @@ $.SvgCanvas = function(container, config) {
 
                 case "select":
                     //cflorioluis - ignorar elementos divisorios
+
+                    //console.log(mouse_target);
                     if (mouse_target.getAttribute("ignore"))
                         return
 
@@ -3843,7 +3845,9 @@ $.SvgCanvas = function(container, config) {
                         if (selectedElements[0].getAttribute("nameMecanizado") == "drill") {
                             var posX = parseInt(selectedElements[0].getAttribute("cx") - 100),
                                 posY = parseInt(selectedElements[0].getAttribute("cy") - 100),
-                                r = Math.floor(parseFloat(selectedElements[0].getAttribute("r")));
+                                r = parseFloat(selectedElements[0].getAttribute("r"));
+
+                            r = (Math.round(r * 2) / 2).toFixed(1);
 
                             selectedElements[0].setAttribute("realX", posX);
                             selectedElements[0].setAttribute("realY", posY);

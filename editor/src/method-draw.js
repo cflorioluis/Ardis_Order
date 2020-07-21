@@ -3068,7 +3068,7 @@
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value=0">
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value=0" checked>
                                                 <img src="images/drill/corner_left.svg">
                                             </label>                                    
                                         </div>
@@ -3107,33 +3107,50 @@
                             </div>
 
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3>Dist. del Origen</h3></div>
+                                <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
                                 <div class="columnFromHinges">
-                                    <input placeholder="Inicio" required class="inputMecanizadoXY" id="newDepartX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input placeholder="Fin" right required class="inputMecanizadoXY" id="newFinX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newDepartX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newFinX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3>Cantidad de Cazoletas</h3></div>
+                                <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="2" required class="inputMecanizado" id="newNombreCant" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
-                                <div class="columnFromHinges">
-                                    <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="2" required class="inputMecanizadoHinges" id="newNombreCant" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
                                 <div class="columnFromHinges">
-                                    <input required class="inputMecanizado" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="10" required class="inputMecanizadoHinges" id="newDiaInsert" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="10" required class="inputMecanizadoHinges" id="newProfInsert" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="35" required class="inputMecanizadoHinges" id="newDiaCharniere" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="13" required class="inputMecanizadoHinges" id="newProfCharniere" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
 
-
-
+<!--
                             <script>
                                 $('#cboxPasante').click(function() {
                                     if($(this).is(':checked'))
@@ -3149,7 +3166,7 @@
                                     <input type="radio" name="BroachDrill" value="flat"checked >Plana 
                                     <input type="radio" name="BroachDrill" value="lance">Lanza
                                 </div>
-                            </div>
+                            </div>-->
                         `,
                         function(ok) {
                             if (!ok) return;
@@ -3173,7 +3190,7 @@
                             );*/
                         },
                         400,
-                        450,
+                        530,
                         true,
                         "hinges"
                     );
@@ -3264,7 +3281,6 @@
                 // an element has been selected
                 var deleteSelected = function() {
                     if (selectedElement != null || multiselected) {
-
                         //mantener los id de la seleccion para ver si son mecanizados y borrar 
                         //sus relacionados de manera correcta para que queden en el historial Ctrl-Z
                         var tempMultiSelected = multiselected;
@@ -3273,29 +3289,21 @@
 
                         svgCanvas.deleteSelectedElements();
 
-                        if (multiselected) {
-                            for (let ii = 0; ii < tempMultiSelected.length; ii++) {
-                                isMulti = true;
-
-                                const element = tempMultiSelected[ii];
-
-                                //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
-                                if (element.getAttribute("nameMecanizado") == "cajeado") {
-
-                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
-                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
-
-                                    svgCanvas.deleteSelectedElements();
-                                }
+                        for (let ii = 0; ii < tempMultiSelected.length; ii++) {
+                            isMulti = true;
+                            const element = tempMultiSelected[ii];
+                            //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
+                            if (element.getAttribute("nameMecanizado") == "cajeado") {
+                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
+                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
+                                svgCanvas.deleteSelectedElements();
                             }
                         }
 
                         if (!isMulti) {
                             if (tempSelected.getAttribute("nameMecanizado") == "cajeado") {
-
                                 svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line1")], true);
                                 svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line2")], true);
-
                                 svgCanvas.deleteSelectedElements();
                             }
                         }
@@ -3304,6 +3312,14 @@
                     if (path.getNodePoint()) {
                         path.deletePathNode();
                     }
+
+                    /*console.log(multiselected);
+                    if (selectedElement != null || multiselected) {
+                        svgCanvas.deleteSelectedElements();
+                    }
+                    if (path.getNodePoint()) {
+                        path.deletePathNode();
+                    }*/
                 };
 
                 var cutSelected = function() {
@@ -3426,6 +3442,14 @@
 
                         svgCanvas.moveSelectedElements(dx, -dy); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
                     }
+                };
+
+                var scaleRadiusSelected = function(r) {
+
+                    if (selectedElement != null || selectedElement.getAttribute("nameMecanizado") != null || selectedElement.getAttribute("nameMecanizado") != "drill") return;
+
+                    var radio = parseInt(selectedElement.getAttribute("r"));
+                    selectedElement.setAttribute("r", radio + r);
                 };
 
                 var linkControlPoints = function() {
@@ -4784,6 +4808,12 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             },
                         },
                         {
+                            key: ["+", true],
+                            fn: function() {
+                                scaleRadiusSelected(1);
+                            },
+                        },
+                        {
                             key: ["up", true],
                             fn: function() {
                                 moveSelected(0, -1);
@@ -4858,25 +4888,25 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         {
                             key: ["alt+shift+up", true],
                             fn: function() {
-                                svgCanvas.cloneSelectedElements(0, -10);
+                                svgCanvas.cloneSelectedElements(0, 32);
                             },
                         },
                         {
                             key: ["alt+shift+down", true],
                             fn: function() {
-                                svgCanvas.cloneSelectedElements(0, 10);
+                                svgCanvas.cloneSelectedElements(0, -32);
                             },
                         },
                         {
                             key: ["alt+shift+left", true],
                             fn: function() {
-                                svgCanvas.cloneSelectedElements(-10, 0);
+                                svgCanvas.cloneSelectedElements(-32, 0);
                             },
                         },
                         {
                             key: ["alt+shift+right", true],
                             fn: function() {
-                                svgCanvas.cloneSelectedElements(10, 0);
+                                svgCanvas.cloneSelectedElements(32, 0);
                             },
                         },
                         {
@@ -5284,7 +5314,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     cursor: true,
                 });
                 $("#drill_diameter").dragInput({
-                    min: 0,
+                    min: 1,
                     max: lowDimension - 200,
                     step: 1,
                     callback: changeAttributeDrill,

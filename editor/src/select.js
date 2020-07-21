@@ -204,6 +204,16 @@ var svgedit = svgedit || {};
             nbaw = aabox.width + offset * 2,
             nbah = aabox.height + offset * 2;
 
+        //cflorioluis - Ajustar Selector si se trata de un Drill menor a 25 de diametro
+        if (selected.getAttribute("nameMecanizado") != null &&
+            (selected.getAttribute("nameMecanizado") == "drill") && parseInt(selected.getAttribute("r")) < 14) {
+            nbax = aabox.x - offset - 10,
+                nbay = aabox.y - offset - 10,
+                nbaw = 20 + aabox.width + offset * 2,
+                nbah = 20 + aabox.height + offset * 2;
+        }
+
+
         // now if the shape is rotated, un-rotate it
         var cx = nbax + nbaw / 2,
             cy = nbay + nbah / 2;
