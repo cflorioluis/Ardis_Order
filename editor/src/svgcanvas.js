@@ -10338,6 +10338,73 @@ $.SvgCanvas = function(container, config) {
         //cajeadoCreated.appendChild(lineCajeadoCreated);
     });
 
+    var createHinge = (this.createHinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
+
+        var d = "",
+            cx = parseInt(beginX) + 100,
+            cxEnd = curConfig.realDimensions[0] + 100 - parseInt(endX),
+            cy = 150, //preguntar a hector a qe profundidad esta 
+            diameter = parseInt(hingeDiameter),
+            r = diameter / 2,
+            diameterDrill = parseInt(drillDiameter),
+            rDrill = diameterDrill / 2,
+            aDist = parseInt(axisDist),
+            hingeDistance = (curConfig.realDimensions[0] - parseInt(beginX) - parseInt(endX)) / (parseInt(hingeCount) - 1);
+
+        /*d="
+      M (CX - R), CY
+      a R,R 0 1,0 (R * 2),0
+      a R,R 0 1,0 -(R * 2),0
+    "*/
+
+        console.log(d);
+        console.log(r);
+        for (let ii = 0; ii < hingeCount - 1; ii++) {
+            d += "M" + (cx - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+            d += "M" + (cx - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
+            d += "M" + (cx + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+
+            if (aDist > 0) {
+                cx += aDist;
+            } else { cx += hingeDistance; }
+        }
+
+        //ultima Cazoleta
+        cx = curConfig.realDimensions[0];
+        d += "M" + (cxEnd - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+        d += "M" + (cxEnd - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
+        d += "M" + (cxEnd + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+
+        return d
+
+    });
+
+    var hinge = (this.hinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
+        var cajeadoCreated = addSvgElementFromJson({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: createHinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                nameMecanizado: "hinge",
+                /*tempWidth: widthX,
+                tempHeight: heightY,
+                widthX: widthX,
+                heightY: heightY,
+                maxWidth: maxWidth - 200,
+                maxHeight: maxHeight - 200,*/
+                opacity: 0.5
+            },
+        });
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+    });
+
+
     var editDrill = (this.editDrill = function(face, x, y, r, isPasante, depth, broachType, element) {
 
         var opacity = 1,

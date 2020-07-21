@@ -3109,44 +3109,44 @@
                             <div class="rowForm">
                                 <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newDepartX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newFinX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="2" required class="inputMecanizadoHinges" id="newNombreCant" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="2" required class="inputMecanizadoHinges" id="newHingeCount" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
                                 <div class="columnFromHinges">
-                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newEntraxe" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newAxisDist" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newDiaInsert" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newProfInsert" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="35" required class="inputMecanizadoHinges" id="newDiaCharniere" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="35" required class="inputMecanizadoHinges" id="newHingeDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
                                 <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
                                 <div class="columnFromHinges">
-                                    <input value="13" required class="inputMecanizadoHinges" id="newProfCharniere" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="13" required class="inputMecanizadoHinges" id="newHingeDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
 
@@ -3171,28 +3171,22 @@
                         function(ok) {
                             if (!ok) return;
                             //Capturando los Datos del Formulario Pop-Up para el Drill
-                            var face = $("input[name=face]:checked").val();
-                            var x = $("#newWidthDrill").val();
-                            var y = $("#newHeightDrill").val();
-                            var r = parseFloat($("#newDiameterDrill").val()) / 2;
-                            var isPasante = $('#cboxPasante').is(':checked');
-                            var depth = $("#newDepthDrill").val();
-                            var broach = $("input[name=BroachDrill]:checked").val();
+                            var origin = $("input[name=origin]:checked").val();
+                            var beginX = $("#newBeginX").val();
+                            var endX = $("#newEndX").val();
+                            var hingeCount = $("#newHingeCount").val();
+                            var axisDist = $("#newAxisDist").val();
+                            var drillDiameter = $("#newDrillDiameter").val();
+                            var drillDepth = $("#newDrillDepth").val();
+                            var hingeDiameter = $("#newHingeDiameter").val();
+                            var hingeDepth = $("#newHingeDepth").val();
 
-                            svgCanvas.drill(face, x, y, r, isPasante, depth, broach);
-                            /*svgCanvas.drill(
-                                face,
-                                widthX,
-                                heigthY,
-                                curConfig.dimensions[0],
-                                curConfig.dimensions[1],
-                                radio
-                            );*/
+                            svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth);
                         },
                         400,
                         530,
                         true,
-                        "hinges"
+                        "hinge"
                     );
 
 
