@@ -1636,27 +1636,6 @@
                     });
                     svgCanvas.setCurrentLayer("Layer 1");
                     svgCanvas.setCurrentLayerPosition("1");
-
-                    //cflorioluis - crear fondo para las otras caras de la pieza
-                    /*svgCanvas.createLayer("background1");
-                    cur_shape = svgCanvas.addSvgElementFromJson({
-                        element: "rect",
-                        attr: {
-                            x: 0,
-                            y: -50,
-                            width: res.w,
-                            height: 20,
-                            stroke: "none",
-                            id: "canvas_background1",
-                            opacity: 1,
-                            fill: "url(#imgCanvasBackground)",
-                            style: "pointer-events:none",
-                        },
-                    });*/
-                    /*svgCanvas.setCurrentLayer("Layer 2");
-                    svgCanvas.setCurrentLayerPosition("2");*/
-
-                    $()
                 };
 
                 // create a new layer background if it doesn't exist
@@ -5629,7 +5608,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     $("#tool_import").show().prepend(img_import);
                 }
 
-                var updateCanvas = (Editor.updateCanvas = function(center, new_ctr) {
+                var updateCanvas = Editor.updateCanvas = function(center, new_ctr) {
                     var w = workarea.width(),
                         h = workarea.height();
                     var w_orig = w,
@@ -5640,7 +5619,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     var old_ctr = {
                         x: w_area[0].scrollLeft + w_orig / 2,
-                        y: w_area[0].scrollTop + h_orig / 2,
+                        y: w_area[0].scrollTop + h_orig / 2
                     };
 
                     var multi = curConfig.canvas_expansion;
@@ -5648,9 +5627,9 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     h = Math.max(h_orig, svgCanvas.contentH * zoom * multi);
 
                     if (w == w_orig && h == h_orig) {
-                        workarea.css("overflow", "hidden");
+                        workarea.css('overflow', 'hidden');
                     } else {
-                        workarea.css("overflow", "scroll");
+                        workarea.css('overflow', 'scroll');
                     }
 
                     var old_can_y = cnvs.height() / 2;
@@ -5666,6 +5645,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     var scroll_y = h / 2 - h_orig / 2;
 
                     if (!new_ctr) {
+
                         var old_dist_x = old_ctr.x - old_can_x;
                         var new_x = new_can_x + old_dist_x * ratio;
 
@@ -5674,10 +5654,12 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                         new_ctr = {
                             x: new_x,
-                            y: new_y,
+                            y: new_y
                         };
+
                     } else {
-                        (new_ctr.x += offset.x), (new_ctr.y += offset.y);
+                        new_ctr.x += offset.x,
+                            new_ctr.y += offset.y;
                     }
 
                     //width.val(offset.x)
@@ -5702,22 +5684,15 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         updateRulers(cnvs, zoom);
                         workarea.scroll();
                     }
-                });
+                }
 
                 // Make [1,2,5] array
                 var r_intervals = [];
-                for (var i = 0.1; i < 1e5; i *= 10) {
+                for (var i = .1; i < 1E5; i *= 10) {
                     r_intervals.push(1 * i);
                     r_intervals.push(2 * i);
                     r_intervals.push(5 * i);
                 }
-
-
-                /* console.log(r_intervals);
-
-                 r_intervals.reverse();
-
-                 console.log(r_intervals);*/
 
                 function updateRulers(scanvas, zoom) {
                     var workarea = document.getElementById("workarea");

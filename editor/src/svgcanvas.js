@@ -9882,105 +9882,39 @@ $.SvgCanvas = function(container, config) {
     this.updateCanvas = function(w, h) {
         svgroot.setAttribute("width", w);
         svgroot.setAttribute("height", h);
-        var bg = $("#canvasBackground")[0];
-        var bg1 = $("#canvasBackground1")[0]; //crear cara 1 dela pieza
-        var old_x = svgcontent.getAttribute("x");
-        var old_y = svgcontent.getAttribute("y");
-        var x = w / 2 - (this.contentW * current_zoom) / 2;
-        var y = h / 2 - (this.contentH * current_zoom) / 2;
+        var bg = $('#canvasBackground')[0];
+        var old_x = svgcontent.getAttribute('x');
+        var old_y = svgcontent.getAttribute('y');
+        var x = (w / 2 - this.contentW * current_zoom / 2);
+        var y = (h / 2 - this.contentH * current_zoom / 2);
 
         assignAttributes(svgcontent, {
-            width: (this.contentW * current_zoom),
-            height: (this.contentH * current_zoom),
-            x: x,
-            y: y,
-            viewBox: "0 0 " + (this.contentW) + " " + (this.contentH),
+            width: this.contentW * current_zoom,
+            height: this.contentH * current_zoom,
+            'x': x,
+            'y': y,
+            "viewBox": "0 0 " + this.contentW + " " + this.contentH
         });
-
-        /*assignAttributes(svgcontent1, {
-            width: svgcontent.getAttribute("width"),
-            height: 20,
-            x: x,
-            y: y - 50,
-            viewBox: "0 0 " + this.contentW + " " + this.contentH,
-        });*/
-
-
 
         assignAttributes(bg, {
-            width: parseFloat(svgcontent.getAttribute("width")),
-            height: parseFloat(svgcontent.getAttribute("height")),
+            width: svgcontent.getAttribute('width'),
+            height: svgcontent.getAttribute('height'),
             x: x,
-            y: y,
+            y: y
         });
-        /*
-                assignAttributes(bg, {
-                    width: 100,
-                    height: 100,
-                    x: 0,
-                    y: 0,
-                });*/
 
-        /*var svgContent1 = $("#svgcontent")[0];
-        assignAttributes(svgContent1, {
-            width: "100%",
-            height: "100%",
-            x: 0,
-            y: 0,
-        });*/
-        //console.log("updatecanvas");
-
-        //cflorioluis - actualizar todos loa mecanizados fuera de la pieza
-        /* for (let index = 0; index < $('path[nameMecanizado]').size(); index++) {
-             var mec = $('path[nameMecanizado]')[index];
-
-             console.log($('path[nameMecanizado]')[index]);
-
-             assignAttributes(mec, {
-                 d: createRoundedCajeadoSide(svgcontent.getAttribute("width"), svgcontent.getAttribute("height"), mec.getAttribute("radio"), mec.getAttribute("side")),
-             });
-
-         }*/
-
-
-        /*assignAttributes(bg1, {
-            width: svgcontent.getAttribute("width"),
-            height: 20,
-            x: x,
-            y: y - 50,
-        });*/
-        /* assignAttributes(bg1, {
-             width: svgcontent.getAttribute("width"),
-             height: svgcontent.getAttribute("width"),
-             x: x,
-             y: y - 50,
-         });*/
-
-        var bg_img = getElem("background_image");
+        var bg_img = getElem('background_image');
         if (bg_img) {
             assignAttributes(bg_img, {
-                width: "100%",
-                height: "100%",
+                'width': '100%',
+                'height': '100%'
             });
         }
 
-        //console.log("www");
+        selectorManager.selectorParentGroup.setAttribute("transform", "translate(" + x + "," + y + ")");
 
-        //if(selectedElements[0].getAttribute)
-        selectorManager.selectorParentGroup.setAttribute(
-            "transform",
-            "translate(" + x + "," + y + ")"
-        );
-
-        return {
-            x: x,
-            y: y,
-            old_x: old_x,
-            old_y: old_y,
-            d_x: x - old_x,
-            d_y: y - old_y,
-        };
-    };
+        return { x: x, y: y, old_x: old_x, old_y: old_y, d_x: x - old_x, d_y: y - old_y };
+    }
 
     // Function: setBackground
     // Set the background of the editor (NOT the actual document)
@@ -10009,30 +9943,6 @@ $.SvgCanvas = function(container, config) {
         } else if (bg_img) {
             bg_img.parentNode.removeChild(bg_img);
         }
-
-
-        //
-
-        /*var bg = getElem("canvasBackground1");
-        var border = $(bg).find("rect1")[0];
-        var bg_img = getElem("background_image");
-        border.setAttribute("fill", color);
-        if (url) {
-            if (!bg_img) {
-                bg_img = svgdoc.createElementNS(svgns, "image");
-                assignAttributes(bg_img, {
-                    id: "background_image",
-                    width: "100%",
-                    height: "100%",
-                    preserveAspectRatio: "xMinYMin",
-                    style: "pointer-events:none",
-                });
-            }
-            setHref(bg_img, url);
-            bg.appendChild(bg_img);
-        } else if (bg_img) {
-            bg_img.parentNode.removeChild(bg_img);
-        }*/
     };
 
     // Function: cycleElement
@@ -10349,7 +10259,9 @@ $.SvgCanvas = function(container, config) {
             diameterDrill = parseInt(drillDiameter),
             rDrill = diameterDrill / 2,
             aDist = parseInt(axisDist),
-            hingeDistance = (curConfig.realDimensions[0] - parseInt(beginX) - parseInt(endX)) / (parseInt(hingeCount) - 1);
+            hingeDistance = (curConfig.realDimensions[0] - parseInt(beginX) - parseInt(endX)) / (parseInt(hingeCount) - 1),
+            totalHinges = parseInt(hingeCount);
+
 
         /*d="
       M (CX - R), CY
@@ -10359,7 +10271,12 @@ $.SvgCanvas = function(container, config) {
 
         console.log(d);
         console.log(r);
-        for (let ii = 0; ii < hingeCount - 1; ii++) {
+
+        if (parseInt(endX) == 0) {
+            totalHinges++;
+        }
+
+        for (let ii = 0; ii < totalHinges; ii++) {
             d += "M" + (cx - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
             d += "M" + (cx - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
             d += "M" + (cx + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
@@ -10370,10 +10287,13 @@ $.SvgCanvas = function(container, config) {
         }
 
         //ultima Cazoleta
-        cx = curConfig.realDimensions[0];
-        d += "M" + (cxEnd - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
-        d += "M" + (cxEnd - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
-        d += "M" + (cxEnd + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+        if (parseInt(endX) != 0) {
+            cx = curConfig.realDimensions[0];
+            d += "M" + (cxEnd - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+            d += "M" + (cxEnd - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
+            d += "M" + (cxEnd + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+
+        }
 
         return d
 
