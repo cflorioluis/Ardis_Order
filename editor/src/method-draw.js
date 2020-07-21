@@ -3289,14 +3289,17 @@
 
                         svgCanvas.deleteSelectedElements();
 
-                        for (let ii = 0; ii < tempMultiSelected.length; ii++) {
-                            isMulti = true;
-                            const element = tempMultiSelected[ii];
-                            //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
-                            if (element.getAttribute("nameMecanizado") == "cajeado") {
-                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
-                                svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
-                                svgCanvas.deleteSelectedElements();
+                        if (tempMultiSelected) {
+
+                            for (let ii = 0; ii < tempMultiSelected.length; ii++) {
+                                isMulti = true;
+                                const element = tempMultiSelected[ii];
+                                //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
+                                if (element.getAttribute("nameMecanizado") == "cajeado") {
+                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
+                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
+                                    svgCanvas.deleteSelectedElements();
+                                }
                             }
                         }
 
