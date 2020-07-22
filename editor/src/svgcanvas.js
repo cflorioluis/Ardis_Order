@@ -4116,7 +4116,9 @@ $.SvgCanvas = function(container, config) {
 
                     case "hinge":
                         svgCanvas.clickHingeTool(mouse_target);
-                        //console.log("editarDrill");
+                        return;
+                    case "poly":
+                        svgCanvas.clickPolyTool(mouse_target);
                         return;
                     default:
                         break;

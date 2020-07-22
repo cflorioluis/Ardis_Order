@@ -3173,7 +3173,7 @@
 
                 var clickPolyTool = function() {
                     if (toolButtonClick("#tool_hingeTool")) {
-                        svgCanvas.setMode("hinge");
+                        svgCanvas.setMode("poly");
                     }
 
                     hingeBox = $.confirm(
@@ -3723,7 +3723,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                 break;
                             case "hinge":
                                 functNameElement.append("_Cazoleta");
-                                var param = `"Origine" VAR "0":"Depart_X" VAR "` + mecanizado.getAttribute("starX") + `":"Fin_X" VAR "` + mecanizado.getAttribute("endY") + `":"nombre" VAR "2":"entraxe" VAR "0":"Dia_insert" VAR "10":"Prof_insert" VAR "10":"Dia_charniere" VAR "35":"Prof_charn" VAR "13"`
+                                var param = `"Origine" VAR "` + mecanizado.getAttribute("origin") + `":"Depart_X" VAR "` + mecanizado.getAttribute("beginX") + `":"Fin_X" VAR "` + mecanizado.getAttribute("endX") + `":"nombre" VAR "` + mecanizado.getAttribute("hingeCount") + `":"entraxe" VAR "` + mecanizado.getAttribute("axisDist") + `":"Dia_insert" VAR "` + mecanizado.getAttribute("drillDiameter") + `":"Prof_insert" VAR "` + mecanizado.getAttribute("drillDepth") + `":"Dia_charniere" VAR "` + mecanizado.getAttribute("hingeDiameter") + `":"Prof_charn" VAR "` + mecanizado.getAttribute("hingeDepth") + `"`
                                 paramElement.append(param);
                                 opsideElement.append("2");
                                 sideElement.append("0");
