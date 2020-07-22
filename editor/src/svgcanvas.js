@@ -2652,7 +2652,7 @@ $.SvgCanvas = function(container, config) {
 
 
                     //cflorioluis-hacer que los cajeados no se expandan desde los selectores que dan al exterior
-                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado") {
+                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado" || selectedElements[0].getAttribute("nameMecanizado") == "poly") {
                         var nw = "selectorGrip_resize_nw",
                             n = "selectorGrip_resize_n",
                             ne = "selectorGrip_resize_ne",
@@ -3329,15 +3329,15 @@ $.SvgCanvas = function(container, config) {
                     }
 
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-                    if (selected.getAttribute("nameMecanizado") != "cajeado") {
+                    if ((selected.getAttribute("nameMecanizado") != "cajeado") && (selected.getAttribute("nameMecanizado") != "poly")) {
                         scale.setScale(sx, sy);
+                        console.log("!= cajeado");
                     } else {
-
+                        console.log("== cajeado");
                         var widthX = parseInt(selected.getAttribute("widthX"));
                         var maxWidth = parseInt(selected.getAttribute("maxWidth"));
                         var heightY = parseInt(selected.getAttribute("heightY"));
                         var maxHeight = parseInt(selected.getAttribute("maxHeight"));
-                        var radio = parseInt(selected.getAttribute("radio"));
                         var side = selected.getAttribute("side");
                         var id = selected.id;
 
@@ -3711,7 +3711,7 @@ $.SvgCanvas = function(container, config) {
                     break;
                 case "resize":
                     //cflorioluis - limitar que un cajeado se expanda mas que la pieza
-                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado") {
+                    if (selectedElements[0].getAttribute("nameMecanizado") == "cajeado" || selectedElements[0].getAttribute("nameMecanizado") == "poly") {
                         //cflorioluis - limitar que un cajeado se expanda mas que la pieza
                         var tempWidth = parseInt(selectedElements[0].getAttribute("tempWidth")),
                             tempHeight = parseInt(selectedElements[0].getAttribute("tempHeight")),
@@ -3841,6 +3841,8 @@ $.SvgCanvas = function(container, config) {
 
                             selectedElements[0].setAttribute("d", d);
                         }
+
+
                         //cflorioluis - actualizar valor real de las cordenadas X,Y
                         if (selectedElements[0].getAttribute("nameMecanizado") == "drill") {
                             var posX = parseInt(selectedElements[0].getAttribute("cx") - 100),
@@ -3857,6 +3859,18 @@ $.SvgCanvas = function(container, config) {
                             $("#drill_realX").val(posX);
                             $("#drill_realY").val(posY);
                             $("#drill_diameter").val(r * 2);
+                        }
+
+                        if (selectedElements[0].getAttribute("nameMecanizado") == "poly") {
+                            newWidthX = parseInt(selectedElements[0].getAttribute("widthX"));
+                            newHeightY = parseInt(selectedElements[0].getAttribute("heightY"));
+
+                            side = selectedElements[0].getAttribute("side");
+                            w = newWidthX.toString();
+                            h = newHeightY.toString();
+                            d = createPolySide(w, h, side);
+
+                            selectedElements[0].setAttribute("points", d);
                         }
                     }
 
@@ -10255,6 +10269,52 @@ $.SvgCanvas = function(container, config) {
         //cajeadoCreated.appendChild(lineCajeadoCreated);
     });
 
+    var createPolySide = (this.createPolySide = function(widthX, heightY, side) {
+
+        var cx = parseInt(widthX) + 100;
+        var cy = parseInt(heightY) + 100;
+
+        switch (side) {
+            case "4":
+                return curConfig.corners[0] + "," + curConfig.corners[2] + " " + cx + "," + curConfig.corners[2] + " " + curConfig.corners[0] + "," + (curConfig.corners[2] - parseInt(heightY));
+            case "3":
+                return curConfig.corners[1] + "," + curConfig.corners[2] + " " + curConfig.corners[1] + "," + (curConfig.corners[2] - parseInt(heightY)) + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[2];
+            case "2":
+                return curConfig.corners[1] + "," + curConfig.corners[0] + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[0] + " " + curConfig.corners[1] + "," + cy;
+            case "1":
+                return curConfig.corners[0] + "," + curConfig.corners[0] + " " + curConfig.corners[0] + "," + cy + " " + cx + "," + curConfig.corners[0];
+        }
+    });
+
+    var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight) {
+        var polyCreated = addSvgElementFromJson({
+            element: "polygon",
+            curStyles: true,
+            attr: {
+                points: createPolySide(widthX, heightY, side),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": "0",
+                nameMecanizado: "poly",
+                side: side,
+                tempWidth: widthX,
+                tempHeight: heightY,
+                widthX: widthX,
+                heightY: heightY,
+                maxWidth: maxWidth - 200,
+                maxHeight: maxHeight - 200,
+                opacity: "1"
+            },
+        });
+
+        createLineCajeado(side, widthX, heightY, polyCreated.id);
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+
+    });
+
     var createHinge = (this.createHinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
         var d = "",
             cx = parseInt(beginX) + 100,
@@ -10557,6 +10617,35 @@ $.SvgCanvas = function(container, config) {
         }
     });
 
+    var editPoly = (this.editPoly = function(attrName, attrValue) {
+        if (!selectedElements[0]) return;
+
+        var w, h, points, side;
+        w = selectedElements[0].getAttribute("widthX");
+        h = selectedElements[0].getAttribute("heightY");
+        side = selectedElements[0].getAttribute("side");
+        switch (attrName) {
+            case "newWidthX":
+                w = attrValue;
+                selectedElements[0].setAttribute("widthX", w);
+                selectedElements[0].setAttribute("tempWidth", w);
+                $("#newWidthXPoly").val(w);
+                break;
+            case "newHeightY":
+                h = attrValue;
+                selectedElements[0].setAttribute("heightY", h);
+                selectedElements[0].setAttribute("tempHeight", w);
+                $("#newHeightYPoly").val(h);
+                break;
+        }
+        points = createPolySide(w, h, side);
+        selectedElements[0].setAttribute("points", points);
+
+        selectorManager.requestSelector(selectedElements[0]).resize();
+        /*var id = selectedElements[0].id;
+        editLinesCantoCajeado(side, w, h, id);*/
+    });
+
     var editCajeado = (this.editCajeado = function(attrName, attrValue) {
         if (!selectedElements[0]) return;
 
@@ -10588,18 +10677,23 @@ $.SvgCanvas = function(container, config) {
         selectorManager.requestSelector(selectedElements[0]).resize();
         var id = selectedElements[0].id;
         editLinesCantoCajeado(side, w, h, id);
-
-        /*svgCanvas.deleteSelectedElements();
-        svgCanvas.cajeado(
-            side,
-            w,
-            h,
-            curConfig.dimensions[0],
-            curConfig.dimensions[1],
-            r
-        );*/
     });
 
+    var selectPoly = (this.selectPoly = function(side) {
+        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
+        var element = $("[nameMecanizado*='poly'][side='" + side + "']").attr("id");
+
+        if (element) {
+            selectOnly([getElem(element)], true);
+            //console.log(selectedElements[0].getAttribute("widthX"));
+            $('#newWidthPoly').val(selectedElements[0].getAttribute("widthX"));
+            $('#newHeightPoly').val(selectedElements[0].getAttribute("heightY"));
+        } else {
+            $('#newWidthPoly').val("");
+            $('#newHeightPoly').val("");
+            clearSelection();
+        }
+    });
 
 
     var selectCajeado = (this.selectCajeado = function(side) {
@@ -10618,6 +10712,204 @@ $.SvgCanvas = function(container, config) {
             $('#newRadioCajeado').val("");
             clearSelection();
         }
+    });
+
+    //cflorioluis - Ventana Editar Cazoleta - Edita uno por uno
+    var clickPolyTool = (this.clickPolyTool = function(elem) {
+
+        var side = elem.getAttribute("side"),
+            widthX = elem.getAttribute("widthX"),
+            heigthY = elem.getAttribute("heightY")
+
+        var polyReady1 =
+            `<label>
+                <input onclick="svgCanvas.selectPoly('1');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="1">
+                <div class="triangle-1"></div>
+            </label>`,
+            polyReady2 =
+            `<label>
+                <input onclick="svgCanvas.selectPoly('2');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="2">
+                <div class="triangle-2"></div>
+            </label>`,
+            polyReady3 =
+            `<label>
+                <input onclick="svgCanvas.selectPoly('3');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="3">
+                <div class="triangle-3"></div>
+            </label>`,
+            polyReady4 =
+            `<label>
+                <input onclick="svgCanvas.selectPoly('4');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="4">
+                <div class="triangle-4"></div>
+            </label>`;
+
+        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+        var polyReady = $("path[nameMecanizado*='poly']");
+
+        if (polyReady.length > 0) {
+            for (let i = 0; i < polyReady.length; i++) {
+                const element = polyReady[i];
+                switch (element.getAttribute("side")) {
+                    case "1":
+                        polyReady1 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectPoly('1');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="1">
+                                            <div class="triangle-1 usedPolybottom usedPolyPointer"></div>
+                                        </label>`;
+                        break;
+                    case "2":
+                        polyReady2 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectPoly('2');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="2">
+                                            <div class="triangle-2 usedPolybottom usedPolyPointer"></div>
+                                        </label>`;
+                        break;
+                    case "3":
+                        polyReady3 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectPoly('3');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="3">
+                                            <div class="triangle-3 usedPolyTop usedPolyPointer"></div>
+                                        </label>`
+                        break;
+                    case "4":
+                        polyReady4 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectPoly('4');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="4">
+                                            <div class="triangle-4 usedPolyTop usedPolyPointer"></div>
+                                        </label>`
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+        switch (side) {
+            case "1":
+                polyReady1 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectPoly('1');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="1" checked>
+                                        <div class="triangle-1 usedPolybottom usedPolyPointer"></div>
+                                    </label>`;
+                break;
+            case "2":
+                polyReady2 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectPoly('2');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="2" checked>
+                                        <div class="triangle-2 usedPolybottom usedPolyPointer"></div>
+                                    </label>`;
+                break;
+            case "3":
+                polyReady3 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectPoly('3');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="3" checked>
+                                        <div class="triangle-3 usedPolyTop usedPolyPointer"></div>
+                                    </label>`
+                break;
+            case "4":
+                polyReady4 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectPoly('4');" type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="4" checked>
+                                        <div class="triangle-4 usedPolyTop usedPolyPointer"></div>
+                                    </label>`
+                break;
+
+            default:
+                break;
+        }
+
+
+        polyBox = $.confirm(
+            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Poly</h2></strong>` +
+            `<form>
+                <div class="rowForm" style="padding-bottom: 0px;">
+                    <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
+                    <div class="columnFromCajeado">
+                        <div class="tablero grid">
+                            <div class="columnCajeado">` +
+            polyReady4 +
+            `<label>
+                                    <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>` +
+            polyReady1 +
+            `</div>
+                            
+                            <div class="columnCajeado">                       
+                                <label>
+                                    <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                            </div>
+                            
+                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+            polyReady3 +
+            `<label>
+                                    <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png">
+                                </label>` +
+            polyReady2 +
+            `</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromCajeado right"><h3>Ancho</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + widthX + `"` + `class="inputMecanizado" mecanizadoInput="poly" id="newWidthPoly" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editPoly('newWidthX', this.value);"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromCajeado right"><h3>Fondo</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + heigthY + `"` + `class="inputMecanizado" mecanizadoInput="poly" id="newHeightPoly" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editPoly('newHeightY', this.value);"/>
+                    </div>
+                </div>
+            </form>
+            `,
+            function(ok) {
+                if (!ok) return;
+                //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                side = $("input[name=cornerPoly]:checked").val();
+                widthX = $("#newWidthPoly").val();
+                heigthY = $("#newHeightPoly").val();
+
+                if (selectedElements[0] == null) {
+                    svgCanvas.poly(
+                        side,
+                        widthX,
+                        heigthY,
+                        curConfig.dimensions[0],
+                        curConfig.dimensions[1]
+                    );
+                } else {
+                    var points = createPolySide(widthX, heigthY, side);
+                    selectedElements[0].setAttribute("points", points);
+                    var id = selectedElements[0].id,
+                        w = widthX,
+                        h = heigthY;
+
+                    editLinesCantoCajeado(side, w, h, id);
+                    selectorManager.requestSelector(selectedElements[0]).resize();
+                }
+            },
+            350,
+            320,
+            true,
+            "poly"
+        );
+
     });
 
 
@@ -11680,4 +11972,4 @@ $.SvgCanvas = function(container, config) {
             svgCanvas.setMode("cajeadoToolCanvas");
         }*/
     });
-};
+}

@@ -20,14 +20,18 @@
 
     if (!window.methodDraw)
         window.methodDraw = (function($) {
+            var partW = 1500;
+            var partL = 700;
             var svgCanvas;
             var Editor = {};
             var is_ready = false;
             var curConfig = {
                 canvas_expansion: 1,
+                realDimensions: [partW, partL],
                 //cflorioluis aqui esta el tamaño de la pieza
-                dimensions: [1500 + 200, 700 + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
-                realDimensions: [1500, 700],
+                dimensions: [partW + 200, partL + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
+
+                corners: [100, partW + 100, partL + 100],
                 cantos: [1, 0, 0, 1],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
@@ -591,6 +595,33 @@
 
 
                                 break;
+                            case "poly":
+                                var polyInputs = 0;
+                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                    polyInputs = $('input[mecanizadoOption="poly"]:checked').length
+                                    if (polyInputs == 0) {
+                                        $('.tablero').addClass('input-error');
+                                    } else {
+                                        $('.tablero').removeClass('input-error');
+                                    }
+
+                                    $('input[mecanizadoInput="poly"]').each(function() {
+                                        $(this).removeClass('input-error');
+                                        if ($(this).val() != "") {
+                                            polyInputs++;
+                                        } else {
+                                            $(this).addClass('input-error');
+                                        }
+                                    });
+                                    console.log(polyInputs);
+
+                                    if (polyInputs == 3) {
+                                        box.hide();
+                                        var resp = type == "prompt" ? input.val() : true;
+                                        if (callback) callback(resp);
+                                    }
+                                });
+                                break;
                             default:
                                 break;
                         }
@@ -621,6 +652,7 @@
 
                         //cflorioluis - ocultar evento callback original si se trata de un mecanizado
                         switch (mecanizadoType) {
+                            case "poly":
                             case "drill":
                             case "cajeado":
                                 break;
@@ -1887,7 +1919,8 @@
                             path: [],
                             //cforioluis - update cajeado contextual tools
                             cajeado: ["widthX", "heightY", "radio"],
-                            drill: ["realX", "realY", "diameter", ]
+                            drill: ["realX", "realY", "diameter", ],
+                            poly: ["widthX", "heightY"]
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
@@ -2289,9 +2322,40 @@
                         default:
                             break;
                     }
+                };
 
+                changeAttributePoly = function(el, completed) {
+                    var attr = el.getAttribute("data-attr");
+                    var multiplier = el.getAttribute("data-multiplier") || 1;
+                    multiplier = parseFloat(multiplier);
+                    var val = el.value * multiplier;
+                    var valid = svgedit.units.isValidUnit(attr, val, selectedElement);
+                    if (!valid) {
+                        $.alert("Invalid value given");
+                        el.value = selectedElement.getAttribute(attr);
+                        return false;
+                    }
 
+                    var minValue = parseInt($("#poly_heightY").val());
 
+                    if (parseInt($("#poly_widthX").val()) < minValue) {
+                        minValue = parseInt($("#poly_widthX").val());
+                    }
+
+                    svgCanvas.getSelectedElems()[0].setAttribute("widthX", $("#poly_widthX").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("heightY", $("#poly_heightY").val());
+
+                    var side = svgCanvas.getSelectedElems()[0].getAttribute("side");
+                    var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
+                    var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
+                    var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
+                    var points = svgCanvas.createPolySide(w, h, side);
+
+                    svgCanvas.getSelectedElems()[0].setAttribute("points", points);
+                    svgCanvas.editLinesCantoCajeado(side, w, h, id);
+                    svgCanvas.selectorManager.requestSelector(selectedElement).resize();
+
+                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
 
                 changeAttribute = function(el, completed) {
@@ -3172,149 +3236,152 @@
                 };
 
                 var clickPolyTool = function() {
-                    if (toolButtonClick("#tool_hingeTool")) {
+                    if (toolButtonClick("#tool_polyTool")) {
                         svgCanvas.setMode("poly");
                     }
 
-                    hingeBox = $.confirm(
-                        `<strong><h2 id="moveConfirm" style="cursor: move;">Cazoleta</h2></strong>` +
+                    var side = null,
+                        widthX = null,
+                        heigthY = null;
+
+                    var polyReady1 =
+                        `<label>
+                            <input required type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="1">
+                            <div class="triangle-1"></div>
+                        </label>`,
+                        polyReady2 =
+                        `<label>
+                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="2">
+                            <div class="triangle-2"></div>
+                        </label>`,
+                        polyReady3 =
+                        `<label>
+                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="3" >
+                            <div class="triangle-3"></div>
+                        </label>`,
+                        polyReady4 =
+                        `<label>
+                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="4" >
+                            <div class="triangle-4"></div>
+                        </label>`;
+
+                    //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+                    var polyReady = $("polygon[nameMecanizado*='poly']");
+                    console.log(polyReady);
+
+                    if (polyReady.length > 0) {
+                        for (let i = 0; i < polyReady.length; i++) {
+                            const element = polyReady[i];
+                            switch (element.getAttribute("side")) {
+                                case "1":
+                                    polyReady1 =
+                                        `<label>
+                                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="1" disabled>
+                                            <div class="triangle-1 usedPolybottom"></div>
+                                        </label>`;
+                                    break;
+                                case "2":
+                                    polyReady2 =
+                                        `<label>
+                                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="2" disabled>
+                                            <div class="triangle-2 usedPolybottom"></div>
+                                        </label>`;
+                                    break;
+                                case "3":
+                                    polyReady3 =
+                                        `<label>
+                                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="3" disabled>
+                                            <div class="triangle-3 usedPolyTop"></div>
+                                        </label>`
+                                    break;
+                                case "4":
+                                    polyReady4 =
+                                        `<label>
+                                            <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="4" disabled>
+                                            <div class="triangle-4 usedPolyTop"></div>
+                                        </label>`
+                                    break;
+                            }
+                        }
+                    }
+
+                    polyBox = $.confirm(
+                        `<strong><h2 id="moveConfirm" style="cursor: move;">Poly</h2></strong>` +
                         `<form>
 
-                        <div class="rowForm" style="padding-bottom: 0px;">
-                                <div class="columnFromHinges right"><h3>Origen</h3></div>
-                                <div class="columnFromHinges FaceSelection" style="height: 69px;width: 121px;">
-                               
-                                    <div class="gridDrill">
-                                        <div class="columnHinges">                                            
+                            <div class="rowForm" style="padding-bottom: 0px;">
+                                <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
+                                <div class="columnFromCajeado">
+                                    <div class="tablero grid">
+                                        <div class="columnCajeado">` +
+                        polyReady4 +
+                        `<label>
+                                                <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="0" disabled >
+                                                <img src="images/mecanizado/cajeado_empty.png" >
+                                            </label>` +
+                        polyReady1 +
+                        `</div>
+                                        
+                                        <div class="columnCajeado">                       
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/corner.png" >
-                                            </label> 
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1"disabled>
-                                                <img src="images/drill/edge_left_right_white.png">
+                                                <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
                                             </label>
-
+                                            
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="0" checked>
-                                                <img src="images/drill/corner_left.svg">
-                                            </label>                                    
-                                        </div>
-                                        <div class="columnHinges wide">                                            
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/edge_sup_down_white.png" >
-                                            </label> 
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
+                                                <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
                                             </label>
-
+                                            
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/edge_sup_down_white.png">
-                                            </label>                                    
-                                        </div>
-                                        <div class="columnHinges">                                            
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/corner.png" >
-                                            </label> 
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
-                                                <img src="images/drill/edge_left_right_white.png">
+                                                <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="0" disabled>
+                                                <img src="images/mecanizado/cajeado_empty.png" >
                                             </label>
-
-                                            <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="1" >
-                                                <img src="images/drill/corner_right.svg">
-                                            </label>                                    
                                         </div>
+                                        
+                                        <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+                        polyReady3 +
+                        `<label>
+                                                <input type="radio" hiddenRadio name="cornerPoly" mecanizadoOption="poly" value="0" disabled >
+                                                <img src="images/mecanizado/cajeado_empty.png">
+                                            </label>` +
+                        polyReady2 +
+                        `</div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div class="columnFromCajeado right"><h3>Distancia X</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newWidthXPoly" mecanizadoInput="poly" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="2" required class="inputMecanizadoHinges" id="newHingeCount" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div class="columnFromCajeado right"><h3>Distancia Y</h3></div>
+                                <div class="columnFromCajeado">
+                                    <input required class="inputMecanizado" id="newHeightYPoly" mecanizadoInput="poly" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
-                                <div class="columnFromHinges">
-                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newAxisDist" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="35" required class="inputMecanizadoHinges" id="newHingeDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-                            <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="13" required class="inputMecanizadoHinges" id="newHingeDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                </div>
-                            </div>
-
-<!--
-                            <script>
-                                $('#cboxPasante').click(function() {
-                                    if($(this).is(':checked'))
-                                        $('.hidden').slideToggle("fast");
-                                    else
-                                        $('.hidden').fadeIn( "slow", );
-                                });
-                            </script>    
-
-                            <div class="rowForm">
-                                <div class="columnFromCajeado right"><h3>Broca</h3></div>
-                                <div class="columnFromCajeado broachSelection" style="padding-bottom: 10px;">
-                                    <input type="radio" name="BroachDrill" value="flat"checked >Plana 
-                                    <input type="radio" name="BroachDrill" value="lance">Lanza
-                                </div>
-                            </div>-->
+                            </div>  
                         `,
                         function(ok) {
                             if (!ok) return;
-                            //Capturando los Datos del Formulario Pop-Up para el Drill
-                            var origin = $("input[name=origin]:checked").val();
-                            var beginX = $("#newBeginX").val();
-                            var endX = $("#newEndX").val();
-                            var hingeCount = $("#newHingeCount").val();
-                            var axisDist = $("#newAxisDist").val();
-                            var drillDiameter = $("#newDrillDiameter").val();
-                            var drillDepth = $("#newDrillDepth").val();
-                            var hingeDiameter = $("#newHingeDiameter").val();
-                            var hingeDepth = $("#newHingeDepth").val();
+                            //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                            side = $("input[name=cornerPoly]:checked").val();
+                            widthX = $("#newWidthXPoly").val();
+                            heigthY = $("#newHeightYPoly").val();
 
-                            svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth);
+                            svgCanvas.poly(
+                                side,
+                                widthX,
+                                heigthY,
+                                curConfig.dimensions[0],
+                                curConfig.dimensions[1]
+                            );
                         },
-                        400,
-                        530,
+                        350,
+                        270,
                         true,
-                        "hinge"
+                        "poly"
                     );
                 };
 
@@ -3407,15 +3474,17 @@
                         var tempSelected = selectedElement;
                         var isMulti = false;
 
+
                         svgCanvas.deleteSelectedElements();
 
                         if (tempMultiSelected) {
 
                             for (let ii = 0; ii < tempMultiSelected.length; ii++) {
                                 isMulti = true;
-                                const element = tempMultiSelected[ii];
+
+                                var element = tempMultiSelected[ii];
                                 //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
-                                if (element.getAttribute("nameMecanizado") == "cajeado") {
+                                if ((element.getAttribute("nameMecanizado") == "cajeado") || (element.getAttribute("nameMecanizado") == "poly")) {
                                     svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
                                     svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
                                     svgCanvas.deleteSelectedElements();
@@ -3424,7 +3493,7 @@
                         }
 
                         if (!isMulti) {
-                            if (tempSelected.getAttribute("nameMecanizado") == "cajeado") {
+                            if ((tempSelected.getAttribute("nameMecanizado") == "cajeado") || (tempSelected.getAttribute("nameMecanizado") == "poly")) {
                                 svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line1")], true);
                                 svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line2")], true);
                                 svgCanvas.deleteSelectedElements();
@@ -5447,6 +5516,21 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     max: lowDimension - 200,
                     step: 1,
                     callback: changeAttributeDrill,
+                    cursor: true,
+                });
+
+                $("#poly_widthX").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributePoly,
+                    cursor: true,
+                });
+                $("#poly_heightY").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributePoly,
                     cursor: true,
                 });
 

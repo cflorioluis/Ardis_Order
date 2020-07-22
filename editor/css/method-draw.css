@@ -2519,3 +2519,75 @@ input[right][type="text"]::placeholder {
     /* Firefox, Chrome, Opera */
     text-align: right;
 }
+
+.triangle-1 {
+    width: 0;
+    height: 0;
+    border-left: 0px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 20px solid rgb(0, 0, 0);
+    cursor: pointer;
+    padding-top: 3px;
+}
+
+.triangle-2 {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 0px solid transparent;
+    border-bottom: 20px solid rgb(0, 0, 0);
+    cursor: pointer;
+    padding-top: 3px;
+}
+
+.triangle-3 {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 0px solid transparent;
+    border-top: 20px solid rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.triangle-4 {
+    width: 0;
+    height: 0;
+    border-left: 0px solid transparent;
+    border-right: 30px solid transparent;
+    border-top: 20px solid rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.usedPolybottom {
+    border-bottom: 20px solid rgb(136, 136, 136) !important;
+    cursor: default !important;
+}
+
+.usedPolyPointer {
+    cursor: pointer !important;
+}
+
+.usedPolyTop {
+    border-top: 20px solid rgb(136, 136, 136) !important;
+    cursor: default !important;
+}
+
+[type=radio][mecanizadoOption="poly"]:checked+.triangle-1 {
+    border-bottom: 20px solid rgb(255, 0, 0) !important;
+    overflow: hidden;
+}
+
+[type=radio][mecanizadoOption="poly"]:checked+.triangle-2 {
+    border-bottom: 20px solid rgb(255, 0, 0) !important;
+    overflow: hidden;
+}
+
+[type=radio][mecanizadoOption="poly"]:checked+.triangle-3 {
+    border-top: 20px solid rgb(255, 0, 0) !important;
+    overflow: hidden;
+}
+
+[type=radio][mecanizadoOption="poly"]:checked+.triangle-4 {
+    border-top: 20px solid rgb(255, 0, 0) !important;
+    overflow: hidden;
+}
