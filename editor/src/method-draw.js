@@ -156,7 +156,8 @@
                         cajeadoTool: "cajeadoTool.png",
                         cremalleraTool: "cremallera.png",
                         drillTool: "drill.png",
-                        hingesTool: "cabinetHinges.png",
+                        hingeTool: "hinge.png",
+                        polyTool: "poly.png",
                         select_node: "select_node.png",
                         pencil: "pencil.png",
                         pen: "line.png",
@@ -185,7 +186,8 @@
                         "#tool_cajeadoTool": "cajeadoTool",
                         "#tool_cremalleraTool": "cremalleraTool",
                         "#tool_drillTool": "drillTool",
-                        "#tool_hingesTool": "hingesTool",
+                        "#tool_hingeTool": "hingeTool",
+                        "#tool_polyTool": "polyTool",
                         //
                         "#tool_fhpath": "pencil",
                         "#tool_line": "pen",
@@ -2893,7 +2895,7 @@
                         svgCanvas.setMode("drill");
                     }
 
-                    cajeadoBox = $.confirm(
+                    drillBox = $.confirm(
                         `<strong><h2 id="moveConfirm" style="cursor: move;">Taladro</h2></strong>` +
                         `<form>
 
@@ -3022,12 +3024,12 @@
                     );
                 };
 
-                var clickHingesTool = function() {
-                    if (toolButtonClick("#tool_hingesTool")) {
-                        svgCanvas.setMode("cabinetHinges");
+                var clickHingeTool = function() {
+                    if (toolButtonClick("#tool_hingeTool")) {
+                        svgCanvas.setMode("hinge");
                     }
 
-                    cajeadoBox = $.confirm(
+                    hingeBox = $.confirm(
                         `<strong><h2 id="moveConfirm" style="cursor: move;">Cazoleta</h2></strong>` +
                         `<form>
 
@@ -3047,7 +3049,7 @@
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value=0" checked>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="0" checked>
                                                 <img src="images/drill/corner_left.svg">
                                             </label>                                    
                                         </div>
@@ -3167,8 +3169,153 @@
                         true,
                         "hinge"
                     );
+                };
 
+                var clickPolyTool = function() {
+                    if (toolButtonClick("#tool_hingeTool")) {
+                        svgCanvas.setMode("hinge");
+                    }
 
+                    hingeBox = $.confirm(
+                        `<strong><h2 id="moveConfirm" style="cursor: move;">Cazoleta</h2></strong>` +
+                        `<form>
+
+                        <div class="rowForm" style="padding-bottom: 0px;">
+                                <div class="columnFromHinges right"><h3>Origen</h3></div>
+                                <div class="columnFromHinges FaceSelection" style="height: 69px;width: 121px;">
+                               
+                                    <div class="gridDrill">
+                                        <div class="columnHinges">                                            
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/corner.png" >
+                                            </label> 
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1"disabled>
+                                                <img src="images/drill/edge_left_right_white.png">
+                                            </label>
+
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="0" checked>
+                                                <img src="images/drill/corner_left.svg">
+                                            </label>                                    
+                                        </div>
+                                        <div class="columnHinges wide">                                            
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_sup_down_white.png" >
+                                            </label> 
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
+                                            </label>
+
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_sup_down_white.png">
+                                            </label>                                    
+                                        </div>
+                                        <div class="columnHinges">                                            
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/corner.png" >
+                                            </label> 
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <img src="images/drill/edge_left_right_white.png">
+                                            </label>
+
+                                            <label>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="1" >
+                                                <img src="images/drill/corner_right.svg">
+                                            </label>                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rowForm">
+                                <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="2" required class="inputMecanizadoHinges" id="newHingeCount" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
+                                <div class="columnFromHinges">
+                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newAxisDist" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="35" required class="inputMecanizadoHinges" id="newHingeDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+                            <div class="rowForm">
+                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
+                                <div class="columnFromHinges">
+                                    <input value="13" required class="inputMecanizadoHinges" id="newHingeDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                </div>
+                            </div>
+
+<!--
+                            <script>
+                                $('#cboxPasante').click(function() {
+                                    if($(this).is(':checked'))
+                                        $('.hidden').slideToggle("fast");
+                                    else
+                                        $('.hidden').fadeIn( "slow", );
+                                });
+                            </script>    
+
+                            <div class="rowForm">
+                                <div class="columnFromCajeado right"><h3>Broca</h3></div>
+                                <div class="columnFromCajeado broachSelection" style="padding-bottom: 10px;">
+                                    <input type="radio" name="BroachDrill" value="flat"checked >Plana 
+                                    <input type="radio" name="BroachDrill" value="lance">Lanza
+                                </div>
+                            </div>-->
+                        `,
+                        function(ok) {
+                            if (!ok) return;
+                            //Capturando los Datos del Formulario Pop-Up para el Drill
+                            var origin = $("input[name=origin]:checked").val();
+                            var beginX = $("#newBeginX").val();
+                            var endX = $("#newEndX").val();
+                            var hingeCount = $("#newHingeCount").val();
+                            var axisDist = $("#newAxisDist").val();
+                            var drillDiameter = $("#newDrillDiameter").val();
+                            var drillDepth = $("#newDrillDepth").val();
+                            var hingeDiameter = $("#newHingeDiameter").val();
+                            var hingeDepth = $("#newHingeDepth").val();
+
+                            svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth);
+                        },
+                        400,
+                        530,
+                        true,
+                        "hinge"
+                    );
                 };
 
                 var clickFHPath = function() {
@@ -3574,7 +3721,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                 opsideElement.append("2");
                                 sideElement.append("0");
                                 break;
-                            case "cabinetHinges":
+                            case "hinge":
                                 functNameElement.append("_Cazoleta");
                                 var param = `"Origine" VAR "0":"Depart_X" VAR "` + mecanizado.getAttribute("starX") + `":"Fin_X" VAR "` + mecanizado.getAttribute("endY") + `":"nombre" VAR "2":"entraxe" VAR "0":"Dia_insert" VAR "10":"Prof_insert" VAR "10":"Dia_charniere" VAR "35":"Prof_charn" VAR "13"`
                                 paramElement.append(param);
@@ -4539,12 +4686,18 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             key: [modKey + "Shift+4"],
                         },
                         {
-                            sel: "#tool_hingesTool",
-                            fn: clickHingesTool,
+                            sel: "#tool_hingeTool",
+                            fn: clickHingeTool,
                             evt: "click",
                             key: [modKey + "Shift+5"],
                         },
 
+                        {
+                            sel: "#tool_polyTool",
+                            fn: clickPolyTool,
+                            evt: "click",
+                            key: [modKey + "Shift+6"],
+                        },
 
                         {
                             sel: "#tool_fhpath",
