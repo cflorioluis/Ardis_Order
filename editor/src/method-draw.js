@@ -6182,6 +6182,14 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     svgCanvas.createDivs(curConfig.cantos); //crear divisiones originales para ver los cantos
 
+                    $('#Face-control').on('change', function() {
+                        var rotation = ($(this).val() * 180) + 180;
+                        $("#svgroot").css("transform", "rotateX(" + rotation + "deg)");
+                        $("#svgroot").css("transition", "0.6s");
+                        $("#svgroot").css("transform-style", "preserve-3d");
+                        $("#svgroot").css("position", "relative");
+                    });
+
                 });
 
                 Editor.setLang = function(lang, allStrings) {
