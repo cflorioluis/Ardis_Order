@@ -10287,6 +10287,19 @@ $.SvgCanvas = function(container, config) {
     });
 
     var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight, face) {
+        var realCorner = 1;
+        switch (side) {
+            case "2":
+                realCorner = 3;
+                break;
+            case "3":
+                realCorner = 4;
+                break;
+            case "4":
+                realCorner = 2;
+                break;
+        }
+
         var polyCreated = addSvgElementFromJson({
             element: "polygon",
             curStyles: true,
@@ -10307,6 +10320,7 @@ $.SvgCanvas = function(container, config) {
                 opacity: "1",
                 face: face,
                 cross: 1,
+                realCorner: realCorner,
             },
         });
 
@@ -10827,7 +10841,7 @@ $.SvgCanvas = function(container, config) {
 
 
         polyBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Poly</h2></strong>` +
+            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Angulo en Lados</h2></strong>` +
             `<form>
                 <div class="rowForm" style="padding-bottom: 0px;">
                     <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>

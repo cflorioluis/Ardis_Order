@@ -3344,7 +3344,7 @@
                     }
 
                     polyBox = $.confirm(
-                        `<strong><h2 id="moveConfirm" style="cursor: move;">Poly</h2></strong>` +
+                        `<strong><h2 id="moveConfirm" style="cursor: move;">Angulo en Lados</h2></strong>` +
                         `<form>
 
                             <div class="rowForm" style="padding-bottom: 0px;">
@@ -3801,6 +3801,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     var mecanizados = $("[nameMecanizado]");
                     //console.log(mecanizados);
                     var doc = document.implementation.createDocument("", "", null);
+                    var hingeReady = false;
 
                     for (let ii = 0; ii < mecanizados.length; ii++) {
                         const mecanizado = mecanizados[ii];
@@ -3836,6 +3837,53 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                 paramElement.append(param);
                                 opsideElement.append("2");
                                 sideElement.append("0");
+                                break;
+
+                            case "poly":
+                                //cflorioluis - capturar todos los poly (angulos en lados)
+                                if (hingeReady) continue;
+                                var polys = $('[nameMecanizado="poly"]'),
+                                    b1 = "",
+                                    b2 = "",
+                                    b3 = "",
+                                    b4 = "",
+                                    h1 = "",
+                                    h2 = "",
+                                    h3 = "",
+                                    h4 = "";
+
+                                for (let jj = 0; jj < polys.length; jj++) {
+                                    const poly = polys[jj];
+
+                                    switch (poly.getAttribute("realCorner")) {
+                                        case "1":
+                                            b1 = poly.getAttribute("widthX");
+                                            h1 = poly.getAttribute("heightY");
+                                            break;
+                                        case "2":
+                                            b2 = poly.getAttribute("widthX");
+                                            h2 = poly.getAttribute("heightY");
+                                            break;
+                                        case "3":
+                                            b3 = poly.getAttribute("widthX");
+                                            h3 = poly.getAttribute("heightY");
+                                            break;
+                                        case "4":
+                                            b4 = poly.getAttribute("widthX");
+                                            h4 = poly.getAttribute("heightY");
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+
+                                }
+
+                                functNameElement.append("_Anguloenlados");
+                                var param = `"b1" VAR "` + b1 + `":"h1" VAR "` + h1 + `":"b2" VAR "` + b2 + `":"h2" VAR "` + h2 + `":"b3" VAR "` + b3 + `":"h3" VAR "` + h3 + `":"b4" VAR "` + b4 + `":"h4" VAR "` + h4 + `"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                hingeReady = true;
                                 break;
                         }
 
