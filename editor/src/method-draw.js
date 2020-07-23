@@ -595,6 +595,38 @@
 
 
                                 break;
+                            case "hinge":
+
+                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                    var hingeInputs = 0,
+                                        existsHinge = $('[nameMecanizado=hinge]').length;
+
+                                    $("#dialog_buttons_custom").removeClass('input-error');
+                                    $("#errorExistsHinde").remove();
+
+                                    $('input[mecanizadoInput="hinge"]').each(function() {
+                                        $(this).removeClass('input-error');
+                                        if ($(this).prop('required')) {
+                                            if ($(this).val() != "") {
+                                                hingeInputs++;
+                                            } else {
+                                                $(this).addClass('input-error');
+                                            }
+                                        }
+                                    });
+
+                                    if (existsHinge) {
+                                        $("#dialog_buttons_custom").addClass('input-error');
+                                        $("#dialog_buttons_custom").children().last().before('<h6 id="errorExistsHinde" style="font-size: large; text-align: center; margin: 20px;">Elimine Existente</h6>');
+                                    }
+
+                                    if (hingeInputs == 7 && !existsHinge) {
+                                        box.hide();
+                                        var resp = type == "prompt" ? input.val() : true;
+                                        if (callback) callback(resp);
+                                    }
+                                });
+                                break;
                             case "poly":
                                 var polyInputs = 0;
                                 $('#dialog_buttons_custom').children().first().click(function(event) {
@@ -649,10 +681,11 @@
                         }
 
                         box.show();
-
                         //cflorioluis - ocultar evento callback original si se trata de un mecanizado
                         switch (mecanizadoType) {
+
                             case "poly":
+                            case "hinge":
                             case "drill":
                             case "cajeado":
                                 break;
@@ -2930,6 +2963,7 @@
                             widthX = $("#newWidthCajeado").val();
                             heigthY = $("#newHeightCajeado").val();
                             radio = $("#newRadioCajeado").val();
+                            face = 0;
 
                             svgCanvas.cajeado(
                                 side,
@@ -2937,7 +2971,8 @@
                                 heigthY,
                                 curConfig.dimensions[0],
                                 curConfig.dimensions[1],
-                                radio
+                                radio,
+                                face
                             );
                         },
                         350,
@@ -2970,46 +3005,46 @@
                                     <div class="gridDrill">
                                         <div class="columnDrill">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="5" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4" disabled>
                                                 <img src="images/drill/edge_left_right.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value=0" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                                 <img src="images/drill/corner.png">
                                             </label>                                    
                                         </div>
                                         <div class="columnDrill wide">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1" disabled>
                                                 <img src="images/drill/edge_sup_down.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1" checked>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" checked>
                                                 <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3" disabled>
                                                 <img src="images/drill/edge_sup_down.png">
                                             </label>                                    
                                         </div>
                                         <div class="columnDrill">                                            
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3"  disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  disabled>
                                                 <img src="images/drill/edge_left_right.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                                 <img src="images/drill/corner.png">
                                             </label>                                    
                                         </div>
@@ -3098,52 +3133,52 @@
                         `<form>
 
                         <div class="rowForm" style="padding-bottom: 0px;">
-                                <div class="columnFromHinges right"><h3>Origen</h3></div>
-                                <div class="columnFromHinges FaceSelection" style="height: 69px;width: 121px;">
+                                <div class="columnFromHinge right"><h3>Origen</h3></div>
+                                <div class="columnFromHinge FaceSelection" style="height: 69px;width: 121px;">
                                
                                     <div class="gridDrill">
-                                        <div class="columnHinges">                                            
+                                        <div class="columnHinge">                                            
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1"disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1"disabled>
                                                 <img src="images/drill/edge_left_right_white.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="0" checked>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="0" checked>
                                                 <img src="images/drill/corner_left.svg">
                                             </label>                                    
                                         </div>
-                                        <div class="columnHinges wide">                                            
+                                        <div class="hinge wide">                                            
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/edge_sup_down_white.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/edge_sup_down_white.png">
                                             </label>                                    
                                         </div>
-                                        <div class="columnHinges">                                            
+                                        <div class="columnHinge">                                            
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/corner.png" >
                                             </label> 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                                 <img src="images/drill/edge_left_right_white.png">
                                             </label>
 
                                             <label>
-                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="1" >
+                                                <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="1" >
                                                 <img src="images/drill/corner_right.svg">
                                             </label>                                    
                                         </div>
@@ -3152,46 +3187,46 @@
                             </div>
 
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div class="columnFromHinge right"><h3>Distancia del Origen</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="100" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                    <input value="100" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="2" required class="inputMecanizadoHinges" id="newHingeCount" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div class="columnFromHinge right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="3" required class="inputMecanizadoHinge" id="newHingeCount" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
-                                <div class="columnFromHinges">
-                                    <input placeholder="Igual" required class="inputMecanizadoHinges" id="newAxisDist" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div  class="columnFromHinge right"><h3>Distancia entre Ejes</h3></div>
+                                <div class="columnFromHinge">
+                                    <input placeholder="Igual" class="inputMecanizadoHinge" id="newAxisDist" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="10" required class="inputMecanizadoHinge" id="newDrillDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="10" required class="inputMecanizadoHinges" id="newDrillDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div  class="columnFromHinge right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="10" required class="inputMecanizadoHinge" id="newDrillDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="35" required class="inputMecanizadoHinges" id="newHingeDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="35" required class="inputMecanizadoHinge" id="newHingeDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
                             <div class="rowForm">
-                                <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
-                                <div class="columnFromHinges">
-                                    <input value="13" required class="inputMecanizadoHinges" id="newHingeDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                                <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
+                                <div class="columnFromHinge">
+                                    <input value="13" required class="inputMecanizadoHinge" id="newHingeDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                                 </div>
                             </div>
 
@@ -3214,8 +3249,10 @@
                             </div>-->
                         `,
                         function(ok) {
-                            if (!ok) return;
-                            //Capturando los Datos del Formulario Pop-Up para el Drill
+
+
+                            if (!ok) { $("#dialog_buttons_custom").removeClass('input-error'); return };
+                            //Capturando los Datos del Formulario Pop-Up para el Hinge
                             var origin = $("input[name=origin]:checked").val();
                             var beginX = $("#newBeginX").val();
                             var endX = $("#newEndX").val();
@@ -3225,8 +3262,9 @@
                             var drillDepth = $("#newDrillDepth").val();
                             var hingeDiameter = $("#newHingeDiameter").val();
                             var hingeDepth = $("#newHingeDepth").val();
+                            var face = 0;
 
-                            svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth);
+                            svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face);
                         },
                         400,
                         530,
@@ -3369,13 +3407,15 @@
                             side = $("input[name=cornerPoly]:checked").val();
                             widthX = $("#newWidthXPoly").val();
                             heigthY = $("#newHeightYPoly").val();
+                            var face = 0;
 
                             svgCanvas.poly(
                                 side,
                                 widthX,
                                 heigthY,
                                 curConfig.dimensions[0],
-                                curConfig.dimensions[1]
+                                curConfig.dimensions[1],
+                                face
                             );
                         },
                         350,
@@ -3964,6 +4004,43 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         curConfig.showRulers = false;
                     }
                     $("#rulers").toggle(!!curConfig.showRulers);
+                };
+
+                //cflorioluis - Ver todos los Mecanizados
+                var clickViewAllMachining = function() {
+                    flash($("#view_menu"));
+                    var viewAllMachining = !$("#tool_viewAllMachining").hasClass("push_button_pressed");
+                    var face = "0";
+                    if ($("#Face-control").val() == "1") face = "5";
+
+                    var mecanizados = $("[nameMecanizado]");
+
+                    if (viewAllMachining) {
+                        $("#tool_viewAllMachining").addClass("push_button_pressed");
+
+                        for (let ii = 0; ii < mecanizados.length; ii++) {
+                            var mecanizado = mecanizados[ii];
+                            if (mecanizado.getAttribute("cross") == "0") {
+                                if (mecanizado.getAttribute("face") != face) {
+                                    $(mecanizado).show();
+                                    $(mecanizado).attr("fill", "transparent");
+                                    $(mecanizado).attr("stroke-width", "1");
+                                }
+                            }
+                        }
+                    } else {
+                        $("#tool_viewAllMachining").removeClass("push_button_pressed");
+                        for (let ii = 0; ii < mecanizados.length; ii++) {
+                            var mecanizado = mecanizados[ii];
+                            if (mecanizado.getAttribute("cross") == "0") {
+                                if (mecanizado.getAttribute("face") != face) {
+                                    $(mecanizado).hide();
+                                    $(mecanizado).attr("fill", "#3F3F3F");
+                                    $(mecanizado).attr("stroke-width", "0");
+                                }
+                            }
+                        }
+                    }
                 };
 
                 var updateWireFrame = function() {
@@ -4844,6 +4921,8 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         { sel: "#tool_wireframe", fn: clickWireframe, evt: "click" },
                         { sel: "#tool_snap", fn: clickSnapGrid, evt: "click" },
                         { sel: "#tool_rulers", fn: clickRulers, evt: "click" },
+                        //cflorioluis - Ver todos los Mecanizados
+                        { sel: "#tool_viewAllMachining", fn: clickViewAllMachining, evt: "click" },
                         {
                             sel: "#tool_source_cancel,#svg_source_overlay,#tool_docprops_cancel,#tool_prefs_cancel",
                             fn: cancelOverlays,
@@ -5164,6 +5243,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                                 // Bind function to shortcut key
                                 if (opts.key) {
+
                                     // Set shortcut based on options
                                     var keyval,
                                         shortcut = "",
@@ -5183,7 +5263,9 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                         if (modifier_key == "ctrl") keyval.replace("ctrl", "cmd");
                                     }
 
+
                                     $.each(keyval.split("/"), function(i, key) {
+                                        console.log(key);
                                         $(document).bind("keydown", key, function(e) {
                                             fn();
                                             if (pd) {
@@ -6188,6 +6270,64 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         $("#svgroot").css("transition", "0.6s");
                         $("#svgroot").css("transform-style", "preserve-3d");
                         $("#svgroot").css("position", "relative");
+
+
+                        //console.log();
+                        //bloquear cajeado para que no se haga por la cara tracera
+                        var regExp = /\(([^)]+)\)/; //get command short for cajeado
+
+                        var command = regExp.exec($('#tool_cajeadoTool')[0].title);
+                        if (rotation == 360) { //en cara tracera
+
+                            var mecanizados = $("[nameMecanizado]");
+
+                            for (let ii = 0; ii < mecanizados.length; ii++) {
+                                var mecanizado = mecanizados[ii];
+                                if (mecanizado.getAttribute("cross") == "0") {
+                                    if (mecanizado.getAttribute("face") == "0") {
+                                        //$(mecanizado).slideToggle("fast");
+                                        $(mecanizado).hide();
+                                        $(mecanizado).attr("fill", "transparent");
+                                        $(mecanizado).attr("stroke-width", "1");
+                                    }
+                                    if (mecanizado.getAttribute("face") == "5") {
+                                        $(mecanizado).show();
+                                    }
+                                }
+                            }
+                        } else { //en cara delantera
+                            var mecanizados = $("[nameMecanizado]");
+
+                            for (let ii = 0; ii < mecanizados.length; ii++) {
+                                var mecanizado = mecanizados[ii];
+                                if (mecanizado.getAttribute("cross") == "0") {
+                                    if (mecanizado.getAttribute("face") == "0") {
+                                        $(mecanizado).show();
+                                        $(mecanizado).attr("fill", "#3F3F3F");
+                                        $(mecanizado).attr("stroke-width", "0");
+                                    }
+                                    if (mecanizado.getAttribute("face") == "5") {
+                                        $(mecanizado).hide();
+                                    }
+                                }
+                            }
+                        }
+                        /*fill: "#3F3F3F",
+                                                "stroke-width": "0",
+
+                                                fill="transparent"  stroke-width="1" */
+
+
+                        //$('#tool_cajeadoTool').off('keydown');
+
+                        /*$(document).bind("keydown", key, function(e) {
+                            fn();
+                            if (pd) {
+                                e.preventDefault();
+                            }
+                            // Prevent default on ALL keys?
+                            return false;
+                        });*/
                     });
 
                 });

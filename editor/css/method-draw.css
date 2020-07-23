@@ -2404,12 +2404,12 @@ input[readonly=readonly]:focus {
     width: 12px;
 }
 
-.columnHinges.wide {
+.columnHinge.wide {
     width: 98px;
     padding-left: 1px;
 }
 
-.columnHinges {
+.columnHinge {
     width: 14px;
 }
 
@@ -2448,19 +2448,19 @@ input[readonly=readonly]:focus {
     width: 40%;
 }
 
-.columnFromHinges.right {
+.columnFromHinge.right {
     text-align: right;
     padding-right: 5%;
 }
 
-.columnFromHinges {
+.columnFromHinge {
     float: left;
     width: 45%;
 }
 
 
 /*
-.columnFromHinges>h3 {
+.columnFromHinge>h3 {
     padding: 0;
     margin: 0;
 }*/
@@ -2477,7 +2477,7 @@ input[readonly=readonly]:focus {
     width: 100px !important;
 }
 
-.inputMecanizadoHinges {
+.inputMecanizadoHinge {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;

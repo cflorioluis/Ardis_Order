@@ -10286,7 +10286,7 @@ $.SvgCanvas = function(container, config) {
         }
     });
 
-    var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight) {
+    var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight, face) {
         var polyCreated = addSvgElementFromJson({
             element: "polygon",
             curStyles: true,
@@ -10304,7 +10304,9 @@ $.SvgCanvas = function(container, config) {
                 heightY: heightY,
                 maxWidth: maxWidth - 200,
                 maxHeight: maxHeight - 200,
-                opacity: "1"
+                opacity: "1",
+                face: face,
+                cross: 1,
             },
         });
 
@@ -10326,14 +10328,14 @@ $.SvgCanvas = function(container, config) {
             rDrill = diameterDrill / 2,
             aDist = parseInt(axisDist),
             hingeDistance = (curConfig.realDimensions[0] - parseInt(beginX) - parseInt(endX)) / (parseInt(hingeCount) - 1),
-            totalHinges = parseInt(hingeCount),
-            reverseHinges = 0,
-            reverseHingesEnd = 0,
+            totalHinge = parseInt(hingeCount),
+            reverseHinge = 0,
+            reverseHingeEnd = 0,
             factor = -1;
 
         if (origin == "1") {
-            reverseHinges = curConfig.dimensions[0];
-            reverseHingesEnd = reverseHinges;
+            reverseHinge = curConfig.dimensions[0];
+            reverseHingeEnd = reverseHinge;
             factor = 1;
             console.log("GG");
         }
@@ -10345,15 +10347,15 @@ $.SvgCanvas = function(container, config) {
         "*/
 
         if (endX == "") {
-            totalHinges++;
+            totalHinge++;
         }
 
         if (origin == "1") {
-            for (let ii = 0; ii < totalHinges - 1; ii++) {
-                d += "M" + (reverseHinges - cx - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
-                d += "M" + (reverseHinges - cx - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
-                d += "M" + (reverseHinges - cx + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
-                    //console.log((factor * (reverseHinges - cx - r)));
+            for (let ii = 0; ii < totalHinge - 1; ii++) {
+                d += "M" + (reverseHinge - cx - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+                d += "M" + (reverseHinge - cx - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
+                d += "M" + (reverseHinge - cx + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+                    //console.log((factor * (reverseHinge - cx - r)));
                 if (aDist > 0) {
                     cx += aDist;
                 } else { cx += hingeDistance; }
@@ -10363,16 +10365,16 @@ $.SvgCanvas = function(container, config) {
             //ultima Cazoleta
             if (parseInt(endX) != 0) {
                 //cx = curConfig.realDimensions[0];
-                d += "M" + (reverseHingesEnd - cxEnd - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
-                d += "M" + (reverseHingesEnd - cxEnd - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
-                d += "M" + (reverseHingesEnd - cxEnd + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+                d += "M" + (reverseHingeEnd - cxEnd - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
+                d += "M" + (reverseHingeEnd - cxEnd - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
+                d += "M" + (reverseHingeEnd - cxEnd + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
             }
         } else {
-            for (let ii = 0; ii < totalHinges - 1; ii++) {
+            for (let ii = 0; ii < totalHinge - 1; ii++) {
                 d += "M" + (cx - diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
                 d += "M" + (cx - r) + ", " + cy + "a " + r + ", " + r + " 0 1, 0 " + (r * 2) + ", 0 a " + r + ", " + r + " 0 1, 0 " + (r * 2 * -1) + ", 0 "
                 d += "M" + (cx + diameter - rDrill) + ", " + (cy + (r / 2)) + "a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2) + ", 0 a " + rDrill + ", " + rDrill + " 0 1, 0 " + (rDrill * 2 * -1) + ", 0 "
-                    //console.log((factor * (reverseHinges - cx - r)));
+                    //console.log((factor * (reverseHinge - cx - r)));
                 if (aDist > 0) {
                     cx += aDist;
                 } else { cx += hingeDistance; }
@@ -10414,7 +10416,7 @@ $.SvgCanvas = function(container, config) {
                 drillDepth: drillDepth,
                 hingeDiameter: hingeDiameter,
                 hingeDepth: hingeDepth,
-                opacity: 0.5
+                opacity: 0.5,
             },
             100
         );
@@ -10423,7 +10425,7 @@ $.SvgCanvas = function(container, config) {
 
     });
 
-    var hinge = (this.hinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
+    var hinge = (this.hinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face) {
         var cajeadoCreated = addSvgElementFromJson({
             element: "path",
             curStyles: true,
@@ -10443,7 +10445,9 @@ $.SvgCanvas = function(container, config) {
                 drillDepth: drillDepth,
                 hingeDiameter: hingeDiameter,
                 hingeDepth: hingeDepth,
-                opacity: 0.5
+                opacity: 0.5,
+                face: face,
+                cross: 0,
             },
         });
 
@@ -10487,7 +10491,7 @@ $.SvgCanvas = function(container, config) {
     var drill = (this.drill = function(face, x, y, r, isPasante, depth, broachType) {
 
         switch (face) {
-            case "1":
+            case "0":
                 //console.log("cara Principal");
                 var opacity = 1,
                     cross = 1;
@@ -10543,7 +10547,7 @@ $.SvgCanvas = function(container, config) {
 
     });
 
-    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio) {
+    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio, face) {
         var cajeadoCreated = addSvgElementFromJson({
             element: "path",
             curStyles: true,
@@ -10562,7 +10566,9 @@ $.SvgCanvas = function(container, config) {
                 heightY: heightY,
                 maxWidth: maxWidth - 200,
                 maxHeight: maxHeight - 200,
-                opacity: "1"
+                opacity: "1",
+                face: face,
+                cross: 1,
             },
         });
 
@@ -10884,6 +10890,8 @@ $.SvgCanvas = function(container, config) {
                 side = $("input[name=cornerPoly]:checked").val();
                 widthX = $("#newWidthPoly").val();
                 heigthY = $("#newHeightPoly").val();
+                var face = 0,
+                    cross = 1;
 
                 if (selectedElements[0] == null) {
                     svgCanvas.poly(
@@ -10891,7 +10899,10 @@ $.SvgCanvas = function(container, config) {
                         widthX,
                         heigthY,
                         curConfig.dimensions[0],
-                        curConfig.dimensions[1]
+                        curConfig.dimensions[1],
+                        face,
+                        cross
+
                     );
                 } else {
                     var points = createPolySide(widthX, heigthY, side);
@@ -10935,52 +10946,52 @@ $.SvgCanvas = function(container, config) {
             `<form>
 
             <div class="rowForm" style="padding-bottom: 0px;">
-                    <div class="columnFromHinges right"><h3>Origen</h3></div>
-                    <div class="columnFromHinges FaceSelection" style="height: 69px;width: 121px;">
+                    <div class="columnFromHinge right"><h3>Origen</h3></div>
+                    <div class="columnFromHinge FaceSelection" style="height: 69px;width: 121px;">
                    
                         <div class="gridDrill">
-                            <div class="columnHinges">                                            
+                            <div class="columnHinge">                                            
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/corner.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1"disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1"disabled>
                                     <img src="images/drill/edge_left_right_white.png">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="0" ` + origin0 + `>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="0" ` + origin0 + `>
                                     <img src="images/drill/corner_left.svg">
                                 </label>                                    
                             </div>
-                            <div class="columnHinges wide">                                            
+                            <div class="columnHinge wide">                                            
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/edge_sup_down_white.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/edge_sup_down_white.png">
                                 </label>                                    
                             </div>
-                            <div class="columnHinges">                                            
+                            <div class="columnHinge">                                            
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/corner.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="-1" disabled>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
                                     <img src="images/drill/edge_left_right_white.png">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinges" value="1" ` + origin1 + `>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="1" ` + origin1 + `>
                                     <img src="images/drill/corner_right.svg">
                                 </label>                                    
                             </div>
@@ -10989,51 +11000,51 @@ $.SvgCanvas = function(container, config) {
                 </div>
 
                 <div class="rowForm">
-                    <div class="columnFromHinges right"><h3>Distancia del Origen</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("beginX") + `" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                        <input value="` + elem.getAttribute("endX") + `" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div class="columnFromHinge right"><h3>Distancia del Origen</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("beginX") + `" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                        <input value="` + elem.getAttribute("endX") + `" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div class="columnFromHinges right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("hingeCount") + `" required class="inputMecanizadoHinges" id="newHingeCount" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div class="columnFromHinge right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("hingeCount") + `" required class="inputMecanizadoHinge" id="newHingeCount" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div  class="columnFromHinges right"><h3>Distancia entre Ejes</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("axisDist") + `" placeholder="Igual" required class="inputMecanizadoHinges" id="newAxisDist" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div  class="columnFromHinge right"><h3>Distancia entre Ejes</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("axisDist") + `" placeholder="Igual" required class="inputMecanizadoHinge" id="newAxisDist" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("drillDiameter") + `"  required class="inputMecanizadoHinges" id="newDrillDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("drillDiameter") + `"  required class="inputMecanizadoHinge" id="newDrillDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div  class="columnFromHinges right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("drillDepth") + `" required class="inputMecanizadoHinges" id="newDrillDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("drillDepth") + `" required class="inputMecanizadoHinge" id="newDrillDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("hingeDiameter") + `" required class="inputMecanizadoHinges" id="newHingeDiameter" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("hingeDiameter") + `" required class="inputMecanizadoHinge" id="newHingeDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
                 <div class="rowForm">
-                    <div  class="columnFromHinges right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
-                    <div class="columnFromHinges">
-                        <input value="` + elem.getAttribute("hingeDepth") + `" required class="inputMecanizadoHinges" id="newHingeDepth" mecanizadoInput="hinges" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + elem.getAttribute("hingeDepth") + `" required class="inputMecanizadoHinge" id="newHingeDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                     </div>
                 </div>
             `,
             function(ok) {
-                if (!ok) return;
+                if (!ok) { $("#dialog_buttons_custom").removeClass('input-error'); return };
                 //Capturando los Datos del Formulario Pop-Up para el Drill
                 var origin = $("input[name=origin]:checked").val();
                 var beginX = $("#newBeginX").val();
@@ -11044,8 +11055,9 @@ $.SvgCanvas = function(container, config) {
                 var drillDepth = $("#newDrillDepth").val();
                 var hingeDiameter = $("#newHingeDiameter").val();
                 var hingeDepth = $("#newHingeDepth").val();
+                var face = 0;
 
-                svgCanvas.editHinge(elem, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth);
+                svgCanvas.editHinge(elem, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face);
             },
             400,
             530,
@@ -11122,46 +11134,46 @@ $.SvgCanvas = function(container, config) {
                         <div class="gridDrill">
                             <div class="columnDrill">                                            
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                     <img src="images/drill/corner.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="5"  ` + face5 + ` >
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4"  ` + face5 + ` >
                                     <img src="images/drill/edge_left_right.png">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value=0" disabled>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                     <img src="images/drill/corner.png">
                                 </label>                                    
                             </div>
                             <div class="columnDrill wide">                                            
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face2 + `>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1"  ` + face2 + `>
                                     <img src="images/drill/edge_sup_down.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1"  ` + face1 + `>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face1 + `>
                                     <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4"  ` + face4 + `>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3"  ` + face4 + `>
                                     <img src="images/drill/edge_sup_down.png">
                                 </label>                                    
                             </div>
                             <div class="columnDrill">                                            
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                     <img src="images/drill/corner.png" >
                                 </label> 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3"  ` + face3 + ` >
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face3 + ` >
                                     <img src="images/drill/edge_left_right.png">
                                 </label>
 
                                 <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0" disabled>
+                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
                                     <img src="images/drill/corner.png">
                                 </label>                                    
                             </div>
@@ -11948,6 +11960,7 @@ $.SvgCanvas = function(container, config) {
                 widthX = $("#newWidthCajeado").val();
                 heigthY = $("#newHeightCajeado").val();
                 radio = $("#newRadioCajeado").val();
+                var face = 0;
                 console.log(" " + side + " " + widthX + " " + heigthY + " " + curConfig.dimensions[0] + " " + curConfig.dimensions[1] + " " + radio);
 
                 svgCanvas.deleteSelectedElements();
@@ -11958,7 +11971,8 @@ $.SvgCanvas = function(container, config) {
                     heigthY,
                     curConfig.dimensions[0],
                     curConfig.dimensions[1],
-                    radio
+                    radio,
+                    face
                 );
             },
             500,
