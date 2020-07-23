@@ -58,7 +58,30 @@
 		<svg viewBox="0 0 24 24" version="1.1">
 			<g transform="translate(0.000000,27.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
 				<path fill="#2F2F2C" d="M0 230 l0 -40 135 0 135 0 0 40 0 40 -135 0 -135 0 0 -40z" />
-				<polygon fill="#2F2F2C" points="270,130 270,190 160,210"/>
+				<polygon fill="#2F2F2C" points="270,130 270,190 160,210" />
+			</g>
+		</svg>
+	</g>
+	<g id="rectTools">
+		<svg viewBox="0 0 24 24" version="1.1">
+			<g transform="translate(0.000000,27.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+				<path fill="#2F2F2C" d="M0 230 l0 -40 135 0 135 0 0 40 0 40 -135 0 -135 0 0 -40z" />
+				<rect fill="#2F2F2C" height="60" width="120" y="70" x="70" />
+			</g>
+		</svg>
+	</g>
+	<g id="rectTool">
+		<svg viewBox="0 0 24 24" version="1.1">
+			<g transform="translate(0.000000,27.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+				<path fill="#2F2F2C" d="M0 230 l0 -40 135 0 135 0 0 40 0 40 -135 0 -135 0 0 -40z" />
+				<rect fill="#2F2F2C" height="60" width="120" y="70" x="70" />
+			</g>
+		</svg>
+	</g><g id="rectRoundTool">
+		<svg viewBox="0 0 24 24" version="1.1">
+			<g transform="translate(0.000000,27.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+				<path fill="#2F2F2C" d="M0 230 l0 -40 135 0 135 0 0 40 0 40 -135 0 -135 0 0 -40z" />
+				<rect fill="#2F2F2C" height="60" width="120" y="70" x="70" rx="15" ry="25"/>
 			</g>
 		</svg>
 	</g>

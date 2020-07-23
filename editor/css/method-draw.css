@@ -2591,3 +2591,14 @@ input[right][type="text"]::placeholder {
     border-top: 20px solid rgb(255, 0, 0) !important;
     overflow: hidden;
 }
+
+#subRectTool {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 100%;
+}
+
+#tool_rectTools:hover div {
+    display: block;
+}

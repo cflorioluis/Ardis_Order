@@ -162,6 +162,9 @@
                         drillTool: "drill.png",
                         hingeTool: "hinge.png",
                         polyTool: "poly.png",
+                        rectTools: "rectTool.png",
+                        rectTool: "rectTool.png",
+                        rectRoundTool: "rectRound.png",
                         select_node: "select_node.png",
                         pencil: "pencil.png",
                         pen: "line.png",
@@ -192,6 +195,10 @@
                         "#tool_drillTool": "drillTool",
                         "#tool_hingeTool": "hingeTool",
                         "#tool_polyTool": "polyTool",
+                        "#tool_rectTools": "rectTools",
+                        "#tool_rectTool": "rectTool",
+                        "#tool_rectRoundTool": "rectRoundTool",
+
                         //
                         "#tool_fhpath": "pencil",
                         "#tool_line": "pen",
@@ -6309,6 +6316,8 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                 $(function() {
                     window.svgCanvas = svgCanvas;
                     svgCanvas.ready = methodDraw.ready;
+
+                    $("#color_tools").remove(); //cflorioluis - quitar seleccionador de color
 
                     svgCanvas.createDivs(curConfig.cantos); //crear divisiones originales para ver los cantos
 

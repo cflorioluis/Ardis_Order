@@ -51,8 +51,8 @@
     <script type="text/javascript" src="lib/contextmenu.js"></script>
     <script type="text/javascript" src="lib/jgraduate/jpicker.min.js"></script>
     <script type="text/javascript" src="lib/mousewheel.js"></script>
-    <script type="text/javascript" src="extensions/ext-eyedropper.js"></script>
-    <script type="text/javascript" src="extensions/ext-shapes.js"></script>
+    <!--<script type="text/javascript" src="extensions/ext-eyedropper.js"></script>-->
+    <!--<script type="text/javascript" src="extensions/ext-shapes.js"></script>-->
     <script type="text/javascript" src="extensions/ext-grid.js"></script>
     <script type="text/javascript" src="lib/requestanimationframe.js"></script>
     <script type="text/javascript" src="lib/taphold.js"></script>
@@ -592,22 +592,29 @@
             <div class="tool_button" id="tool_select" title="Select Tool [V]"></div>
             <!--add new toll - cflorioluis-->
             <div class="tool_button" id="tool_cajeadoTool" title="Cajeado []"></div>
-
             <div class="tool_button" id="tool_cremalleraTool" title="Cremallera []"></div>
-
             <div class="tool_button" id="tool_drillTool" title="Taladro []"></div>
             <div class="tool_button" id="tool_hingeTool" title="Cazoleta []"></div>
-            <div class="tool_button" id="tool_polyTool" title="AWPolyG []"></div>
+            <div class="tool_button" id="tool_polyTool" title="Angulo en Lados []"></div>
+
+            <div class="tool_button" id="tool_rectTools" title="Rectangulos">
+                <div id="subRectTool" class="tools_panel">
+                    <div class="tool_button" id="tool_rectTool" title="Rectangulo []"></div>
+                    <div class="tool_button" id="tool_rectRoundTool" title="Rectangulo Redondeado []"></div>
+                </div>
+            </div>
 
 
+            <div class="tool_button" id="tool_zoom" title="Zoom Tool [Z]"></div>
+
+            <!--
             <div class="tool_button" id="tool_fhpath" title="Pencil Tool [P]"></div>
             <div class="tool_button" id="tool_line" title="Line Tool [L]"></div>
             <div class="tool_button" id="tool_rect" title="Square/Rect Tool [R]"></div>
             <div class="tool_button" id="tool_ellipse" title="Ellipse/Circle Tool [C]"></div>
             <div class="tool_button" id="tool_path" title="Path Tool [P]"></div>
             <div class="tool_button" id="tool_text" title="Text Tool [T]"></div>
-            <div class="tool_button" id="tool_zoom" title="Zoom Tool [Z]"></div>
-
+-->
             <div id="color_tools">
                 <div id="tool_switch" title="Switch stroke and fill colors [X]"></div>
                 <div class="color_tool active" id="tool_fill">
@@ -656,10 +663,10 @@
                     <input id="zoom" size="3" value="100%" type="text" readonly="readonly" />
                 </div>
             </div>
-
+            <!--
             <div id="tools_bottom_3">
                 <div id="palette" title="Click to change fill color, shift-click to change stroke color"></div>
-            </div>
+            </div>-->
         </div>
 
 

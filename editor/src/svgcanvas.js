@@ -3881,11 +3881,17 @@ $.SvgCanvas = function(container, config) {
                         rubberBox.setAttribute("display", "none");
                     }
                     var factor = evt.altKey ? 0.5 : 2;
+                    console.log("X y width height");
+                    console.log(Math.min(r_start_x, real_x) + " " + Math.min(r_start_y, real_y) + " " + Math.abs(real_x - r_start_x) + " " + Math.abs(real_y - r_start_y));
                     call("zoomed", {
                         x: Math.min(r_start_x, real_x),
                         y: Math.min(r_start_y, real_y),
                         width: Math.abs(real_x - r_start_x),
                         height: Math.abs(real_y - r_start_y),
+                        /*x: 400,
+                        y: 400;
+                        width: 200,
+                        height: 200,*/
                         factor: factor,
                     });
                     return;
