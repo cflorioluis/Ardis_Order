@@ -3432,6 +3432,22 @@
                     );
                 };
 
+                var clickRectTool = function() {
+                    if (toolButtonClick("#tool_rectTool")) {
+                        svgCanvas.setMode("rectTool");
+                    }
+                };
+
+                var clickRectRoundTool = function() {
+                    if (toolButtonClick("#tool_rectRoundTool")) {
+                        svgCanvas.setMode("rectRoundTool");
+                    }
+                };
+
+
+
+
+
                 var clickFHPath = function() {
                     if (toolButtonClick("#tool_fhpath")) {
                         svgCanvas.setMode("fhpath");
@@ -4892,13 +4908,26 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             evt: "click",
                             key: [modKey + "Shift+5"],
                         },
-
                         {
                             sel: "#tool_polyTool",
                             fn: clickPolyTool,
                             evt: "click",
                             key: [modKey + "Shift+6"],
                         },
+                        {
+                            sel: "#tool_rectTool",
+                            fn: clickRectTool,
+                            evt: "click",
+                            key: [modKey + "Shift+7"],
+                        },
+                        {
+                            sel: "#tool_rectRoundTool",
+                            fn: clickRectRoundTool,
+                            evt: "click",
+                            key: [modKey + "Shift+8"],
+                        },
+
+
 
                         {
                             sel: "#tool_fhpath",
