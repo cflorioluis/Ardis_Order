@@ -3109,7 +3109,7 @@ $.SvgCanvas = function(container, config) {
                                     //console.clear();
                                     //console.log("(" + posX + "," + dx + ")");
                                     switch (faceDrill) {
-                                        case "1":
+                                        case "0":
                                             var limits = 0,
                                                 wX = -rx,
                                                 sY = -ry,
@@ -10060,8 +10060,371 @@ $.SvgCanvas = function(container, config) {
         return obj;
     };
 
-    //cflorioluis - Nuevas Funciones para el Mecanizado de Piezas
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
+    var clickCajeadoTool = (this.clickCajeadoTool = function(elem) {
+        var side = "",
+            widthX = "",
+            heigthY = "",
+            radio = "",
+            title = "Cajeado";
+
+        if (elem && elem.getAttribute("nameMecanizado") == "cajeado") {
+            var side = elem.getAttribute("side"),
+                widthX = elem.getAttribute("widthX"),
+                heigthY = elem.getAttribute("heightY"),
+                radio = elem.getAttribute("radio"),
+                title = "Editar Cajeado";
+        }
+        //dimension mas pequeña para limitar el radio
+        var radioLimit = Math.min(curConfig.dimensions[0], curConfig.dimensions[1]);
+
+        var cajeadoReady1 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady2 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady3 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`,
+            cajeadoReady4 =
+            `<label>
+                <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
+                <img src="images/mecanizado/cajeado_not_use.png">
+            </label>`;
+
+        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
+        var cajeadoReady = $("path[nameMecanizado*='cajeado']");
+
+        if (cajeadoReady.length > 0) {
+            for (let i = 0; i < cajeadoReady.length; i++) {
+                const element = cajeadoReady[i];
+                switch (element.getAttribute("side")) {
+                    case "1":
+                        cajeadoReady1 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "2":
+                        cajeadoReady2 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`;
+                        break;
+                    case "3":
+                        cajeadoReady3 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+                    case "4":
+                        cajeadoReady4 =
+                            `<label>
+                                            <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
+                                            <img src="images/mecanizado/cajeado_in_use.png">
+                                        </label>`
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+        switch (side) {
+            case "1":
+                cajeadoReady1 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`;
+                break;
+            case "2":
+                cajeadoReady2 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`;
+                break;
+            case "3":
+                cajeadoReady3 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`
+                break;
+            case "4":
+                cajeadoReady4 =
+                    `<label>
+                                        <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4" checked>
+                                        <img src="images/mecanizado/cajeado_in_use.png">
+                                    </label>`
+                break;
+
+            default:
+                break;
+        }
+
+
+        cajeadoBox = $.confirm(
+            `<strong><h2 id="moveConfirm" style="cursor: move;">` + title + `</h2></strong>` +
+            `<form>
+                <div class="rowForm" style="padding-bottom: 0px;">
+                    <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
+                    <div class="columnFromCajeado">
+                        <div class="tablero grid">
+                            <div class="columnCajeado">` +
+            cajeadoReady4 +
+            `<label>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>` +
+            cajeadoReady1 +
+            `</div>
+                            
+                            <div class="columnCajeado">                       
+                                <label>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                                
+                                <label>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
+                                    <img src="images/mecanizado/cajeado_empty.png" >
+                                </label>
+                            </div>
+                            
+                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
+            cajeadoReady3 +
+            `<label>
+                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
+                                    <img src="images/mecanizado/cajeado_empty.png">
+                                </label>` +
+            cajeadoReady2 +
+            `</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromCajeado right"><h3>Ancho</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + widthX + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newWidthX', this.value);"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromCajeado right"><h3>Fondo</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + heigthY + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newHeightY', this.value);"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromCajeado right"><h3>Radio</h3></div>
+                    <div class="columnFromCajeado">
+                        <input required value="` + radio + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('radio', this.value);"/>
+                    </div>
+                </div>
+            </form>
+            `,
+            function(ok) {
+                if (!ok) return;
+                //Capturando los Datos del Formulario Pop-Up para el Cajeado
+                side = $("input[name=corner]:checked").val();
+                widthX = $("#newWidthCajeado").val();
+                heigthY = $("#newHeightCajeado").val();
+                radio = $("#newRadioCajeado").val();
+
+                if (selectedElements[0] == null) {
+                    svgCanvas.cajeado(
+                        side,
+                        widthX,
+                        heigthY,
+                        curConfig.dimensions[0],
+                        curConfig.dimensions[1],
+                        radio
+                    );
+                } else {
+                    var d = createRoundedCajeadoSide(widthX, heigthY, radio, side);
+                    selectedElements[0].setAttribute("d", d);
+                    var id = selectedElements[0].id,
+                        w = widthX,
+                        h = heigthY;
+
+                    editLinesCantoCajeado(side, w, h, id);
+                    selectorManager.requestSelector(selectedElements[0]).resize();
+                }
+            },
+            350,
+            320,
+            true,
+            "cajeado"
+        );
+    });
+
+    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio, face) {
+        var cajeadoCreated = addSvgElementFromJson({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: createRoundedCajeadoSide(widthX, heightY, radio, side),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": "0",
+                nameMecanizado: "cajeado" /*_" + side*/ ,
+                side: side,
+                radio: radio,
+                tempWidth: widthX,
+                tempHeight: heightY,
+                widthX: widthX,
+                heightY: heightY,
+                maxWidth: maxWidth - 200,
+                maxHeight: maxHeight - 200,
+                opacity: "1",
+                face: face,
+                cross: 1,
+            },
+        });
+
+        createLineCajeado(side, widthX, heightY, cajeadoCreated.id);
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+
+    });
+
+    var editLinesCantoCajeado = (this.editLinesCantoCajeado = function(side, w, h, id) {
+        switch (side) {
+            case "4":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (parseInt(w) + 100));
+                line1.setAttribute("x2", (parseInt(w) + 100));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                break;
+            case "3":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
+                break;
+            case "2":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
+                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (parseInt(h) + 100));
+                line2.setAttribute("y2", (parseInt(h) + 100));
+                break;
+            case "1":
+                var line1 = svgCanvas.getElem(id + "_line1");
+                line1.setAttribute("x1", (parseInt(w) + 100));
+                line1.setAttribute("x2", (parseInt(w) + 100));
+
+                var line2 = svgCanvas.getElem(id + "_line2");
+                line2.setAttribute("y1", (parseInt(h) + 100));
+                line2.setAttribute("y2", (parseInt(h) + 100));
+                break;
+
+            default:
+                break;
+        }
+    });
+
+    var selectCajeado = (this.selectCajeado = function(side) {
+        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
+        var element = $("[nameMecanizado*='cajeado'][side='" + side + "']").attr("id");
+
+        if (element) {
+            selectOnly([getElem(element)], true);
+            //console.log(selectedElements[0].getAttribute("widthX"));
+            $('#newWidthCajeado').val(selectedElements[0].getAttribute("widthX"));
+            $('#newHeightCajeado').val(selectedElements[0].getAttribute("heightY"));
+            $('#newRadioCajeado').val(selectedElements[0].getAttribute("radio"));
+        } else {
+            $('#newWidthCajeado').val("");
+            $('#newHeightCajeado').val("");
+            $('#newRadioCajeado').val("");
+            clearSelection();
+        }
+    });
+
+    var editCajeado = (this.editCajeado = function(attrName, attrValue) {
+        if (!selectedElements[0]) return;
+
+        var w, h, r, d, side;
+        w = selectedElements[0].getAttribute("widthX");
+        h = selectedElements[0].getAttribute("heightY");
+        r = selectedElements[0].getAttribute("radio");
+        side = selectedElements[0].getAttribute("side");
+        switch (attrName) {
+            case "newWidthX":
+                w = attrValue;
+                selectedElements[0].setAttribute("widthX", w);
+                $("#newWidthCajeado").val(w);
+                break;
+            case "newHeightY":
+                h = attrValue;
+                selectedElements[0].setAttribute("heightY", h);
+                $("#newHeightCajeado").val(h);
+                break;
+            case "radio":
+                r = attrValue;
+                selectedElements[0].setAttribute("radio", radio);
+                $("#newRadioCajeado").val(radio);
+                break;
+        }
+        d = createRoundedCajeadoSide(w, h, r, side);
+        selectedElements[0].setAttribute("d", d);
+
+        selectorManager.requestSelector(selectedElements[0]).resize();
+        var id = selectedElements[0].id;
+        editLinesCantoCajeado(side, w, h, id);
+    });
+
+    //cflorioluis - Nuevas Funciones para el Mecanizado de Piezas
     var createRoundedCajeadoSide = (this.createRoundedCajeadoSide = function(widthX, heightY, radio, side) {
         switch (side) {
             case "4":
@@ -10100,7 +10463,6 @@ $.SvgCanvas = function(container, config) {
     });
 
     var createLineCajeado = (this.createLineCajeado = function(side, widthX, heightY, id) {
-
         //crear linea que se vera en el canto
         switch (side) {
             case "4":
@@ -10271,70 +10633,510 @@ $.SvgCanvas = function(container, config) {
             default:
                 break;
         }
-
         //cajeadoCreated.appendChild(lineCajeadoCreated);
     });
 
-    var createPolySide = (this.createPolySide = function(widthX, heightY, side) {
+    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
+    var clickDrillTool = (this.clickDrillTool = function(elem) {
+        var face0 = "",
+            face1 = "disabled",
+            face2 = "disabled",
+            face3 = "disabled",
+            face4 = "disabled",
+            face5 = "disabled",
+            cross = "",
+            crossStyle = "",
+            flat = "",
+            lance = "",
+            title = "Taladro",
+            realX = "",
+            realY = "",
+            diameter = "",
+            depth = "";
 
-        var cx = parseInt(widthX) + 100;
-        var cy = parseInt(heightY) + 100;
 
-        switch (side) {
-            case "4":
-                return curConfig.corners[0] + "," + curConfig.corners[2] + " " + cx + "," + curConfig.corners[2] + " " + curConfig.corners[0] + "," + (curConfig.corners[2] - parseInt(heightY));
-            case "3":
-                return curConfig.corners[1] + "," + curConfig.corners[2] + " " + curConfig.corners[1] + "," + (curConfig.corners[2] - parseInt(heightY)) + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[2];
-            case "2":
-                return curConfig.corners[1] + "," + curConfig.corners[0] + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[0] + " " + curConfig.corners[1] + "," + cy;
-            case "1":
-                return curConfig.corners[0] + "," + curConfig.corners[0] + " " + curConfig.corners[0] + "," + cy + " " + cx + "," + curConfig.corners[0];
+        if (elem && elem.getAttribute("nameMecanizado") == "drill") {
+
+            realX = elem.getAttribute("realX");
+            realY = elem.getAttribute("realY");
+            diameter = elem.getAttribute("diameter");
+            depth = elem.getAttribute("depth");
+            title = "Editar Taladro";
+
+            switch (elem.getAttribute("cross")) {
+                case "1":
+                    cross = `checked`;
+                    crossStyle = `style="display: none;"`
+                    break;
+                case "0":
+                    crossStyle = `style="display: block;"`
+                    break;
+            }
+
+
+            switch (elem.getAttribute("broachType")) {
+                case "flat":
+                    flat = `checked`;
+                    break;
+                case "lance":
+                    lance = `checked`;
+                    break;
+            }
+
+            switch (elem.getAttribute("face")) {
+                case "0":
+                    face0 = `checked`;
+                    break;
+                case "1":
+                    face1 = `checked`;
+                    break;
+                case "2":
+                    face2 = `checked`;
+                    break;
+                case "3":
+                    face3 = `checked`;
+                    break;
+                case "4":
+                    face4 = `checked`;
+                    break;
+                case "5":
+                    face5 = `checked`;
+                    break;
+            }
         }
+
+
+
+        //console.log(elem);
+        drillBox = $.confirm(
+            `<strong><h2 id="moveConfirm" style="cursor: move;">` + title + `</h2></strong>` +
+            `<form>
+
+        <div class="rowForm" style="padding-bottom: 0px;">
+                <div class="columnFromDrill right"><h3>Seleccionar Cara</h3></div>
+                <div class="columnFromDrill FaceSelection" style="height: 69px;width: 121px;">
+               
+                    <div class="gridDrill">
+                        <div class="columnDrill">                                            
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
+                                <img src="images/drill/corner.png" >
+                            </label> 
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4"  ` + face4 + ` >
+                                <img src="images/drill/edge_left_right.png">
+                            </label>
+
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
+                                <img src="images/drill/corner.png">
+                            </label>                                    
+                        </div>
+                        <div class="columnDrill wide">                                            
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1"  ` + face1 + `>
+                                <img src="images/drill/edge_sup_down.png" >
+                            </label> 
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="0"  ` + face0 + `>
+                                <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
+                            </label>
+
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4"  ` + face3 + `>
+                                <img src="images/drill/edge_sup_down.png">
+                            </label>                                    
+                        </div>
+                        <div class="columnDrill">                                            
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
+                                <img src="images/drill/corner.png" >
+                            </label> 
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face2 + ` >
+                                <img src="images/drill/edge_left_right.png">
+                            </label>
+
+                            <label>
+                                <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
+                                <img src="images/drill/corner.png">
+                            </label>                                    
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Posición (X,Y)</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + realX + `" required class="inputMecanizadoXY" id="newWidthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <input value="` + realY + `" required class="inputMecanizadoXY" id="newHeightDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                </div>
+            </div>
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Diametro</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + diameter + `"required class="inputMecanizado" id="newDiameterDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                </div>
+            </div>
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Pasante</h3></div>
+                <div class="columnFromCajeado">
+                    <input type="checkbox" id="cboxPasante" value="pasante"  ` + cross + `>
+                </div>
+            </div>
+            <div class="rowForm hidden"` + crossStyle + `>
+                <div  class="columnFromCajeado right"><h3>Profundidad</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + depth + `" required class="inputMecanizado" id="newDepthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                </div>
+            </div>
+            <script>
+                $('#cboxPasante').click(function() {
+                    if($(this).is(':checked'))
+                        $('.hidden').slideToggle("fast");
+                    else
+                        $('.hidden').fadeIn( "slow", );
+                });
+            </script>    
+
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Broca</h3></div>
+                <div class="columnFromCajeado broachSelection" style="padding-bottom: 10px;">
+                    <input type="radio" name="BroachDrill" value="flat"` + flat + `>Plana 
+                    <input type="radio" name="BroachDrill" value="lance"` + lance + `>Lanza
+                </div>
+            </div>
+        `,
+            function(ok) {
+                if (!ok) return;
+                //Capturando los Datos del Formulario Pop-Up para el Drill
+                var face = $("input[name=face]:checked").val();
+                var x = $("#newWidthDrill").val();
+                var y = $("#newHeightDrill").val();
+                var r = parseFloat($("#newDiameterDrill").val()) / 2;
+                var isPasante = $('#cboxPasante').is(':checked');
+                var depth = $("#newDepthDrill").val();
+                var broach = $("input[name=BroachDrill]:checked").val();
+
+                if (elem == null) {
+                    svgCanvas.drill(face, x, y, r, isPasante, depth, broach);
+                } else {
+                    svgCanvas.editDrill(face, x, y, r, isPasante, depth, broach, elem);
+                }
+            },
+            350,
+            400,
+            true,
+            "drill"
+        );
     });
 
-    var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight, face) {
-        var realCorner = 1;
-        switch (side) {
+    var drill = (this.drill = function(face, x, y, r, isPasante, depth, broachType) {
+        switch (face) {
+            case "0":
+                //console.log("cara Principal");
+                var opacity = 1,
+                    cross = 1;
+
+                if (!isPasante) {
+                    opacity = 0.5;
+                    cross = 0;
+                }
+
+                addSvgElementFromJson({
+                    element: "circle",
+                    curStyles: true,
+                    attr: {
+                        cx: parseInt(x) + 100,
+                        cy: parseInt(y) + 100,
+                        r: r,
+                        realX: parseInt(x),
+                        realY: parseInt(y),
+                        diameter: r * 2,
+                        id: getNextId(),
+                        opacity: opacity,
+                        nameMecanizado: "drill",
+                        face: face,
+                        stroke: "#000",
+                        fill: "#3F3F3F",
+                        "stroke-width": "0",
+                        cross: cross,
+                        depth: depth,
+                        broachType: broachType,
+                    },
+                });
+                break;
             case "2":
-                realCorner = 3;
                 break;
             case "3":
-                realCorner = 4;
                 break;
             case "4":
-                realCorner = 2;
+                break;
+            case "5":
+                break;
+            case "6":
                 break;
         }
-
-        var polyCreated = addSvgElementFromJson({
-            element: "polygon",
-            curStyles: true,
-            attr: {
-                points: createPolySide(widthX, heightY, side),
-                id: getNextId(),
-                stroke: "#000",
-                fill: "#3F3F3F",
-                "stroke-width": "0",
-                nameMecanizado: "poly",
-                side: side,
-                tempWidth: widthX,
-                tempHeight: heightY,
-                widthX: widthX,
-                heightY: heightY,
-                maxWidth: maxWidth - 200,
-                maxHeight: maxHeight - 200,
-                opacity: "1",
-                face: face,
-                cross: 1,
-                realCorner: realCorner,
-            },
-        });
-
-        createLineCajeado(side, widthX, heightY, polyCreated.id);
 
         this.setMode("select");
         selectOnly([getElem(getId())], true);
+    });
 
+    var editDrill = (this.editDrill = function(face, x, y, r, isPasante, depth, broachType, element) {
+
+        var opacity = 1,
+            cross = 1;
+
+        if (!isPasante) {
+            opacity = 0.5;
+            cross = 0;
+        }
+        svgedit.utilities.assignAttributes(
+            element, {
+                r: r,
+                face: face,
+                depth: depth,
+                broachType: broachType,
+                opacity: opacity,
+                cross: cross,
+                cx: parseInt(x) + 100,
+                cy: parseInt(y) + 100,
+                realX: x,
+                realY: y,
+            },
+            100
+        );
+        //actualizar cuador se seleccion
+        selectorManager.requestSelector(element).resize();
+
+        //selectorManager.width(100).height(200);
+
+        //console.log(selectorManager);
+    });
+
+    //cflorioluis - Ventana Editar Cazoleta - Edita uno por uno
+    var clickHingeTool = (this.clickHingeTool = function(elem) {
+        var origin0 = `checked`,
+            origin1 = "",
+            title = "Cazoleta",
+            beginX = "100",
+            endX = "100",
+            hingeCount = "3",
+            axisDist = "",
+            drillDiameter = "10",
+            drillDepth = "10",
+            hingeDiameter = "35",
+            hingeDepth = "13";
+
+        if (elem && elem.getAttribute("nameMecanizado") == "hinge") {
+
+            beginX = elem.getAttribute("beginX"),
+                endX = elem.getAttribute("endX"),
+                hingeCount = elem.getAttribute("hingeCount"),
+                axisDist = elem.getAttribute("axisDist"),
+                drillDiameter = elem.getAttribute("drillDiameter"),
+                drillDepth = elem.getAttribute("drillDepth"),
+                hingeDiameter = elem.getAttribute("hingeDiameter"),
+                hingeDepth = elem.getAttribute("hingeDepth");
+
+            title = "Editar Cazoleta";
+
+            switch (elem.getAttribute("origin")) {
+                case "1":
+                    origin1 = `checked`;
+                    break;
+                case "0":
+                    origin0 = `checked`;
+                    break;
+            }
+        }
+
+
+
+        hingeBox = $.confirm(
+            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Cazoleta</h2></strong>` +
+            `<form>
+
+            <div class="rowForm" style="padding-bottom: 0px;">
+                    <div class="columnFromHinge right"><h3>Origen</h3></div>
+                    <div class="columnFromHinge FaceSelection" style="height: 69px;width: 121px;">
+                   
+                        <div class="gridDrill">
+                            <div class="columnHinge">                                            
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/corner.png" >
+                                </label> 
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1"disabled>
+                                    <img src="images/drill/edge_left_right_white.png">
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="0" ` + origin0 + `>
+                                    <img src="images/drill/corner_left.svg">
+                                </label>                                    
+                            </div>
+                            <div class="columnHinge wide">                                            
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/edge_sup_down_white.png" >
+                                </label> 
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/edge_sup_down_white.png">
+                                </label>                                    
+                            </div>
+                            <div class="columnHinge">                                            
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/corner.png" >
+                                </label> 
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
+                                    <img src="images/drill/edge_left_right_white.png">
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="1" ` + origin1 + `>
+                                    <img src="images/drill/corner_right.svg">
+                                </label>                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rowForm">
+                    <div class="columnFromHinge right"><h3>Distancia del Origen</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + beginX + `" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                        <input value="` + endX + `" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div class="columnFromHinge right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + hingeCount + `" required class="inputMecanizadoHinge" id="newHingeCount" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div  class="columnFromHinge right"><h3>Distancia entre Ejes</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + axisDist + `" placeholder="Igual" class="inputMecanizadoHinge" id="newAxisDist" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm"> 
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + drillDiameter + `"  required class="inputMecanizadoHinge" id="newDrillDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + drillDepth + `" required class="inputMecanizadoHinge" id="newDrillDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm"> 
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + hingeDiameter + `" required class="inputMecanizadoHinge" id="newHingeDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+                <div class="rowForm">
+                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
+                    <div class="columnFromHinge">
+                        <input value="` + hingeDepth + `" required class="inputMecanizadoHinge" id="newHingeDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    </div>
+                </div>
+            `,
+            function(ok) {
+                if (!ok) { $("#dialog_buttons_custom").removeClass('input-error'); return };
+                //Capturando los Datos del Formulario Pop-Up para el Drill
+                var origin = $("input[name=origin]:checked").val();
+                var beginX = $("#newBeginX").val();
+                var endX = $("#newEndX").val();
+                var hingeCount = $("#newHingeCount").val();
+                var axisDist = $("#newAxisDist").val();
+                var drillDiameter = $("#newDrillDiameter").val();
+                var drillDepth = $("#newDrillDepth").val();
+                var hingeDiameter = $("#newHingeDiameter").val();
+                var hingeDepth = $("#newHingeDepth").val();
+                var face = 0;
+
+                if (elem == null) {
+                    svgCanvas.hinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face);
+                } else {
+                    svgCanvas.editHinge(elem, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face);
+                }
+            },
+            400,
+            530,
+            true,
+            "hinge"
+        );
+    });
+
+    var hinge = (this.hinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face) {
+        var cajeadoCreated = addSvgElementFromJson({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: createHinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                nameMecanizado: "hinge",
+                origin: origin,
+                beginX: beginX,
+                endX: endX,
+                hingeCount: hingeCount,
+                axisDist: axisDist,
+                drillDiameter: drillDiameter,
+                drillDepth: drillDepth,
+                hingeDiameter: hingeDiameter,
+                hingeDepth: hingeDepth,
+                opacity: 0.5,
+                face: face,
+                cross: 0,
+            },
+        });
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+    });
+
+    var editHinge = (this.editHinge = function(element, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
+
+        svgedit.utilities.assignAttributes(
+            element, {
+                d: createHinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                nameMecanizado: "hinge",
+                origin: origin,
+                beginX: beginX,
+                endX: endX,
+                hingeCount: hingeCount,
+                axisDist: axisDist,
+                drillDiameter: drillDiameter,
+                drillDepth: drillDepth,
+                hingeDiameter: hingeDiameter,
+                hingeDepth: hingeDepth,
+                opacity: 0.5,
+            },
+            100
+        );
+        //actualizar cuador se seleccion
+        selectorManager.requestSelector(element).resize();
     });
 
     var createHinge = (this.createHinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
@@ -10410,342 +11212,24 @@ $.SvgCanvas = function(container, config) {
             }
 
         }
-
-
-
-
         return d
-
-    });
-
-    var editHinge = (this.editHinge = function(element, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth) {
-
-        svgedit.utilities.assignAttributes(
-            element, {
-                d: createHinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth),
-                stroke: "#000",
-                fill: "#3F3F3F",
-                "stroke-width": 0,
-                nameMecanizado: "hinge",
-                origin: origin,
-                beginX: beginX,
-                endX: endX,
-                hingeCount: hingeCount,
-                axisDist: axisDist,
-                drillDiameter: drillDiameter,
-                drillDepth: drillDepth,
-                hingeDiameter: hingeDiameter,
-                hingeDepth: hingeDepth,
-                opacity: 0.5,
-            },
-            100
-        );
-        //actualizar cuador se seleccion
-        selectorManager.requestSelector(element).resize();
-
-    });
-
-    var hinge = (this.hinge = function(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face) {
-        var cajeadoCreated = addSvgElementFromJson({
-            element: "path",
-            curStyles: true,
-            attr: {
-                d: createHinge(origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth),
-                id: getNextId(),
-                stroke: "#000",
-                fill: "#3F3F3F",
-                "stroke-width": 0,
-                nameMecanizado: "hinge",
-                origin: origin,
-                beginX: beginX,
-                endX: endX,
-                hingeCount: hingeCount,
-                axisDist: axisDist,
-                drillDiameter: drillDiameter,
-                drillDepth: drillDepth,
-                hingeDiameter: hingeDiameter,
-                hingeDepth: hingeDepth,
-                opacity: 0.5,
-                face: face,
-                cross: 0,
-            },
-        });
-
-        this.setMode("select");
-        selectOnly([getElem(getId())], true);
-    });
-
-
-    var editDrill = (this.editDrill = function(face, x, y, r, isPasante, depth, broachType, element) {
-
-        var opacity = 1,
-            cross = 1;
-
-        if (!isPasante) {
-            opacity = 0.5;
-            cross = 0;
-        }
-        svgedit.utilities.assignAttributes(
-            element, {
-                r: r,
-                face: face,
-                depth: depth,
-                broachType: broachType,
-                opacity: opacity,
-                cross: cross,
-                cx: parseInt(x) + 100,
-                cy: parseInt(y) + 100,
-                realX: x,
-                realY: y,
-            },
-            100
-        );
-        //actualizar cuador se seleccion
-        selectorManager.requestSelector(element).resize();
-
-        //selectorManager.width(100).height(200);
-
-        //console.log(selectorManager);
-    });
-
-    var drill = (this.drill = function(face, x, y, r, isPasante, depth, broachType) {
-
-        switch (face) {
-            case "0":
-                //console.log("cara Principal");
-                var opacity = 1,
-                    cross = 1;
-
-                if (!isPasante) {
-                    opacity = 0.5;
-                    cross = 0;
-                }
-
-                addSvgElementFromJson({
-                    element: "circle",
-                    curStyles: true,
-                    attr: {
-                        cx: parseInt(x) + 100,
-                        cy: parseInt(y) + 100,
-                        r: r,
-                        realX: parseInt(x),
-                        realY: parseInt(y),
-                        diameter: r * 2,
-                        id: getNextId(),
-                        opacity: opacity,
-                        nameMecanizado: "drill",
-                        face: face,
-                        stroke: "#000",
-                        fill: "#3F3F3F",
-                        "stroke-width": "0",
-                        cross: cross,
-                        depth: depth,
-                        broachType: broachType,
-                    },
-                });
-
-                break;
-            case "2":
-
-                break;
-            case "3":
-
-                break;
-            case "4":
-
-                break;
-            case "5":
-
-                break;
-            case "6":
-
-                break;
-        }
-
-        this.setMode("select");
-        selectOnly([getElem(getId())], true);
-
-    });
-
-    var cajeado = (this.cajeado = function(side, widthX, heightY, maxWidth, maxHeight, radio, face) {
-        var cajeadoCreated = addSvgElementFromJson({
-            element: "path",
-            curStyles: true,
-            attr: {
-                d: createRoundedCajeadoSide(widthX, heightY, radio, side),
-                id: getNextId(),
-                stroke: "#000",
-                fill: "#3F3F3F",
-                "stroke-width": "0",
-                nameMecanizado: "cajeado" /*_" + side*/ ,
-                side: side,
-                radio: radio,
-                tempWidth: widthX,
-                tempHeight: heightY,
-                widthX: widthX,
-                heightY: heightY,
-                maxWidth: maxWidth - 200,
-                maxHeight: maxHeight - 200,
-                opacity: "1",
-                face: face,
-                cross: 1,
-            },
-        });
-
-        createLineCajeado(side, widthX, heightY, cajeadoCreated.id);
-
-        this.setMode("select");
-        selectOnly([getElem(getId())], true);
-
-    });
-
-    var editLinesCantoCajeado = (this.editLinesCantoCajeado = function(side, w, h, id) {
-        switch (side) {
-            case "4":
-                var line1 = svgCanvas.getElem(id + "_line1");
-                line1.setAttribute("x1", (parseInt(w) + 100));
-                line1.setAttribute("x2", (parseInt(w) + 100));
-
-                var line2 = svgCanvas.getElem(id + "_line2");
-                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                break;
-            case "3":
-                var line1 = svgCanvas.getElem(id + "_line1");
-                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
-                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
-
-                var line2 = svgCanvas.getElem(id + "_line2");
-                line2.setAttribute("y1", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                line2.setAttribute("y2", (curConfig.dimensions[1] - 100 - parseInt(h)));
-                break;
-            case "2":
-                var line1 = svgCanvas.getElem(id + "_line1");
-                line1.setAttribute("x1", (curConfig.dimensions[0] - 100 - parseInt(w)));
-                line1.setAttribute("x2", (curConfig.dimensions[0] - 100 - parseInt(w)));
-
-                var line2 = svgCanvas.getElem(id + "_line2");
-                line2.setAttribute("y1", (parseInt(h) + 100));
-                line2.setAttribute("y2", (parseInt(h) + 100));
-                break;
-            case "1":
-                var line1 = svgCanvas.getElem(id + "_line1");
-                line1.setAttribute("x1", (parseInt(w) + 100));
-                line1.setAttribute("x2", (parseInt(w) + 100));
-
-                var line2 = svgCanvas.getElem(id + "_line2");
-                line2.setAttribute("y1", (parseInt(h) + 100));
-                line2.setAttribute("y2", (parseInt(h) + 100));
-                break;
-
-            default:
-                break;
-        }
-    });
-
-    var editPoly = (this.editPoly = function(attrName, attrValue) {
-        if (!selectedElements[0]) return;
-
-        var w, h, points, side;
-        w = selectedElements[0].getAttribute("widthX");
-        h = selectedElements[0].getAttribute("heightY");
-        side = selectedElements[0].getAttribute("side");
-        switch (attrName) {
-            case "newWidthX":
-                w = attrValue;
-                selectedElements[0].setAttribute("widthX", w);
-                selectedElements[0].setAttribute("tempWidth", w);
-                $("#newWidthXPoly").val(w);
-                break;
-            case "newHeightY":
-                h = attrValue;
-                selectedElements[0].setAttribute("heightY", h);
-                selectedElements[0].setAttribute("tempHeight", w);
-                $("#newHeightYPoly").val(h);
-                break;
-        }
-        points = createPolySide(w, h, side);
-        selectedElements[0].setAttribute("points", points);
-
-        selectorManager.requestSelector(selectedElements[0]).resize();
-        /*var id = selectedElements[0].id;
-        editLinesCantoCajeado(side, w, h, id);*/
-    });
-
-    var editCajeado = (this.editCajeado = function(attrName, attrValue) {
-        if (!selectedElements[0]) return;
-
-        var w, h, r, d, side;
-        w = selectedElements[0].getAttribute("widthX");
-        h = selectedElements[0].getAttribute("heightY");
-        r = selectedElements[0].getAttribute("radio");
-        side = selectedElements[0].getAttribute("side");
-        switch (attrName) {
-            case "newWidthX":
-                w = attrValue;
-                selectedElements[0].setAttribute("widthX", w);
-                $("#newWidthCajeado").val(w);
-                break;
-            case "newHeightY":
-                h = attrValue;
-                selectedElements[0].setAttribute("heightY", h);
-                $("#newHeightCajeado").val(h);
-                break;
-            case "radio":
-                r = attrValue;
-                selectedElements[0].setAttribute("radio", radio);
-                $("#newRadioCajeado").val(radio);
-                break;
-        }
-        d = createRoundedCajeadoSide(w, h, r, side);
-        selectedElements[0].setAttribute("d", d);
-
-        selectorManager.requestSelector(selectedElements[0]).resize();
-        var id = selectedElements[0].id;
-        editLinesCantoCajeado(side, w, h, id);
-    });
-
-    var selectPoly = (this.selectPoly = function(side) {
-        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
-        var element = $("[nameMecanizado*='poly'][side='" + side + "']").attr("id");
-
-        if (element) {
-            selectOnly([getElem(element)], true);
-            //console.log(selectedElements[0].getAttribute("widthX"));
-            $('#newWidthPoly').val(selectedElements[0].getAttribute("widthX"));
-            $('#newHeightPoly').val(selectedElements[0].getAttribute("heightY"));
-        } else {
-            $('#newWidthPoly').val("");
-            $('#newHeightPoly').val("");
-            clearSelection();
-        }
-    });
-
-
-    var selectCajeado = (this.selectCajeado = function(side) {
-        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
-        var element = $("[nameMecanizado*='cajeado'][side='" + side + "']").attr("id");
-
-        if (element) {
-            selectOnly([getElem(element)], true);
-            //console.log(selectedElements[0].getAttribute("widthX"));
-            $('#newWidthCajeado').val(selectedElements[0].getAttribute("widthX"));
-            $('#newHeightCajeado').val(selectedElements[0].getAttribute("heightY"));
-            $('#newRadioCajeado').val(selectedElements[0].getAttribute("radio"));
-        } else {
-            $('#newWidthCajeado').val("");
-            $('#newHeightCajeado').val("");
-            $('#newRadioCajeado').val("");
-            clearSelection();
-        }
     });
 
     //cflorioluis - Ventana Editar Cazoleta - Edita uno por uno
     var clickPolyTool = (this.clickPolyTool = function(elem) {
 
-        var side = elem.getAttribute("side"),
-            widthX = elem.getAttribute("widthX"),
-            heigthY = elem.getAttribute("heightY")
+        var side = "",
+            widthX = "",
+            heigthY = "",
+            title = "Angulo en Lado";
+
+        if (elem && elem.getAttribute("nameMecanizado") == "poly") {
+
+            side = elem.getAttribute("side");
+            widthX = elem.getAttribute("widthX");
+            heigthY = elem.getAttribute("heightY");
+            title = "Editar Angulo en Lado";
+        }
 
         var polyReady1 =
             `<label>
@@ -10847,7 +11331,7 @@ $.SvgCanvas = function(container, config) {
 
 
         polyBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Angulo en Lados</h2></strong>` +
+            `<strong><h2 id="moveConfirm" style="cursor: move;">` + title + `</h2></strong>` +
             `<form>
                 <div class="rowForm" style="padding-bottom: 0px;">
                     <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
@@ -10936,551 +11420,239 @@ $.SvgCanvas = function(container, config) {
                 }
             },
             350,
-            320,
+            270,
             true,
             "poly"
         );
-
     });
 
+    var selectPoly = (this.selectPoly = function(side) {
+        //var element = $("[nameMecanizado*='cajeado_" + side + "']").attr("id");
+        var element = $("[nameMecanizado*='poly'][side='" + side + "']").attr("id");
 
-    //cflorioluis - Ventana Editar Cazoleta - Edita uno por uno
-    var clickHingeTool = (this.clickHingeTool = function(elem) {
-
-        var origin0 = "",
-            origin1 = "";
-
-        switch (elem.getAttribute("origin")) {
-            case "1":
-                origin1 = `checked`;
-                break;
-
-            case "0":
-                origin0 = `checked`;
-                break;
+        if (element) {
+            selectOnly([getElem(element)], true);
+            //console.log(selectedElements[0].getAttribute("widthX"));
+            $('#newWidthPoly').val(selectedElements[0].getAttribute("widthX"));
+            $('#newHeightPoly').val(selectedElements[0].getAttribute("heightY"));
+        } else {
+            $('#newWidthPoly').val("");
+            $('#newHeightPoly').val("");
+            clearSelection();
         }
-
-
-        hingeBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Cazoleta</h2></strong>` +
-            `<form>
-
-            <div class="rowForm" style="padding-bottom: 0px;">
-                    <div class="columnFromHinge right"><h3>Origen</h3></div>
-                    <div class="columnFromHinge FaceSelection" style="height: 69px;width: 121px;">
-                   
-                        <div class="gridDrill">
-                            <div class="columnHinge">                                            
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/corner.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1"disabled>
-                                    <img src="images/drill/edge_left_right_white.png">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="0" ` + origin0 + `>
-                                    <img src="images/drill/corner_left.svg">
-                                </label>                                    
-                            </div>
-                            <div class="columnHinge wide">                                            
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/edge_sup_down_white.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/edge_sup_down_white.png">
-                                </label>                                    
-                            </div>
-                            <div class="columnHinge">                                            
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/corner.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="-1" disabled>
-                                    <img src="images/drill/edge_left_right_white.png">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="origin" hiddenRadio mecanizadoOption="hinge" value="1" ` + origin1 + `>
-                                    <img src="images/drill/corner_right.svg">
-                                </label>                                    
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="rowForm">
-                    <div class="columnFromHinge right"><h3>Distancia del Origen</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("beginX") + `" placeholder="Inicio" required class="inputMecanizadoXY" id="newBeginX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                        <input value="` + elem.getAttribute("endX") + `" placeholder="Fin" right required class="inputMecanizadoXY" id="newEndX" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromHinge right"><h3 style="margin-top: 8px;">Cantidad de Cazoletas</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("hingeCount") + `" required class="inputMecanizadoHinge" id="newHingeCount" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3>Distancia entre Ejes</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("axisDist") + `" placeholder="Igual" required class="inputMecanizadoHinge" id="newAxisDist" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro Taladros Inserción</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("drillDiameter") + `"  required class="inputMecanizadoHinge" id="newDrillDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;"> Profundidad Taladros de Inserción</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("drillDepth") + `" required class="inputMecanizadoHinge" id="newDrillDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Diametro de la cazoleta</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("hingeDiameter") + `" required class="inputMecanizadoHinge" id="newHingeDiameter" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px;">Profundidad de la Cazoleta</h3></div>
-                    <div class="columnFromHinge">
-                        <input value="` + elem.getAttribute("hingeDepth") + `" required class="inputMecanizadoHinge" id="newHingeDepth" mecanizadoInput="hinge" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-            `,
-            function(ok) {
-                if (!ok) { $("#dialog_buttons_custom").removeClass('input-error'); return };
-                //Capturando los Datos del Formulario Pop-Up para el Drill
-                var origin = $("input[name=origin]:checked").val();
-                var beginX = $("#newBeginX").val();
-                var endX = $("#newEndX").val();
-                var hingeCount = $("#newHingeCount").val();
-                var axisDist = $("#newAxisDist").val();
-                var drillDiameter = $("#newDrillDiameter").val();
-                var drillDepth = $("#newDrillDepth").val();
-                var hingeDiameter = $("#newHingeDiameter").val();
-                var hingeDepth = $("#newHingeDepth").val();
-                var face = 0;
-
-                svgCanvas.editHinge(elem, origin, beginX, endX, hingeCount, axisDist, drillDiameter, drillDepth, hingeDiameter, hingeDepth, face);
-            },
-            400,
-            530,
-            true,
-            "hinge"
-        );
-
     });
-    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
-    var clickDrillTool = (this.clickDrillTool = function(elem) {
-        var face1 = "disabled",
-            face2 = "disabled",
-            face3 = "disabled",
-            face4 = "disabled",
-            face5 = "disabled",
-            face6 = "disabled",
-            cross = "",
-            crossStyle = "",
-            flat = "",
-            lance = "";
 
-        switch (elem.getAttribute("cross")) {
-            case "1":
-                cross = `checked`;
-                crossStyle = `style="display: none;"`
+    var editPoly = (this.editPoly = function(attrName, attrValue) {
+        if (!selectedElements[0]) return;
+
+        var w, h, points, side;
+        w = selectedElements[0].getAttribute("widthX");
+        h = selectedElements[0].getAttribute("heightY");
+        side = selectedElements[0].getAttribute("side");
+        switch (attrName) {
+            case "newWidthX":
+                w = attrValue;
+                selectedElements[0].setAttribute("widthX", w);
+                selectedElements[0].setAttribute("tempWidth", w);
+                $("#newWidthXPoly").val(w);
                 break;
-
-            case "0":
-                crossStyle = `style="display: block;"`
-                break;
-        }
-
-
-        switch (elem.getAttribute("broachType")) {
-            case "flat":
-                flat = `checked`;
-                break;
-
-            case "lance":
-                lance = `checked`;
+            case "newHeightY":
+                h = attrValue;
+                selectedElements[0].setAttribute("heightY", h);
+                selectedElements[0].setAttribute("tempHeight", w);
+                $("#newHeightYPoly").val(h);
                 break;
         }
+        points = createPolySide(w, h, side);
+        selectedElements[0].setAttribute("points", points);
 
-        switch (elem.getAttribute("face")) {
-            case "1":
-                face1 = `checked`;
-                break;
+        selectorManager.requestSelector(selectedElements[0]).resize();
+        /*var id = selectedElements[0].id;
+        editLinesCantoCajeado(side, w, h, id);*/
+    });
+
+    var poly = (this.poly = function(side, widthX, heightY, maxWidth, maxHeight, face) {
+        var realCorner = 1;
+        switch (side) {
             case "2":
-                face2 = `checked`;
+                realCorner = 3;
                 break;
             case "3":
-                cface3 = `checked`;
+                realCorner = 4;
                 break;
             case "4":
-                face4 = `checked`;
-                break;
-            case "5":
-                face5 = `checked`;
-                break;
-            case "6":
-                face5 = `checked`;
+                realCorner = 2;
                 break;
         }
 
-        //console.log(elem);
-        drillBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Taladro</h2></strong>` +
-            `<form>
-
-            <div class="rowForm" style="padding-bottom: 0px;">
-                    <div class="columnFromDrill right"><h3>Seleccionar Cara</h3></div>
-                    <div class="columnFromDrill FaceSelection" style="height: 69px;width: 121px;">
-                   
-                        <div class="gridDrill">
-                            <div class="columnDrill">                                            
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
-                                    <img src="images/drill/corner.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="4"  ` + face5 + ` >
-                                    <img src="images/drill/edge_left_right.png">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
-                                    <img src="images/drill/corner.png">
-                                </label>                                    
-                            </div>
-                            <div class="columnDrill wide">                                            
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="1"  ` + face2 + `>
-                                    <img src="images/drill/edge_sup_down.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face1 + `>
-                                    <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="3"  ` + face4 + `>
-                                    <img src="images/drill/edge_sup_down.png">
-                                </label>                                    
-                            </div>
-                            <div class="columnDrill">                                            
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
-                                    <img src="images/drill/corner.png" >
-                                </label> 
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="2"  ` + face3 + ` >
-                                    <img src="images/drill/edge_left_right.png">
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="face" hiddenRadio mecanizadoOption="drill" value="-1" disabled>
-                                    <img src="images/drill/corner.png">
-                                </label>                                    
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Posición (X,Y)</h3></div>
-                    <div class="columnFromCajeado">
-                        <input value="` + elem.getAttribute("realX") + `" required class="inputMecanizadoXY" id="newWidthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                        <input value="` + elem.getAttribute("realY") + `" required class="inputMecanizadoXY" id="newHeightDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Diametro</h3></div>
-                    <div class="columnFromCajeado">
-                        <input value="` + elem.getAttribute("diameter") + `"required class="inputMecanizado" id="newDiameterDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Pasante</h3></div>
-                    <div class="columnFromCajeado">
-                        <input type="checkbox" id="cboxPasante" value="pasante"  ` + cross + `>
-                    </div>
-                </div>
-                <div class="rowForm hidden"` + crossStyle + `>
-                    <div  class="columnFromCajeado right"><h3>Profundidad</h3></div>
-                    <div class="columnFromCajeado">
-                        <input value="` + elem.getAttribute("depth") + `" required class="inputMecanizado" id="newDepthDrill" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <script>
-                    $('#cboxPasante').click(function() {
-                        if($(this).is(':checked'))
-                            $('.hidden').slideToggle("fast");
-                        else
-                            $('.hidden').fadeIn( "slow", );
-                    });
-                </script>    
-
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Broca</h3></div>
-                    <div class="columnFromCajeado broachSelection" style="padding-bottom: 10px;">
-                        <input type="radio" name="BroachDrill" value="flat"` + flat + `>Plana 
-                        <input type="radio" name="BroachDrill" value="lance"` + lance + `>Lanza
-                    </div>
-                </div>
-            `,
-            function(ok) {
-                if (!ok) return;
-                //Capturando los Datos del Formulario Pop-Up para el Drill
-                var face = $("input[name=face]:checked").val();
-                var x = $("#newWidthDrill").val();
-                var y = $("#newHeightDrill").val();
-                var r = parseFloat($("#newDiameterDrill").val()) / 2;
-                var isPasante = $('#cboxPasante').is(':checked');
-                var depth = $("#newDepthDrill").val();
-                var broach = $("input[name=BroachDrill]:checked").val();
-
-                svgCanvas.editDrill(face, x, y, r, isPasante, depth, broach, elem);
-                /*svgCanvas.drill(
-                    face,
-                    widthX,
-                    heigthY,
-                    curConfig.dimensions[0],
-                    curConfig.dimensions[1],
-                    radio
-                );*/
+        var polyCreated = addSvgElementFromJson({
+            element: "polygon",
+            curStyles: true,
+            attr: {
+                points: createPolySide(widthX, heightY, side),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": "0",
+                nameMecanizado: "poly",
+                side: side,
+                tempWidth: widthX,
+                tempHeight: heightY,
+                widthX: widthX,
+                heightY: heightY,
+                maxWidth: maxWidth - 200,
+                maxHeight: maxHeight - 200,
+                opacity: "1",
+                face: face,
+                cross: 1,
+                realCorner: realCorner,
             },
-            350,
-            400,
-            true,
-            "drill"
-        );
+        });
 
+        createLineCajeado(side, widthX, heightY, polyCreated.id);
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
     });
 
+    var createPolySide = (this.createPolySide = function(widthX, heightY, side) {
 
-    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
-    var clickCajeadoTool = (this.clickCajeadoTool = function(elem) {
-
-        var side = elem.getAttribute("side"),
-            widthX = elem.getAttribute("widthX"),
-            heigthY = elem.getAttribute("heightY"),
-            radio = elem.getAttribute("radio");
-
-        //dimension mas pequeña para limitar el radio
-        var radioLimit = Math.min(curConfig.dimensions[0], curConfig.dimensions[1]);
-
-        var cajeadoReady1 =
-            `<label>
-                <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady2 =
-            `<label>
-                <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady3 =
-            `<label>
-                <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady4 =
-            `<label>
-                <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`;
-
-        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
-        var cajeadoReady = $("path[nameMecanizado*='cajeado']");
-
-        if (cajeadoReady.length > 0) {
-            for (let i = 0; i < cajeadoReady.length; i++) {
-                const element = cajeadoReady[i];
-                switch (element.getAttribute("side")) {
-                    case "1":
-                        cajeadoReady1 =
-                            `<label>
-                                            <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1">
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`;
-                        break;
-                    case "2":
-                        cajeadoReady2 =
-                            `<label>
-                                            <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2">
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`;
-                        break;
-                    case "3":
-                        cajeadoReady3 =
-                            `<label>
-                                            <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3">
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`
-                        break;
-                    case "4":
-                        cajeadoReady4 =
-                            `<label>
-                                            <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4">
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
+        var cx = parseInt(widthX) + 100;
+        var cy = parseInt(heightY) + 100;
 
         switch (side) {
-            case "1":
-                cajeadoReady1 =
-                    `<label>
-                                        <input onclick="svgCanvas.selectCajeado('1');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="1" checked>
-                                        <img src="images/mecanizado/cajeado_in_use.png">
-                                    </label>`;
-                break;
-            case "2":
-                cajeadoReady2 =
-                    `<label>
-                                        <input onclick="svgCanvas.selectCajeado('2');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="2" checked>
-                                        <img src="images/mecanizado/cajeado_in_use.png">
-                                    </label>`;
-                break;
-            case "3":
-                cajeadoReady3 =
-                    `<label>
-                                        <input onclick="svgCanvas.selectCajeado('3');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="3" checked>
-                                        <img src="images/mecanizado/cajeado_in_use.png">
-                                    </label>`
-                break;
             case "4":
-                cajeadoReady4 =
-                    `<label>
-                                        <input onclick="svgCanvas.selectCajeado('4');" type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="4" checked>
-                                        <img src="images/mecanizado/cajeado_in_use.png">
-                                    </label>`
-                break;
+                return curConfig.corners[0] + "," + curConfig.corners[2] + " " + cx + "," + curConfig.corners[2] + " " + curConfig.corners[0] + "," + (curConfig.corners[2] - parseInt(heightY));
+            case "3":
+                return curConfig.corners[1] + "," + curConfig.corners[2] + " " + curConfig.corners[1] + "," + (curConfig.corners[2] - parseInt(heightY)) + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[2];
+            case "2":
+                return curConfig.corners[1] + "," + curConfig.corners[0] + " " + (curConfig.corners[1] - parseInt(widthX)) + "," + curConfig.corners[0] + " " + curConfig.corners[1] + "," + cy;
+            case "1":
+                return curConfig.corners[0] + "," + curConfig.corners[0] + " " + curConfig.corners[0] + "," + cy + " " + cx + "," + curConfig.corners[0];
+        }
+    });
 
-            default:
-                break;
+
+    var clickRectTool = (this.clickRectTool = function(elem) {
+
+        var realX = "",
+            realY = "",
+            widthX = "",
+            heigthY = "",
+            title = "Rectangulo";
+
+        if (elem && elem.getAttribute("nameMecanizado") == "rectTool") {
+
+            realX = elem.getAttribute("realX");
+            realY = elem.getAttribute("realY");
+            widthX = elem.getAttribute("widthX");
+            heigthY = elem.getAttribute("heigthY");
+            title = "Editar Rectangulo";
         }
 
-
         cajeadoBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;">Editar Cajeado</h2></strong>` +
+            `<strong><h2 id="moveConfirm" style="cursor: move;">` + title + `</h2></strong>` +
             `<form>
-                <div class="rowForm" style="padding-bottom: 0px;">
-                    <div class="columnFromCajeado right"><h3>Seleccionar Esquina</h3></div>
-                    <div class="columnFromCajeado">
-                        <div class="tablero grid">
-                            <div class="columnCajeado">` +
-            cajeadoReady4 +
-            `<label>
-                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>` +
-            cajeadoReady1 +
-            `</div>
-                            
-                            <div class="columnCajeado">                       
-                                <label>
-                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                                
-                                <label>
-                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                                
-                                <label>
-                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                            </div>
-                            
-                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
-            cajeadoReady3 +
-            `<label>
-                                    <input type="radio" hiddenRadio name="corner" mecanizadoOption="cajeado" value="0" disabled >
-                                    <img src="images/mecanizado/cajeado_empty.png">
-                                </label>` +
-            cajeadoReady2 +
-            `</div>
+            <div class="rowForm" style="padding-bottom: 0px;">
+                <div class="columnFromCajeado right"><h3>Forma del Mecanizado</h3></div>
+                <div class="columnFromCajeado">
+                    <div class="tablero grid">
+                        <div class="columnCajeado">
+                            <img src="images/mecanizado/pieceRect.png">
                         </div>
                     </div>
                 </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Ancho</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + widthX + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newWidthX', this.value);"/>
-                    </div>
+            </div>
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Posición (X,Y)</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + realX + `" required class="inputMecanizadoXY" id="newXRect" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
+                    <input value="` + realY + `" required class="inputMecanizadoXY" id="newYRect" mecanizadoInput="drill" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                 </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Fondo</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + heigthY + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('newHeightY', this.value);"/>
-                    </div>
+            </div>
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Ancho</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + widthX + `" required class="inputMecanizado" id="newWidthRect" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                 </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Radio</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + radio + `"` + `class="inputMecanizado" mecanizadoInput="cajeado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" onchange="svgCanvas.editCajeado('radio', this.value);"/>
-                    </div>
+            </div>
+            <div class="rowForm">
+                <div class="columnFromCajeado right"><h3>Fondo</h3></div>
+                <div class="columnFromCajeado">
+                    <input value="` + heigthY + `" required class="inputMecanizado" id="newHeightRect" mecanizadoInput="cajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
                 </div>
-            </form>
-            `,
+            </div>
+        `,
             function(ok) {
                 if (!ok) return;
                 //Capturando los Datos del Formulario Pop-Up para el Cajeado
-                side = $("input[name=corner]:checked").val();
-                widthX = $("#newWidthCajeado").val();
-                heigthY = $("#newHeightCajeado").val();
-                radio = $("#newRadioCajeado").val();
+                realX = $("#newXRect").val();
+                realY = $("#newYRect").val();
+                widthX = $("#newWidthRect").val();
+                heigthY = $("#newHeightRect").val();
+                face = $("#Face-control").val();
 
-                if (selectedElements[0] == null) {
-                    svgCanvas.cajeado(
-                        side,
-                        widthX,
-                        heigthY,
-                        curConfig.dimensions[0],
-                        curConfig.dimensions[1],
-                        radio
-                    );
+                if (elem == null) {
+                    svgCanvas.rectTool(realX, realY, widthX, heigthY, face);
                 } else {
-                    var d = createRoundedCajeadoSide(widthX, heigthY, radio, side);
-                    selectedElements[0].setAttribute("d", d);
-                    var id = selectedElements[0].id,
-                        w = widthX,
-                        h = heigthY;
-
-                    editLinesCantoCajeado(side, w, h, id);
-                    selectorManager.requestSelector(selectedElements[0]).resize();
+                    svgCanvas.editRectTool(elem, realX, realY, widthX, heigthY);
                 }
             },
             350,
             320,
             true,
-            "cajeado"
+            "rectTool"
         );
     });
+    var rectTool = (this.rectTool = function(realX, realY, widthX, heigthY, face) {
+        var rectCreated = addSvgElementFromJson({
+            element: "rect",
+            curStyles: true,
+            attr: {
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                nameMecanizado: "rect",
+                x: parseInt(realX) + 100,
+                y: parseInt(realY) + 100,
+                width: widthX,
+                height: heigthY,
+                realX: realX,
+                realY: realY,
+                opacity: 1,
+                face: face,
+                cross: 1,
+            },
+        });
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+    });
+
+    var editRectTool = (this.editRectTool = function(element, realX, realY, widthX, heigthY) {
+
+        svgedit.utilities.assignAttributes(
+            element, {
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                nameMecanizado: "rect",
+                x: realX,
+                y: realY,
+                width: widthX,
+                height: heigthY,
+                opacity: 1,
+                face: face,
+                cross: 1,
+            },
+            100
+        );
+        //actualizar cuador se seleccion
+        selectorManager.requestSelector(element).resize();
+    });
+    //var clickRectRoundTool =
+
     //cflorioluis - crear divisiones originales
     var createDivs = (this.createDivs = function(cantos) {
         svgCanvas.addSvgElementFromJson({
@@ -11642,13 +11814,10 @@ $.SvgCanvas = function(container, config) {
                 "ignore": true,
             },
         });
-
         //cflorioluis - sombrear en que lado hay canto
         for (let ii = 0; ii < cantos.length; ii++) {
             const canto = cantos[ii];
-
             if (canto > 0) {
-
                 switch (ii + 1) {
                     case 1:
                         svgCanvas.addSvgElementFromJson({
@@ -11734,276 +11903,9 @@ $.SvgCanvas = function(container, config) {
                             },
                         });
                         break;
-
-                    default:
-                        break;
                 }
             }
-
-
         }
-
-        /*svgCanvas.addSvgElementFromJson({
-            element: "rect",
-            curStyles: true,
-            attr: {
-                fill: "#3F3F3F",
-                stroke: "#000",
-                "stroke-width": 0,
-                "stroke-opacity": "null",
-                "fill-opacity": "null",
-                x: curConfig.dimensions[0] - 100,
-                y: curConfig.dimensions[1] - 100,
-                width: 100,
-                height: 100,
-                id: "svg__8",
-                "stroke-dasharray": "none",
-                opacity: 1,
-                "ignore": true,
-            },
-        });
-        svgCanvas.addSvgElementFromJson({
-            element: "rect",
-            curStyles: true,
-            attr: {
-                fill: "#3F3F3F",
-                stroke: "#000",
-                "stroke-width": 0,
-                "stroke-opacity": "null",
-                "fill-opacity": "null",
-                x: curConfig.dimensions[0] - 100,
-                y: curConfig.dimensions[1] - 100,
-                width: 100,
-                height: 100,
-                id: "svg__8",
-                "stroke-dasharray": "none",
-                opacity: 1,
-                "ignore": true,
-            },
-        });
-        svgCanvas.addSvgElementFromJson({
-            element: "rect",
-            curStyles: true,
-            attr: {
-                fill: "#3F3F3F",
-                stroke: "#000",
-                "stroke-width": 0,
-                "stroke-opacity": "null",
-                "fill-opacity": "null",
-                x: curConfig.dimensions[0] - 100,
-                y: curConfig.dimensions[1] - 100,
-                width: 100,
-                height: 100,
-                id: "svg__8",
-                "stroke-dasharray": "none",
-                opacity: 1,
-                "ignore": true,
-            },
-        });*/
-
         svgCanvas.undoMgr.resetUndoStack();
-    });
-
-    //cflorioluis - Editar Cajeado dinamicamente
-    var clickCajeadoToolDinamico = (this.clickCajeadoToolDinamico = function(elem) {
-        var side = elem.getAttribute("side"),
-            widthX = elem.getAttribute("widthX"),
-            heigthY = elem.getAttribute("heightY"),
-            radio = elem.getAttribute("radio");
-        var cajeadoReady1 =
-            `<label>
-                <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled>
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady2 =
-            `<label>
-                <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled>
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady3 =
-            `<label>
-                <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled>
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`,
-            cajeadoReady4 =
-            `<label>
-                <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled>
-                <img src="images/mecanizado/cajeado_not_use.png">
-            </label>`;
-
-        //var cajeadoReady = $("path[nameMecanizado*='cajeado_']");
-        var cajeadoReady = $("path[nameMecanizado*='cajeado']");
-
-        if (cajeadoReady.length > 0) {
-            for (let i = 0; i < cajeadoReady.length; i++) {
-                const element = cajeadoReady[i];
-                switch (element.getAttribute("side")) {
-                    case "1":
-                        cajeadoReady1 =
-                            `<label>
-                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled>
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`;
-                        break;
-                    case "2":
-                        cajeadoReady2 =
-                            `<label>
-                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled>
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`;
-                        break;
-                    case "3":
-                        cajeadoReady3 =
-                            `<label>
-                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled>
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`
-                        break;
-                    case "4":
-                        cajeadoReady4 =
-                            `<label>
-                                            <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled>
-                                            <img src="images/mecanizado/cajeado_in_use.png">
-                                        </label>`
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-
-        switch (side) {
-            case "1":
-                cajeadoReady1 =
-                    `<label>
-                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="1" disabled checked>
-                                <img src="images/mecanizado/cajeado_in_use.png">
-                            </label>`;
-                break;
-            case "2":
-                cajeadoReady2 =
-                    `<label>
-                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="2" disabled checked>
-                                <img src="images/mecanizado/cajeado_in_use.png">
-                            </label>`;
-                break;
-            case "3":
-                cajeadoReady3 =
-                    `<label>
-                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="3" disabled checked>
-                                <img src="images/mecanizado/cajeado_in_use.png">
-                            </label>`
-                break;
-            case "4":
-                cajeadoReady4 =
-                    `<label>
-                                <input type="radio" name="corner" mecanizadoOption="cajeado" value="4" disabled checked>
-                                <img src="images/mecanizado/cajeado_in_use.png">
-                            </label>`
-                break;
-
-            default:
-                break;
-        }
-
-
-        cajeadoBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move;" >Editar Cajeado</h2></strong>` +
-            `<form>
-                <div class="rowForm" style="padding-bottom: 0px;">
-                    <div class="columnFromCajeado right"><h3>Side</h3></div>
-                    <div class="columnFromCajeado">
-                        <div class="tablero grid">
-                            <div class="columnCajeado">` +
-            cajeadoReady4 +
-            `<label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>` +
-            cajeadoReady1 +
-            `</div>
-                            
-                            <div class="columnCajeado">                       
-                                <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                                
-                                <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                                
-                                <label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled>
-                                    <img src="images/mecanizado/cajeado_empty.png" >
-                                </label>
-                            </div>
-                            
-                            <div  class="columnCajeado" style="margin-bottom: -40px !important;">` +
-            cajeadoReady3 +
-            `<label>
-                                    <input type="radio" name="corner" mecanizadoOption="cajeado" value="0" disabled >
-                                    <img src="images/mecanizado/cajeado_empty.png">
-                                </label>` +
-            cajeadoReady2 +
-            `</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Width_X</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + widthX + `"` + `class="inputMecanizado" id="newWidthCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Heigth_Y</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + heigthY + `"` + `class="inputMecanizado" id="newHeightCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div class="columnFromCajeado right"><h3>Radio</h3></div>
-                    <div class="columnFromCajeado">
-                        <input required value="` + radio + `"` + `class="inputMecanizado" id="newRadioCajeado" type="text" height="100%" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"/>
-                    </div>
-                </div>
-            </form>
-            `,
-            function(ok) {
-                if (!ok) return;
-                //Capturando los Datos del Formulario Pop-Up para el Cajeado
-                side = $("input[name=corner]:checked").val();
-                widthX = $("#newWidthCajeado").val();
-                heigthY = $("#newHeightCajeado").val();
-                radio = $("#newRadioCajeado").val();
-                var face = 0;
-                console.log(" " + side + " " + widthX + " " + heigthY + " " + curConfig.dimensions[0] + " " + curConfig.dimensions[1] + " " + radio);
-
-                svgCanvas.deleteSelectedElements();
-
-                svgCanvas.cajeado(
-                    side,
-                    widthX,
-                    heigthY,
-                    curConfig.dimensions[0],
-                    curConfig.dimensions[1],
-                    radio,
-                    face
-                );
-            },
-            500,
-            330,
-            true
-        );
-
-
-
-        /*if (toolButtonClick("#tool_cajeadoTool")) {
-            svgCanvas.setMode("cajeadoToolCanvas");
-        }*/
     });
 }
