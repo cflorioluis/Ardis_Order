@@ -26,6 +26,8 @@
             var Editor = {};
             var is_ready = false;
             var curConfig = {
+                partW: 1500,
+                partL: 700,
                 canvas_expansion: 1,
                 realDimensions: [partW, partL],
                 //cflorioluis aqui esta el tamaño de la pieza
@@ -526,10 +528,10 @@
                         //cflorioluis - validar formulario con boton ok
                         switch (mecanizadoType) {
                             case "cajeado":
-                                var cajeadoInputs = 0;
+                                var rectRoundInputs = 0;
                                 $('#dialog_buttons_custom').children().first().click(function(event) {
-                                    cajeadoInputs = $('input[mecanizadoOption="cajeado"]:checked').length
-                                    if (cajeadoInputs == 0) {
+                                    rectRoundInputs = $('input[mecanizadoOption="cajeado"]:checked').length
+                                    if (rectRoundInputs == 0) {
                                         $('.tablero').addClass('input-error');
                                     } else {
                                         $('.tablero').removeClass('input-error');
@@ -538,13 +540,13 @@
                                     $('input[mecanizadoInput="cajeado"]').each(function() {
                                         $(this).removeClass('input-error');
                                         if ($(this).val() != "") {
-                                            cajeadoInputs++;
+                                            rectRoundInputs++;
                                         } else {
                                             $(this).addClass('input-error');
                                         }
                                     });
 
-                                    if (cajeadoInputs == 4) {
+                                    if (rectRoundInputs == 4) {
                                         box.hide();
                                         var resp = type == "prompt" ? input.val() : true;
                                         if (callback) callback(resp);
@@ -603,7 +605,6 @@
 
                                 break;
                             case "hinge":
-
                                 $('#dialog_buttons_custom').children().first().click(function(event) {
                                     var hingeInputs = 0,
                                         existsHinge = $('[nameMecanizado=hinge]').length;
@@ -611,7 +612,6 @@
                                     $("#dialog_buttons_custom").removeClass('input-error');
 
                                     //$("#errorExistsHinde").remove();
-
 
                                     $('input[mecanizadoInput="hinge"]').each(function() {
                                         $(this).removeClass('input-error');
@@ -663,6 +663,52 @@
                                     }
                                 });
                                 break;
+                            case "rect":
+
+                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                    var rectRoundInputs = 0;
+                                    $('input[mecanizadoInput="rect"]').each(function() {
+                                        $(this).removeClass('input-error');
+                                        if ($(this).prop('required')) {
+                                            if ($(this).val() != "") {
+                                                rectRoundInputs++;
+                                            } else {
+                                                $(this).addClass('input-error');
+                                            }
+                                        }
+                                    });
+
+                                    if (rectRoundInputs == 4) {
+                                        box.hide();
+                                        var resp = type == "prompt" ? input.val() : true;
+                                        if (callback) callback(resp);
+                                    }
+                                });
+                                break;
+                            case "rectRound":
+
+                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                    var rectRoundInputs = 0;
+                                    $('input[mecanizadoInput="rectRound"]').each(function() {
+                                        $(this).removeClass('input-error');
+                                        if ($(this).prop('required')) {
+                                            if ($(this).val() != "") {
+                                                rectRoundInputs++;
+                                            } else {
+                                                $(this).addClass('input-error');
+                                            }
+                                        }
+                                    });
+
+                                    console.log(rectRoundInputs);
+
+                                    if (rectRoundInputs == 6) {
+                                        box.hide();
+                                        var resp = type == "prompt" ? input.val() : true;
+                                        if (callback) callback(resp);
+                                    }
+                                });
+                                break;
                             default:
                                 break;
                         }
@@ -693,6 +739,8 @@
                         //cflorioluis - ocultar evento callback original si se trata de un mecanizado
                         switch (mecanizadoType) {
 
+                            case "rectRound":
+                            case "rect":
                             case "poly":
                             case "hinge":
                             case "drill":
@@ -1964,6 +2012,7 @@
                             drill: ["realX", "realY", "diameter", ],
                             poly: ["widthX", "heightY"],
                             rect: ["width", "height", "realX", "realY"],
+                            rectRound: ["width", "height", "realX", "realY", "rx", "ry"],
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
@@ -2376,17 +2425,66 @@
                     }
                     var realX = parseInt($("#rect_realX").val()),
                         realY = parseInt($("#rect_realY").val()),
-                        widthX = parseInt($("#rect_widthX").val()),
-                        heigthY = parseInt($("#rect_heigthY").val()),
-                        face = svgCanvas.getSelectedElems()[0].getAttribute("face");
+                        width = parseInt($("#rect_width").val()),
+                        height = parseInt($("#rect_height").val()),
+                        face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
 
-                    svgCanvas.getSelectedElems()[0].setAttribute("x", realX + 100);
-                    svgCanvas.getSelectedElems()[0].setAttribute("y", realY + 100);
+                        cx = realX + 100,
+                        cy = realY + 100;
 
+                    if ((realX + width) > curConfig.partW) {
+                        $("#rect_width").val(curConfig.partW - realX);
+                        svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
+                    } else if ((realY + height) > curConfig.partL) {
+                        $("#rect_height").val(curConfig.partL - realY);
+                        svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
+                    }
+
+                    svgCanvas.getSelectedElems()[0].setAttribute("x", cx);
+                    svgCanvas.getSelectedElems()[0].setAttribute("y", cy);
+
+                    console.log(realX + width);
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+                };
+
+                changeAttributeRectRound = function(el, completed) {
+                    var attr = el.getAttribute("data-attr");
+                    var multiplier = el.getAttribute("data-multiplier") || 1;
+                    multiplier = parseFloat(multiplier);
+                    var val = el.value * multiplier;
+                    var valid = svgedit.units.isValidUnit(attr, val, selectedElement);
+                    if (!valid) {
+                        $.alert("Invalid value given");
+                        el.value = selectedElement.getAttribute(attr);
+                        return false;
+                    }
+                    var realX = parseInt($("#rectRound_realX").val()),
+                        realY = parseInt($("#rectRound_realY").val()),
+                        width = parseInt($("#rectRound_width").val()),
+                        height = parseInt($("#rectRound_height").val()),
+                        rx = parseInt($("#rectRound_rx").val()),
+                        ry = parseInt($("#rectRound_ry").val()),
+                        face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
+
+                        cx = realX + 100,
+                        cy = realY + 100;
+
+                    if ((realX + width) > curConfig.partW) {
+                        $("#rectRound_width").val(curConfig.partW - realX);
+                        svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
+                    } else if ((realY + height) > curConfig.partL) {
+                        $("#rectRound_height").val(curConfig.partL - realY);
+                        svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
+                    }
+
+                    if (rx > (width / 2))
 
 
+                        svgCanvas.getSelectedElems()[0].setAttribute("x", cx);
+                    svgCanvas.getSelectedElems()[0].setAttribute("y", cy);
+
+                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
 
                 changeAttributePoly = function(el, completed) {
@@ -2862,7 +2960,7 @@
                     if (toolButtonClick("#tool_cajeadoTool")) {
                         svgCanvas.setMode("cajeado");
                     }
-
+                    svgCanvas.clearSelection();
                     svgCanvas.clickCajeadoTool(null);
                 };
 
@@ -2877,6 +2975,7 @@
                     if (toolButtonClick("#tool_drillTool")) {
                         svgCanvas.setMode("drill");
                     }
+                    svgCanvas.clearSelection();
                     svgCanvas.clickDrillTool(null);
                 };
 
@@ -2884,6 +2983,7 @@
                     if (toolButtonClick("#tool_hingeTool")) {
                         svgCanvas.setMode("hinge");
                     }
+                    svgCanvas.clearSelection();
                     svgCanvas.clickHingeTool(null);
                 };
 
@@ -2891,6 +2991,7 @@
                     if (toolButtonClick("#tool_polyTool")) {
                         svgCanvas.setMode("poly");
                     }
+                    svgCanvas.clearSelection();
                     svgCanvas.clickPolyTool(null);
                 };
 
@@ -2898,6 +2999,7 @@
                     if (toolButtonClick("#tool_rectTool")) {
                         svgCanvas.setMode("rectTool");
                     }
+                    svgCanvas.clearSelection();
                     svgCanvas.clickRectTool(null);
 
                 };
@@ -2906,6 +3008,7 @@
                     if (toolButtonClick("#tool_rectRoundTool")) {
                         svgCanvas.setMode("rectRoundTool");
                     }
+                    svgCanvas.clearSelection();
                     svgCanvas.clickRectRoundTool(null);
                 };
 
@@ -3141,25 +3244,43 @@
                             dy *= multi;
                         }
                         $("input").blur();
-                        //cflorioluis - evitar que un mecanizado se mueva con las flechas del techado
-                        if (selectedElement.getAttribute("nameMecanizado") == "cajeado") return;
-
-                        if (selectedElement.getAttribute("nameMecanizado") == "drill") {
-
-                            var posX = Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
-                                posY = Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
-
-                            if (posX < 0 || posX > curConfig.realDimensions[0])
+                        //cflorioluis - evitar que un mecanizado se mueva correctamente con las flechas del techado 
+                        switch (selectedElement.getAttribute("nameMecanizado")) {
+                            case "hinge":
+                            case "poly":
+                            case "cajeado":
                                 return;
+                            case "drill":
+                                var posX = Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
+                                    posY = Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
 
-                            if (posY < 0 || posY > curConfig.realDimensions[1])
-                                return;
+                                if (posX < 0 || posX > curConfig.realDimensions[0])
+                                    return;
 
-                            selectedElement.setAttribute("realX", posX);
-                            selectedElement.setAttribute("realY", posY);
+                                if (posY < 0 || posY > curConfig.realDimensions[1])
+                                    return;
+
+                                selectedElement.setAttribute("realX", posX);
+                                selectedElement.setAttribute("realY", posY);
+                                break;
+                            case "rect":
+                            case "rectRound":
+                                var posX = Math.floor(selectedElement.getAttribute("x")) - 100 + dx,
+                                    posY = Math.floor(selectedElement.getAttribute("y")) - 100 - dy,
+                                    width = parseInt(selectedElement.getAttribute("width")),
+                                    height = parseInt(selectedElement.getAttribute("height"));
+
+                                if (posX < 0 || ((posX + width) > curConfig.realDimensions[0]))
+                                    return;
+
+                                if (posY < 0 || ((posY + height) > curConfig.realDimensions[1]))
+                                    return;
+
+                                selectedElement.setAttribute("realX", posX);
+                                selectedElement.setAttribute("realY", posY);
+                                break;
 
                         }
-
                         svgCanvas.moveSelectedElements(dx, -dy); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
                     }
                 };
@@ -5167,14 +5288,14 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                 //cflorioluis - agragar funciones al Rectangulo
                 $("#rect_realX").dragInput({
-                    min: 1,
+                    min: 0,
                     max: curConfig.realDimensions[0],
                     step: 1,
                     callback: changeAttributeRect,
                     cursor: true,
                 });
                 $("#rect_realY").dragInput({
-                    min: 1,
+                    min: 0,
                     max: curConfig.realDimensions[1],
                     step: 1,
                     callback: changeAttributeRect,
@@ -5193,6 +5314,52 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     max: curConfig.realDimensions[1],
                     step: 1,
                     callback: changeAttributeRect,
+                    cursor: true,
+                });
+
+                //cflorioluis - agragar funciones al Rectangulo Redondeado
+                $("#rectRound_realX").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributeRectRound,
+                    cursor: true,
+                });
+                $("#rectRound_realY").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeRectRound,
+                    cursor: true,
+                });
+
+                $("#rectRound_width").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributeRectRound,
+                    cursor: true,
+                });
+                $("#rectRound_height").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeRectRound,
+                    cursor: true,
+                });
+
+                $("#rectRound_rx").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributeRectRound,
+                    cursor: true,
+                });
+                $("#rectRound_ry").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeRectRound,
                     cursor: true,
                 });
 
@@ -5835,6 +6002,11 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     $('#Face-control').on('change', function() {
                         var rotation = ($(this).val() * 180) + 180;
+
+
+                        //$("text").css("transform", "rotateX(" + rotation + "deg)");
+
+
                         $("#svgroot").css("transform", "rotateX(" + rotation + "deg)");
                         $("#svgroot").css("transition", "0.6s");
                         $("#svgroot").css("transform-style", "preserve-3d");
