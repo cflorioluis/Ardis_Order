@@ -3494,6 +3494,20 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                 opsideElement.append("2");
                                 hingeReady = true;
                                 break;
+                            case "rect":
+                                functNameElement.append("_Rectangulo");
+                                var param = `"StartX1" VAR "` + mecanizado.getAttribute("realX") + `":"StartY1" VAR "` + mecanizado.getAttribute("realY") + `":"Width" VAR "` + mecanizado.getAttribute("width") + `":"Height" VAR "` + mecanizado.getAttribute("height") + `"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                /*sideElement.append("0");*/
+                                break;
+                            case "rectRound":
+                                functNameElement.append("_RectanguloRedondeado");
+                                var param = `"StartX1" VAR "` + mecanizado.getAttribute("realX") + `":"StartY1" VAR "` + mecanizado.getAttribute("realY") + `":"Width" VAR "` + mecanizado.getAttribute("width") + `":"Height" VAR "` + mecanizado.getAttribute("height") + `":"RadiusX" VAR "` + mecanizado.getAttribute("rx") + `":"RadiusY" VAR "` + mecanizado.getAttribute("ry") + `"`
+                                paramElement.append(param);
+                                opsideElement.append("2");
+                                /*sideElement.append("0");*/
+                                break;
                         }
 
                         doc.appendChild(drawElement);
