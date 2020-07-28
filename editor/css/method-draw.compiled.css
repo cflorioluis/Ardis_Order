@@ -2260,7 +2260,7 @@ button.cancel {
 
 .touch .contextMenu A {
     padding: 0 15px;
-    border-bottom: #;
+    border-bottom: "#fff";
     font-weight: bold;
     border-top: solid 1px #e3e3e3;
     height: 40px;

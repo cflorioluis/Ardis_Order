@@ -4949,7 +4949,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
 
                                     $.each(keyval.split("/"), function(i, key) {
-                                        console.log(key);
                                         $(document).bind("keydown", key, function(e) {
                                             fn();
                                             if (pd) {
@@ -6015,7 +6014,11 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     svgCanvas.createDivs(curConfig.cantos); //crear divisiones originales para ver los cantos
 
                     $('#Face-control').on('change', function() {
-                        var rotation = ($(this).val() * 180) + 180;
+                        var flip = 0;
+                        if ($(this).val() == "5")
+                            flip = 1;
+
+                        var rotation = (flip * 180) + 180;
 
 
                         //$("text").css("transform", "rotateX(" + rotation + "deg)");

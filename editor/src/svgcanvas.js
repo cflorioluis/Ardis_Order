@@ -10990,7 +10990,8 @@ $.SvgCanvas = function(container, config) {
                     return;
                 }
                 //Capturando los Datos del Formulario Pop-Up para el Drill
-                var face = $("input[name=face]:checked").val();
+                //var face = $("input[name=face]:checked").val();
+                var face = $("#Face-control").val();
                 var x = $("#newWidthDrill").val();
                 var y = $("#newHeightDrill").val();
                 var r = parseFloat($("#newDiameterDrill").val()) / 2;
