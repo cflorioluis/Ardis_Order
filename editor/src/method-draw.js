@@ -4191,7 +4191,7 @@
                 //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
                 var clickSaveChanges = function() {
 
-                    svgCanvas.removeDivsExport();
+                    /*svgCanvas.removeDivsExport();
 
                     var newOrder = JSON.parse(localStorage.newOrder);
                     var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
@@ -4199,7 +4199,7 @@
                     newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
                     localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
-                    svgCanvas.createDivs(curConfig.edges);
+                    svgCanvas.createDivs(curConfig.edges);*/
                     generatePartDraw();
                 };
 
