@@ -109,9 +109,9 @@ var svgedit = svgedit || {};
             steps--;
         }
         var i = 0;
-        //cflorioluis - cambiar icono del cursor de resize
+        /*//cflorioluis - cambiar icono del cursor de resize
         [dir_arr[0], dir_arr[6]] = [dir_arr[6], dir_arr[0]]; //nw - sw
-        [dir_arr[2], dir_arr[4]] = [dir_arr[4], dir_arr[2]]; //ne - se
+        [dir_arr[2], dir_arr[4]] = [dir_arr[4], dir_arr[2]]; //ne - se*/
 
         for (var dir in selectorManager_.selectorGrips) {
             selectorManager_.selectorGrips[dir].setAttribute(
@@ -137,6 +137,9 @@ var svgedit = svgedit || {};
             this.selectorGroup.appendChild(selectorManager_.selectorGripsGroup);
             this.updateGripCursors(svgedit.utilities.getRotationAngle(elem));
         }
+
+        //cflorioluis - Rotar el Selector de Escala
+        svgCanvas.rotateSelectorGripRresize();
     };
 
     // Function: svgedit.select.Selector.resize
@@ -212,6 +215,11 @@ var svgedit = svgedit || {};
                 nbaw = 20 + aabox.width + offset * 2,
                 nbah = 20 + aabox.height + offset * 2;
         }
+
+
+
+
+
 
 
         // now if the shape is rotated, un-rotate it
@@ -396,6 +404,12 @@ var svgedit = svgedit || {};
             this.rotateGrips[dir] = this.selectorGripsGroup.appendChild(grip);
         }
 
+        //cflorioluis - Ocultar el selector de Rotacion
+        $("[id*='selectorGrip_rotate_']").hide();
+        //$( "[id*='selectorGrip_rotate_']" ).show();
+
+        console.log("test");
+
         // add the corner grips
         for (var dir in this.selectorGrips) {
             var grip = svgFactory_.createSVGElement({
@@ -534,21 +548,40 @@ var svgedit = svgedit || {};
                 height: 1106,
             },
         });
+        var row = JSON.parse(localStorage.getItem('row'));
 
-        var imageImg = svgFactory_.createSVGElement({
-            element: "image",
-            attr: {
-                "xlink:href": "images/texturas/H1887.jpg",
-                x: "0",
-                y: "0",
-                width: 1106,
-                height: 1106,
-                "stroke-width": 2,
-                "stroke-color": "#3f3f3f",
+        if (row && row[1] == "A") {
+
+            var imageImg = svgFactory_.createSVGElement({
+                element: "image",
+                attr: {
+                    "xlink:href": "images/texturas/H1887Ancho.jpg",
+                    x: "0",
+                    y: "0",
+                    width: 1106,
+                    height: 1106,
+                    "stroke-width": 2,
+                    "stroke-color": "#3f3f3f",
+                },
+            });
+        } else {
+            var imageImg = svgFactory_.createSVGElement({
+                element: "image",
+                attr: {
+                    "xlink:href": "images/texturas/H1887.jpg",
+                    x: "0",
+                    y: "0",
+                    width: 1106,
+                    height: 1106,
+                    "stroke-width": 2,
+                    "stroke-color": "#3f3f3f",
+                },
+            });
+        }
 
 
-            },
-        });
+
+
 
         canvasbg.appendChild(defsImg);
         defsImg.appendChild(patternImg);

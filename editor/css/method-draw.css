@@ -206,6 +206,7 @@ body {
     height: 480px;
     position: relative;
     background: #3F3F3C;
+    /*background: #edf1f7;*/
 }
 
 #rulers>div {
@@ -298,7 +299,7 @@ body {
     height: 20%;
     width: 5.2%;
     float: left;
-    cursor: url(../images/eyedropper.png) 0 16, crosshair;
+    cursor: url(images/eyedropper.png) 0 16, crosshair;
 }
 
 .palette_item.transparent,
@@ -1720,7 +1721,7 @@ button.cancel {
 
 .touch .contextMenu A {
     padding: 0 15px;
-    border-bottom: #;
+    border-bottom: "#fff";
     font-weight: bold;
     border-top: solid 1px #E3E3E3;
     height: 40px;
@@ -1783,15 +1784,15 @@ button.cancel {
 }
 
 #workarea.eyedropper {
-    cursor: url(../images/eyedropper.png) 0 16, crosshair;
+    cursor: url(images/eyedropper.png) 0 16, crosshair;
 }
 
 #workarea.fhpath {
-    cursor: url(../images/pencil_cursor.png) 0 16, crosshair;
+    cursor: url(images/pencil_cursor.png) 0 16, crosshair;
 }
 
 #workarea.rotate * {
-    cursor: url(../images/rotate.png) 12 12, auto;
+    cursor: url(images/rotate.png) 12 12, auto;
 }
 
 #workarea.select text,
@@ -2063,7 +2064,7 @@ button.cancel {
 .draginput input,
 .draginput input:hover,
 .draginput input:active {
-    cursor: url(../images/drag.png), move;
+    cursor: url(images/drag.png), move;
     cursor: -webkit-grab;
     cursor: -moz-grab;
 }
@@ -2081,7 +2082,7 @@ button.cancel {
 .draginput.active input,
 .draginput.active input:hover,
 .draginput.active input:active {
-    cursor: url(../images/dragging.png), move;
+    cursor: url(images/dragging.png), move;
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
 }
@@ -2213,13 +2214,13 @@ button.cancel {
 }
 
 body.dragging * {
-    cursor: url(../images/dragging.png), move;
+    cursor: url(images/dragging.png), move;
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
 }
 
 body.drag * {
-    cursor: url(../images/dragging.png), move;
+    cursor: url(images/dragging.png), move;
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
 }
@@ -2340,7 +2341,7 @@ input[readonly=readonly]:focus {
 
 /*
 .class_checkbox {
-    width: 20px;  
+    width: 20px;
     height: 20px;
     background-color: red;
 }
@@ -2354,12 +2355,13 @@ input[readonly=readonly]:focus {
 
 [type=radio][name="corner"]:checked+img,
 [type=radio][name="origin"]:checked+img,
+[type=radio][name="cuadrant"]:checked+img,
 [type=radio][name="face"]:checked+img {
     outline: 2px solid #f00 !important;
     overflow: hidden;
 }
 
-[type=radio][mecanizadoOption="cajeado"]:checked+img {
+[type=radio][machiningOption="cajeado"]:checked+img {
     outline: 2px solid #f00 !important;
     overflow: hidden;
 }
@@ -2383,7 +2385,7 @@ input[readonly=readonly]:focus {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.columnCajeado {
+.columnMachining {
     width: 32px;
 }
 
@@ -2398,6 +2400,29 @@ input[readonly=readonly]:focus {
 .columnDrill.wide {
     width: 98px;
     padding-left: 1px;
+}
+
+.columnDrill.wideCuadrant {
+    width: 75px;
+    padding-left: 1px;
+}
+
+.zIndex0 {
+    z-index: 0;
+    position: fixed;
+}
+
+.zIndex1 {
+    z-index: 1;
+    position: fixed;
+}
+
+.cuadrantColumn {
+    width: 42px !important;
+}
+
+.cuadrantColumn>label {
+    height: 14px;
 }
 
 .columnDrill {
@@ -2417,7 +2442,7 @@ input[readonly=readonly]:focus {
     padding: 0px;
 }
 
-.columnFromCajeado {
+.columnFormMachining {
     /*display: block;*/
     float: left;
     width: 40%;
@@ -2438,7 +2463,7 @@ input[readonly=readonly]:focus {
     /*height: 10px !important;*/
 }
 
-.columnFromCajeado.right {
+.columnFormMachining.right {
     text-align: right;
     padding-right: 5%;
 }
@@ -2488,7 +2513,7 @@ input[readonly=readonly]:focus {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;
-    width: 50px !important;
+    width: 100px !important;
 }
 
 .input-error {
@@ -2513,6 +2538,8 @@ input[type=checkbox] {
     /* Opera */
     transform: scale(1.5);
     margin-top: 17px;
+    cursor: pointer;
+    opacity: 1;
 }
 
 input[right][type="text"]::placeholder {
@@ -2572,22 +2599,22 @@ input[right][type="text"]::placeholder {
     cursor: default !important;
 }
 
-[type=radio][mecanizadoOption="poly"]:checked+.triangle-1 {
+[type=radio][machiningOption="poly"]:checked+.triangle-1 {
     border-bottom: 20px solid rgb(255, 0, 0) !important;
     overflow: hidden;
 }
 
-[type=radio][mecanizadoOption="poly"]:checked+.triangle-2 {
+[type=radio][machiningOption="poly"]:checked+.triangle-2 {
     border-bottom: 20px solid rgb(255, 0, 0) !important;
     overflow: hidden;
 }
 
-[type=radio][mecanizadoOption="poly"]:checked+.triangle-3 {
+[type=radio][machiningOption="poly"]:checked+.triangle-3 {
     border-top: 20px solid rgb(255, 0, 0) !important;
     overflow: hidden;
 }
 
-[type=radio][mecanizadoOption="poly"]:checked+.triangle-4 {
+[type=radio][machiningOption="poly"]:checked+.triangle-4 {
     border-top: 20px solid rgb(255, 0, 0) !important;
     overflow: hidden;
 }
@@ -2599,6 +2626,7 @@ input[right][type="text"]::placeholder {
     left: 100%;
 }
 
-#tool_rectTools:hover div {
+#tool_rectTools:hover div,
+#tool_rectRoundTools:hover div {
     display: block;
 }

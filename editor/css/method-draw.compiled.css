@@ -2260,7 +2260,7 @@ button.cancel {
 
 .touch .contextMenu A {
     padding: 0 15px;
-    border-bottom: "#fff";
+    border-bottom: #;
     font-weight: bold;
     border-top: solid 1px #e3e3e3;
     height: 40px;
@@ -2356,19 +2356,19 @@ button.cancel {
 }
 
 #workarea.ne-resize * {
-    cursor: se-resize!important
-}
-
-#workarea.se-resize * {
     cursor: ne-resize!important
 }
 
+#workarea.se-resize * {
+    cursor: se-resize!important
+}
+
 #workarea.nw-resize * {
-    cursor: sw-resize!important
+    cursor: nw-resize!important
 }
 
 #workarea.sw-resize * {
-    cursor: nw-resize!important
+    cursor: sw-resize!important
 }
 
 #workarea.copy {

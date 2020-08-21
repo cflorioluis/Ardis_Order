@@ -17,24 +17,66 @@
 // 3) svgcanvas.js
 
 (function() {
+    //var row = JSON.parse(localStorage.getItem("row"));
+    var newOrder, currentRowSelected, row
+
+    if (localStorage.newOrder && localStorage.currentRowSelected) {
+        newOrder = JSON.parse(localStorage.newOrder);
+        currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+        row = newOrder[currentRowSelected];
+    } else
+        row = [null, null, 1500, 500, null, null, null, null, null, null, null, null, null, null, null]
+
+
+
+    //import * as mathjs from "../lib/math/math.min.js";
+
+    /*import { create, all } from 'mathjs'
+
+    const config = { }
+    const math = create(all, config)*/
+
+    //console.log(math.sqrt(-4).toString()) // 2i
+
+    /*console.log(math.chain(3)
+        .add(4)
+        .multiply(2)
+        .done());*/
+
+    /*let scope = {
+            lpx: row[2],
+            lpy: row[3]
+        }*/
+    //console.log(math.evaluate('lpx', scope));
+
+
 
     if (!window.methodDraw)
         window.methodDraw = (function($) {
-            var partW = 1500;
-            var partL = 700;
+            var partW = row[2];
+            var partL = row[3];
             var svgCanvas;
             var Editor = {};
             var is_ready = false;
             var curConfig = {
-                partW: 1500,
-                partL: 700,
+                scope: {
+                    lpx: row[2],
+                    lpy: row[3]
+                },
+                autoSave: {},
+                currentRowSelected: currentRowSelected,
+                row: row,
+                partW: partW,
+                partL: partL,
+                veta: row[1],
+                cuadrant: 1,
                 canvas_expansion: 1,
                 realDimensions: [partW, partL],
                 //cflorioluis aqui esta el tamaño de la pieza
                 dimensions: [partW + 200, partL + 200], //cflorioluis aumentar 200 en ambos lados para representar los espacion en blanco
-
+                myEdges: JSON.parse(localStorage.getItem("myEdges")),
                 corners: [100, partW + 100, partL + 100],
-                cantos: [1, 0, 0, 1],
+                edges: [row[6], row[7], row[8], row[9]],
                 lowDimension: 0,
                 initFill: { color: "fff", opacity: 1 },
                 initStroke: { width: 1.5, color: "000", opacity: 1 },
@@ -113,6 +155,90 @@
                     }
                 })();
 
+
+
+
+                //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
+                var clickAutoSaveChanges = (this.clickAutoSaveChanges = function() {
+                    svgCanvas.removeDivsExport();
+
+                    var newOrder = JSON.parse(localStorage.newOrder);
+                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+
+                    if (curConfig.currentRowSelected == currentRowSelected) {
+                        newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+                    }
+
+                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
+
+                    svgCanvas.createDivs(curConfig.edges);
+                    generatePartDraw();
+                });
+
+
+                if (localStorage.autoSave) {
+                    $("#tool_autosave").addClass("push_button_pressed");
+                    curConfig.autoSave = setInterval(clickAutoSaveChanges, 300);
+                } else {
+                    clearInterval(curConfig.autoSave);
+                    $("#tool_autosave").removeClass("push_button_pressed");
+                }
+
+
+                //evento si cambia el currentRowSelect se actualiza el mecanizado
+                window.addEventListener(
+                    "storage",
+                    (evt) => {
+                        //alert("storage event called key: " + evt.key);
+                        if (evt.key == "currentRowSelected" && evt.newValue) {
+                            //clearInterval(curConfig.autoSave);
+
+                            location.reload();
+
+
+                        }
+                        if (evt.key == "reload" && evt.newValue) {
+                            location.reload();
+                        }
+                        /*if (evt.key == "updateEdges" && evt.newValue) {
+                            //location.reload();
+
+                            var newOrder = JSON.parse(localStorage.newOrder);
+                            var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+                            var row = newOrder[currentRowSelected];
+                            curConfig.edges[0] = row[6]
+                            curConfig.edges[1] = row[7]
+                            curConfig.edges[2] = row[8]
+                            curConfig.edges[3] = row[9]
+
+                            svgCanvas.updateEdges(curConfig.edges)
+
+                        }*/
+                        /*if (evt.key == "newOrder" && !evt.oldValue && evt.newValue) {
+                            location.reload();
+                        }*/
+                        if (evt.key == "newOrder" && evt.newValue) {
+                            var newOrder = JSON.parse(localStorage.newOrder);
+                            var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+                            var row = newOrder[currentRowSelected];
+                            curConfig.edges[0] = (row[6] == null) ? "" : row[6]
+                            curConfig.edges[1] = (row[7] == null) ? "" : row[7]
+                            curConfig.edges[2] = (row[8] == null) ? "" : row[8]
+                            curConfig.edges[3] = (row[9] == null) ? "" : row[9]
+
+                            svgCanvas.updateEdges(curConfig.edges)
+                        }
+                    },
+                    false
+                );
+
+                //cflorioluis - al cambiar el tamaño de la ventava hacer un update del canvas
+                $(window).resize(function() {
+                    console.log("window was resized");
+
+                    changeZoomPiece();
+                });
+
                 $("body").toggleClass("touch", svgedit.browser.isTouch());
                 $("#canvas_width").val(curConfig.realDimensions[0]); //cflorioluis ajustar que las opciones de la pieza den la medida real
                 $("#canvas_height").val(curConfig.realDimensions[1]);
@@ -122,11 +248,6 @@
                 if (curConfig.dimensions[0] < curConfig.dimensions[1]) {
                     lowDimension = curConfig.dimensions[0];
                 }
-
-
-
-
-
 
                 var extFunc = function() {
                     $.each(curConfig.extensions, function() {
@@ -410,8 +531,6 @@
                     });
                 }
 
-
-
                 // This sets up alternative dialog boxes. They mostly work the same way as
                 // their UI counterparts, expect instead of returning the result, a callback
                 // needs to be included that returns the result as its first parameter.
@@ -426,7 +545,16 @@
                         btn_holder = $("#dialog_buttons");
 
                     //cflorioluis - editando dialogo para validaciones de los mecanizados
-                    var dbox = function(type, msg, callback, width, height, custom, mecanizadoType, defText) {
+                    var dbox = function(
+                        type,
+                        msg,
+                        callback,
+                        width,
+                        height,
+                        custom,
+                        mecanizadoType,
+                        defText
+                    ) {
                         //cflorioluis - custom dialog
                         if (custom !== undefined) {
                             btn_holder = $("#dialog_buttons_custom");
@@ -440,13 +568,9 @@
                                 .toggleClass("prompt", type == "prompt");
 
                             $("#dialog_container").hide();
-                            $("#dialog_container_custom").show()
-
-
+                            $("#dialog_container_custom").show();
                         } else {
-
-                            console.log("original");
-
+                            //console.log("original");
                             $("#dialog_content")
                                 .html("<p>" + msg.replace(/\n/g, "</p><p>") + "</p>")
                                 .toggleClass("prompt", type == "prompt");
@@ -454,7 +578,6 @@
                             $("#dialog_container_custom").hide();
                             $("#dialog_container").show();
                         }
-
 
                         //cflorioluis - Colocar la ventana a un lado, igual se puede mover con el mouse
                         if (width !== undefined || height !== undefined) {
@@ -464,13 +587,13 @@
                             var isDown = false;
 
                             $("#dialog_container_custom").css({
-                                "width": width + "px",
-                                "height": height + "px",
-                                "left": "",
-                                "right": "2%",
-                                "position": "absolute"
-                                    /*"margin-left": (width / 2) * -1 + "px !important",*/
-                                    /*"margin-top:": (height / 2) * -1 + "px !important",*/
+                                width: width + "px",
+                                height: height + "px",
+                                left: "",
+                                right: "2%",
+                                position: "absolute",
+                                /*"margin-left": (width / 2) * -1 + "px !important",*/
+                                /*"margin-top:": (height / 2) * -1 + "px !important",*/
                             });
 
                             $("#dialog_content_custom").css({
@@ -479,33 +602,45 @@
 
                             //cflorioluis - hacer que la ventana se mueva con el mouse
                             div = document.getElementById("dialog_container_custom");
-                            document.getElementById("moveConfirm").addEventListener('mousedown', function(e) {
-                                isDown = true;
-                                offset = [
-                                    div.offsetLeft - e.clientX,
-                                    div.offsetTop - e.clientY
-                                ];
-                            }, true);
+                            document.getElementById("moveConfirm").addEventListener(
+                                "mousedown",
+                                function(e) {
+                                    isDown = true;
+                                    offset = [
+                                        div.offsetLeft - e.clientX,
+                                        div.offsetTop - e.clientY,
+                                    ];
+                                },
+                                true
+                            );
 
-                            document.addEventListener('mouseup', function() {
-                                isDown = false;
-                            }, true);
+                            document.addEventListener(
+                                "mouseup",
+                                function() {
+                                    isDown = false;
+                                },
+                                true
+                            );
 
-                            document.addEventListener('mousemove', function(event) {
-                                event.preventDefault();
-                                if (isDown) {
-                                    mousePosition = {
-                                        x: event.clientX,
-                                        y: event.clientY
-                                    };
+                            document.addEventListener(
+                                "mousemove",
+                                function(event) {
+                                    event.preventDefault();
+                                    if (isDown) {
+                                        mousePosition = {
+                                            x: event.clientX,
+                                            y: event.clientY,
+                                        };
 
-                                    div.style.left = (mousePosition.x + offset[0] + 150) + 'px';
-                                    div.style.top = (mousePosition.y + offset[1] + 80) + 'px';
-                                }
-                            }, true);
+                                        div.style.left = mousePosition.x + offset[0] + 150 + "px";
+                                        div.style.top = mousePosition.y + offset[1] + 80 + "px";
+                                    }
+                                },
+                                true
+                            );
                             ///////////////////////////////////////////////////////////////////
                             /*$("#dialog_container").css("background-color","");
-                            $("#dialog_container").addClass("dialogRight")*/
+                                                        $("#dialog_container").addClass("dialogRight")*/
                         } else {
                             //default values
                             $("#dialog_container").css({
@@ -523,26 +658,73 @@
 
                         btn_holder.empty();
 
-                        var ok = $('<input type="button" value="OK">').appendTo(btn_holder);
+                        var ok = $('<input type="button" value="OK" id="buttonDialogOK">').appendTo(btn_holder);
 
                         //cflorioluis - validar formulario con boton ok
                         switch (mecanizadoType) {
                             case "cajeado":
                                 var rectRoundInputs = 0;
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
-                                    rectRoundInputs = $('input[mecanizadoOption="cajeado"]:checked').length
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
+                                    rectRoundInputs = $(
+                                        'input[machiningOption="cajeado"]:checked'
+                                    ).length;
                                     if (rectRoundInputs == 0) {
-                                        $('.tablero').addClass('input-error');
+                                        $(".tablero").addClass("input-error");
                                     } else {
-                                        $('.tablero').removeClass('input-error');
+                                        $(".tablero").removeClass("input-error");
+                                    }
+
+                                    if ($('#inputErrorWCajeado').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+                                    if ($('#inputErrorHCajeado').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+                                    if ($('#inputErrorRCajeado').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
                                     }
 
                                     $('input[mecanizadoInput="cajeado"]').each(function() {
-                                        $(this).removeClass('input-error');
+                                        $(this).removeClass("input-error");
                                         if ($(this).val() != "") {
-                                            rectRoundInputs++;
+
+                                            try {
+                                                math.evaluate($(this).val(), curConfig.scope)
+                                                rectRoundInputs++;
+
+                                                if ($(this).hasClass("inputErrorWCajeado"))
+                                                    $('#inputErrorWCajeado').hide();
+
+                                                if ($(this).hasClass("inputErrorHCajeado"))
+                                                    $('#inputErrorHCajeado').hide();
+
+                                                if ($(this).hasClass("inputErrorRCajeado"))
+                                                    $('#inputErrorRCajeado').hide();
+                                            } catch (error) {
+                                                //console.log(error.split('/n')[0]);
+                                                $(this).addClass("input-error");
+
+                                                if ($(this).hasClass("inputErrorWCajeado"))
+                                                    $('#inputErrorWCajeado').show();
+
+                                                if ($(this).hasClass("inputErrorHCajeado"))
+                                                    $('#inputErrorHCajeado').show();
+
+                                                if ($(this).hasClass("inputErrorRCajeado"))
+                                                    $('#inputErrorRCajeado').show();
+
+                                                //if (!$('#inputErrorWHDrill').is(":visible")) {
+                                                $('#dialog_container_custom').height("+=15");
+                                                $('#dialog_content_custom').height("+=15");
+                                            }
+
+
+
                                         } else {
-                                            $(this).addClass('input-error');
+                                            $(this).addClass("input-error");
                                         }
                                     });
 
@@ -556,42 +738,108 @@
                             case "drill":
                                 var drillInputs = 0;
                                 var inputs = 0;
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
-                                    drillInputs = $('input[mecanizadoOption="drill"]:checked').length
+                                var error = 0;
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
+                                    drillInputs = $('input[machiningOption="drill"]:checked').length;
+                                    //console.log(drillInputs);
                                     inputs = 0;
                                     if (drillInputs == 0) {
-                                        $('.FaceSelection').addClass('input-error');
+                                        $(".FaceSelection").addClass("input-error");
                                     } else {
-                                        $('.FaceSelection').removeClass('input-error');
+                                        $(".FaceSelection").removeClass("input-error");
+                                    }
+
+
+                                    if ($('#inputErrorWDrill').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorHDrill').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorDiameterDrill').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorDepthDrill').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
                                     }
 
                                     $('input[mecanizadoInput="drill"]').each(function() {
-                                        $(this).removeClass('input-error');
-                                        if ($(this).val() != "") {
-                                            drillInputs++;
-                                            inputs++;
-                                        } else {
-                                            $(this).addClass('input-error');
+                                        $(this).removeClass("input-error");
+                                        if ($(this).prop("required")) {
+                                            if (($(this).val() != "") /*&& eval(!math.evaluate($(this).val(), curConfig.scope))*/ ) {
+
+                                                try {
+                                                    math.evaluate($(this).val(), curConfig.scope)
+                                                    drillInputs++;
+                                                    inputs++;
+
+                                                    if ($(this).hasClass("inputErrorWDrill"))
+                                                        $('#inputErrorWDrill').hide();
+                                                    if ($(this).hasClass("inputErrorHDrill"))
+                                                        $('#inputErrorHDrill').hide();
+                                                    if ($(this).hasClass("inputErrorDiameterDrill"))
+                                                        $('#inputErrorDiameterDrill').hide();
+                                                    if ($(this).hasClass("inputErrorDepthDrill"))
+                                                        $('#inputErrorDepthDrill').hide();
+
+
+                                                } catch (error) {
+                                                    $(this).addClass("input-error");
+
+                                                    if ($(this).hasClass("inputErrorWDrill")) {
+                                                        $('#inputErrorWDrill').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorHDrill")) {
+                                                        $('#inputErrorHDrill').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorDiameterDrill")) {
+                                                        $('#inputErrorDiameterDrill').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorDepthDrill")) {
+                                                        $('#inputErrorDepthDrill').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+                                                }
+                                            } else {
+                                                $(this).addClass("input-error");
+                                            }
                                         }
                                     });
 
                                     $('input[type="checkbox"]').each(function() {
-                                        $(this).removeClass('input-error');
-                                        if ($(this).is(':checked')) {
+                                        $(this).removeClass("input-error");
+                                        if ($(this).is(":checked")) {
                                             drillInputs++;
                                         } else {
-                                            $(this).addClass('input-error');
+                                            $(this).addClass("input-error");
                                         }
                                     });
 
-                                    if ($('input[name="BroachDrill"]:checked').length == 0) {
-                                        $('.broachSelection').addClass('input-error');
-                                    } else {
-                                        $('.broachSelection').removeClass('input-error');
-                                        drillInputs++;
-                                    }
-
-                                    if ($('input[type="checkbox"]').is(':checked') && inputs == 4) {
+                                    /*if ($('input[name="BroachDrill"]:checked').length == 0) {
+                                                            $(".broachSelection").addClass("input-error");
+                                                        } else {
+                                                            $(".broachSelection").removeClass("input-error");
+                                                            drillInputs++;
+                                                        }*/
+                                    //console.log(drillInputs);
+                                    if ($('input[type="checkbox"]').is(":checked") && inputs == 5) {
                                         drillInputs--;
                                     }
 
@@ -602,32 +850,35 @@
                                     }
                                 });
 
-
                                 break;
                             case "hinge":
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
                                     var hingeInputs = 0,
-                                        existsHinge = $('[nameMecanizado=hinge]').length;
+                                        existsHinge = $("[nameMecanizado=hinge]").length;
 
-                                    $("#dialog_buttons_custom").removeClass('input-error');
+                                    $("#dialog_buttons_custom").removeClass("input-error");
 
                                     //$("#errorExistsHinde").remove();
 
+
+
                                     $('input[mecanizadoInput="hinge"]').each(function() {
-                                        $(this).removeClass('input-error');
-                                        if ($(this).prop('required')) {
+                                        $(this).removeClass("input-error");
+                                        if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
+
                                                 hingeInputs++;
+
                                             } else {
-                                                $(this).addClass('input-error');
+                                                $(this).addClass("input-error");
                                             }
                                         }
                                     });
 
                                     /*if (existsHinge) {
-                                        $("#dialog_buttons_custom").addClass('input-error');
-                                        $("#dialog_buttons_custom").children().last().before('<h6 id="errorExistsHinde" style="font-size: large; text-align: center; margin: 20px;">Elimine Existente</h6>');
-                                    }*/
+                                                                            $("#dialog_buttons_custom").addClass('input-error');
+                                                                            $("#dialog_buttons_custom").children().last().before('<h6 id="errorExistsHinde" style="font-size: large; text-align: center; margin: 20px;">Elimine Existente</h6>');
+                                                                        }*/
 
                                     if (hingeInputs == 7 /*&& !existsHinge*/ ) {
                                         box.hide();
@@ -638,23 +889,56 @@
                                 break;
                             case "poly":
                                 var polyInputs = 0;
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
-                                    polyInputs = $('input[mecanizadoOption="poly"]:checked').length
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
+                                    polyInputs = $('input[machiningOption="poly"]:checked')
+                                        .length;
                                     if (polyInputs == 0) {
-                                        $('.tablero').addClass('input-error');
+                                        $(".tablero").addClass("input-error");
                                     } else {
-                                        $('.tablero').removeClass('input-error');
+                                        $(".tablero").removeClass("input-error");
+                                    }
+
+                                    if ($('#inputErrorWPoly').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+                                    if ($('#inputErrorHPoly').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
                                     }
 
                                     $('input[mecanizadoInput="poly"]').each(function() {
-                                        $(this).removeClass('input-error');
+                                        $(this).removeClass("input-error");
                                         if ($(this).val() != "") {
-                                            polyInputs++;
+
+                                            try {
+                                                math.evaluate($(this).val(), curConfig.scope)
+                                                polyInputs++;
+
+                                                if ($(this).hasClass("inputErrorWPoly"))
+                                                    $('#inputErrorWPoly').hide();
+
+                                                if ($(this).hasClass("inputErrorHPoly"))
+                                                    $('#inputErrorHPoly').hide();
+                                            } catch (error) {
+                                                //console.log(error.split('/n')[0]);
+                                                $(this).addClass("input-error");
+
+                                                if ($(this).hasClass("inputErrorWPoly"))
+                                                    $('#inputErrorWPoly').show();
+
+                                                if ($(this).hasClass("inputErrorHPoly"))
+                                                    $('#inputErrorHPoly').show();
+
+                                                $('#dialog_container_custom').height("+=15");
+                                                $('#dialog_content_custom').height("+=15");
+                                            }
+
                                         } else {
-                                            $(this).addClass('input-error');
+                                            $(this).addClass("input-error");
                                         }
                                     });
-                                    console.log(polyInputs);
+                                    //console.log(polyInputs);
 
                                     if (polyInputs == 3) {
                                         box.hide();
@@ -664,21 +948,83 @@
                                 });
                                 break;
                             case "rect":
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
+                                    var rectInputs = 0;
 
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
-                                    var rectRoundInputs = 0;
+                                    if ($('#inputErrorRealXRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorRealYRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorWRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorHRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
                                     $('input[mecanizadoInput="rect"]').each(function() {
-                                        $(this).removeClass('input-error');
-                                        if ($(this).prop('required')) {
+                                        $(this).removeClass("input-error");
+                                        if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
-                                                rectRoundInputs++;
+
+                                                try {
+                                                    math.evaluate($(this).val(), curConfig.scope)
+                                                    rectInputs++;
+
+                                                    if ($(this).hasClass("inputErrorRealXRect"))
+                                                        $('#inputErrorRealXRect').hide();
+                                                    if ($(this).hasClass("inputErrorRealYRect"))
+                                                        $('#inputErrorRealYRect').hide();
+                                                    if ($(this).hasClass("inputErrorWRect"))
+                                                        $('#inputErrorWRect').hide();
+                                                    if ($(this).hasClass("inputErrorHRect"))
+                                                        $('#inputErrorHRect').hide();
+
+
+                                                } catch (error) {
+                                                    $(this).addClass("input-error");
+
+                                                    if ($(this).hasClass("inputErrorRealXRect")) {
+                                                        $('#inputErrorRealXRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorRealYRect")) {
+                                                        $('#inputErrorRealYRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorWRect")) {
+                                                        $('#inputErrorWRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorHRect")) {
+                                                        $('#inputErrorHRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                }
                                             } else {
-                                                $(this).addClass('input-error');
+                                                $(this).addClass("input-error");
                                             }
                                         }
                                     });
 
-                                    if (rectRoundInputs == 4) {
+                                    if (rectInputs == 4) {
                                         box.hide();
                                         var resp = type == "prompt" ? input.val() : true;
                                         if (callback) callback(resp);
@@ -686,21 +1032,109 @@
                                 });
                                 break;
                             case "rectRound":
-
-                                $('#dialog_buttons_custom').children().first().click(function(event) {
+                                $("#dialog_buttons_custom").children().first().click(function(event) {
                                     var rectRoundInputs = 0;
+
+                                    if ($('#inputErrorRealXRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorRealYRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorWRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorHRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorRXRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
+                                    if ($('#inputErrorRYRect').is(":visible")) {
+                                        $('#dialog_container_custom').height("-=15");
+                                        $('#dialog_content_custom').height("-=15");
+                                    }
+
                                     $('input[mecanizadoInput="rectRound"]').each(function() {
-                                        $(this).removeClass('input-error');
-                                        if ($(this).prop('required')) {
+                                        $(this).removeClass("input-error");
+                                        if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
-                                                rectRoundInputs++;
+
+                                                try {
+                                                    math.evaluate($(this).val(), curConfig.scope)
+                                                    rectRoundInputs++;
+
+                                                    if ($(this).hasClass("inputErrorRealXRect"))
+                                                        $('#inputErrorRealXRect').hide();
+                                                    if ($(this).hasClass("inputErrorRealYRect"))
+                                                        $('#inputErrorRealYRect').hide();
+                                                    if ($(this).hasClass("inputErrorWRect"))
+                                                        $('#inputErrorWRect').hide();
+                                                    if ($(this).hasClass("inputErrorHRect"))
+                                                        $('#inputErrorHRect').hide();
+                                                    if ($(this).hasClass("inputErrorRXRect"))
+                                                        $('#inputErrorRXRect').hide();
+                                                    if ($(this).hasClass("inputErrorRYRect"))
+                                                        $('#inputErrorRYRect').hide();
+
+
+                                                } catch (error) {
+                                                    $(this).addClass("input-error");
+
+                                                    if ($(this).hasClass("inputErrorRealXRect")) {
+                                                        $('#inputErrorRealXRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorRealYRect")) {
+                                                        $('#inputErrorRealYRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorWRect")) {
+                                                        $('#inputErrorWRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorHRect")) {
+                                                        $('#inputErrorHRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorRXRect")) {
+                                                        $('#inputErrorRXRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                    if ($(this).hasClass("inputErrorRYRect")) {
+                                                        $('#inputErrorRYRect').show();
+                                                        $('#dialog_container_custom').height("+=15");
+                                                        $('#dialog_content_custom').height("+=15");
+                                                    }
+
+                                                }
                                             } else {
-                                                $(this).addClass('input-error');
+                                                $(this).addClass("input-error");
                                             }
                                         }
                                     });
 
-                                    console.log(rectRoundInputs);
+                                    //console.log(rectRoundInputs);
 
                                     if (rectRoundInputs == 6) {
                                         box.hide();
@@ -715,7 +1149,7 @@
                         /////////////////////////////////////////////////
 
                         if (type != "alert") {
-                            $('<input type="button" value="Cancel">')
+                            $('<input type="button" value="Cancel"  id="buttonDialogCancel">')
                                 .appendTo(btn_holder)
                                 .on("click touchstart", function() {
                                     box.hide();
@@ -738,7 +1172,6 @@
                         box.show();
                         //cflorioluis - ocultar evento callback original si se trata de un mecanizado
                         switch (mecanizadoType) {
-
                             case "rectRound":
                             case "rect":
                             case "poly":
@@ -760,7 +1193,14 @@
                     $.alert = function(msg, cb) {
                         dbox("alert", msg, cb);
                     };
-                    $.confirm = function(msg, cb, width, height, custom, mecanizadoType) {
+                    $.confirm = function(
+                        msg,
+                        cb,
+                        width,
+                        height,
+                        custom,
+                        mecanizadoType
+                    ) {
                         dbox("confirm", msg, cb, width, height, custom, mecanizadoType);
                     };
                     $.process_cancel = function(msg, cb) {
@@ -1048,9 +1488,10 @@
                     var zoomValue = 0;
                     //cflorioluis - Calcular el zoom optimo para que las piezas siempre se vean a un tamaño similar
                     if (curConfig.dimensions[0] > curConfig.dimensions[1]) {
-                        zoomValue = ((w_area.width() / curConfig.dimensions[0]) / 1.25) * 100
+                        zoomValue = (w_area.width() / curConfig.dimensions[0] / 1.25) * 100;
                     } else {
-                        zoomValue = ((w_area.height() / curConfig.dimensions[1]) / 1.25) * 100
+                        zoomValue =
+                            (w_area.height() / curConfig.dimensions[1] / 1.25) * 100;
                     }
 
                     var zoomlevel = zoomValue / 100;
@@ -1072,31 +1513,19 @@
                         true
                     );
                     /*console.log("w_area[0].scrollLeft");
-                    console.log(w_area[0].scrollLeft);
-                    console.log("w_area[0].scrollTop");
-                    console.log(w_area[0].scrollTop);
-                    console.log("w_area.width()");
-                    console.log(w_area.width());
-                    console.log("w_area.height()");
-                    console.log(w_area.height());
+                                        console.log(w_area[0].scrollLeft);
+                                        console.log("w_area[0].scrollTop");
+                                        console.log(w_area[0].scrollTop);
+                                        console.log("w_area.width()");
+                                        console.log(w_area.width());
+                                        console.log("w_area.height()");
+                                        console.log(w_area.height());
 
-                    console.log("zoom");
-                    console.log(zoom);*/
-
+                                        console.log("zoom");
+                                        console.log(zoom);*/
                 };
 
-
-
                 changeZoomPiece();
-
-
-
-
-
-
-
-
-
 
                 $("#cur_context_panel").delegate("a", "click", function() {
                     var link = $(this);
@@ -1758,7 +2187,7 @@
                             style: "pointer-events:none",
                         },
                     });
-                    svgCanvas.setCurrentLayer("Layer 1");
+                    svgCanvas.setCurrentLayer("Pieza " + curConfig.partW + "x" + curConfig.partL);
                     svgCanvas.setCurrentLayerPosition("1");
                 };
 
@@ -2009,7 +2438,7 @@
                             path: [],
                             //cforioluis - update cajeado contextual tools
                             cajeado: ["widthX", "heightY", "radio"],
-                            drill: ["realX", "realY", "diameter", ],
+                            drill: ["realX", "realY", "diameter"],
                             poly: ["widthX", "heightY"],
                             rect: ["width", "height", "realX", "realY"],
                             rectRound: ["width", "height", "realX", "realY", "rx", "ry"],
@@ -2025,7 +2454,7 @@
                         }
 
                         /*console.log("elem.tagName");
-                                    console.log(elem.tagName);*/
+                                                            console.log(elem.tagName);*/
 
                         if ($(elem).data("gsvg")) {
                             $("#g_panel").show();
@@ -2046,21 +2475,20 @@
                             //console.log("cur_panel")
                             //console.log(cur_panel)
                             /*switch ($(elem).attr("nameMecanizado")) {
-                                case "cajeado":
-                                    $("#cajeado_panel").show();
-                                    break;
-                                case "drill":
-                                    $("#drill_panel").show();
-                                    break;
+                                                            case "cajeado":
+                                                                $("#cajeado_panel").show();
+                                                                break;
+                                                            case "drill":
+                                                                $("#drill_panel").show();
+                                                                break;
 
-                                default:
-                                    break;
-                            }
-                            if (!$(elem).attr("nameMecanizado")) {*/
+                                                            default:
+                                                                break;
+                                                        }
+                                                        if (!$(elem).attr("nameMecanizado")) {*/
                             $("#" + el_name + "_panel").show();
                             //}
                             //console.log($(elem).attr("nameMecanizado"))
-
 
                             // corner radius has to live in a different panel
                             // because otherwise it changes the position of the
@@ -2259,18 +2687,18 @@
                         },
                         true
                     );
-                    console.log("w_area[0].scrollLeft");
-                    console.log(w_area[0].scrollLeft);
-                    console.log("w_area[0].scrollTop");
-                    console.log(w_area[0].scrollTop);
-                    console.log("w_area.width()");
-                    console.log(w_area.width());
-                    console.log("w_area.height()");
-                    console.log(w_area.height());
+                    /*
+                                                            console.log("w_area[0].scrollLeft");
+                                                            console.log(w_area[0].scrollLeft);
+                                                            console.log("w_area[0].scrollTop");
+                                                            console.log(w_area[0].scrollTop);
+                                                            console.log("w_area.width()");
+                                                            console.log(w_area.width());
+                                                            console.log("w_area.height()");
+                                                            console.log(w_area.height());
 
-                    console.log("zoom");
-                    console.log(zoom);
-
+                                                            console.log("zoom");
+                                                            console.log(zoom);*/
                 };
 
                 var changeBlur = function(ctl, completed) {
@@ -2317,7 +2745,7 @@
                     var attr = el.getAttribute("data-attr");
                     var multiplier = el.getAttribute("data-multiplier") || 1;
                     multiplier = parseFloat(multiplier);
-                    var val = el.value * multiplier;
+                    var val = math.evaluate(el.value, curConfig.scope) * multiplier;
                     var valid = svgedit.units.isValidUnit(attr, val, selectedElement);
                     if (!valid) {
                         $.alert("Invalid value given");
@@ -2345,10 +2773,11 @@
                     var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
                     var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
-                    var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side);
+                    var face = svgCanvas.getSelectedElems()[0].getAttribute("face");
+                    var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side, face);
 
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
-                    svgCanvas.editLinesCantoCajeado(side, w, h, id);
+                    svgCanvas.editLinesInEdges(side, w, h, id, face);
                     svgCanvas.selectorManager.requestSelector(selectedElement).resize();
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
@@ -2368,18 +2797,67 @@
                     var realX = parseInt($("#drill_realX").val()),
                         realY = parseInt($("#drill_realY").val()),
                         diameter = parseInt($("#drill_diameter").val()),
-                        face = svgCanvas.getSelectedElems()[0].getAttribute("face");
+                        face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
+                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant");
 
-                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
-                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+
+
+
                     svgCanvas.getSelectedElems()[0].setAttribute("r", diameter / 2);
 
-                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
 
-                    var r = parseInt(svgCanvas.getSelectedElems()[0].getAttribute("r"));
                     switch (face) {
-                        case "1":
-                            if (realX < 0) {
+                        case "0":
+                            svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                            svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+                            switch (cuadrant) {
+                                case "1":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                                    break;
+                                case "2":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                                    break;
+                                case "3":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                                    break;
+                                case "4":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+                                    break;
+                            }
+                            break;
+
+                        case "5":
+                            svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                            svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+                            switch (cuadrant) {
+                                case "4":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                                    break;
+                                case "3":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                                    break;
+                                case "2":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                                    break;
+                                case "1":
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
+                                    break;
+                            }
+                            break;
+                    }
+
+
+                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+                    //var r = parseInt(svgCanvas.getSelectedElems()[0].getAttribute("r"));
+
+
+                    switch (face) {
+                        case "0":
+                            /*if (realX < 0) {
                                 $("#drill_realX").val(r);
                             }
                             if (realX > curConfig.realDimensions[0]) {
@@ -2391,26 +2869,21 @@
                             }
                             if (realY > curConfig.realDimensions[1]) {
                                 $("#drill_realY").val(curConfig.realDimensions[1]);
-                            }
+                            }*/
+                            break;
+                        case "1":
                             break;
                         case "2":
-
                             break;
                         case "3":
-
                             break;
                         case "4":
-
-                            break;
-                        case "5":
-
                             break;
 
                         default:
                             break;
                     }
                 };
-
 
                 changeAttributeRect = function(el, completed) {
                     var attr = el.getAttribute("data-attr");
@@ -2427,23 +2900,64 @@
                         realY = parseInt($("#rect_realY").val()),
                         width = parseInt($("#rect_width").val()),
                         height = parseInt($("#rect_height").val()),
+                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant"),
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
+                        isCenter = svgCanvas.getSelectedElems()[0].getAttribute("lw") == "2" ? true : false,
+                        cX = realX + 100,
+                        cY = realY + 100,
+                        posX, posY;
 
-                        cx = realX + 100,
-                        cy = realY + 100;
-
-                    if ((realX + width) > curConfig.partW) {
+                    if (realX + width > curConfig.partW) {
                         $("#rect_width").val(curConfig.partW - realX);
                         svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
-                    } else if ((realY + height) > curConfig.partL) {
+                    } else if (realY + height > curConfig.partL) {
                         $("#rect_height").val(curConfig.partL - realY);
                         svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
                     }
 
-                    svgCanvas.getSelectedElems()[0].setAttribute("x", cx);
-                    svgCanvas.getSelectedElems()[0].setAttribute("y", cy);
+                    svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                    svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
 
-                    console.log(realX + width);
+                    posX = curConfig.realDimensions[0] - realX - width + 100;
+                    posY = curConfig.realDimensions[1] - realY - height + 100;
+
+                    switch (cuadrant) {
+                        case "1":
+                            if (isCenter) {
+                                cX -= (width / 2);
+                                posY += (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                            break;
+                        case "2":
+
+                            if (isCenter) {
+                                posX += (width / 2);
+                                posY += (height / 2);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                            svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                            break;
+                        case "3":
+                            if (isCenter) {
+                                posX += (width / 2);
+                                cY -= (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                            break;
+                        case "4":
+                            if (isCenter) {
+                                cX -= (width / 2);
+                                cY -= (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                                svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                            }
+                            break;
+                    }
+
+                    //console.log(realX + width);
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
@@ -2465,24 +2979,63 @@
                         height = parseInt($("#rectRound_height").val()),
                         rx = parseInt($("#rectRound_rx").val()),
                         ry = parseInt($("#rectRound_ry").val()),
+                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant"),
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
+                        isCenter = svgCanvas.getSelectedElems()[0].getAttribute("lw") == "2" ? true : false,
+                        posX, posY,
+                        cX = realX + 100,
+                        cY = realY + 100;
 
-                        cx = realX + 100,
-                        cy = realY + 100;
-
-                    if ((realX + width) > curConfig.partW) {
+                    if (realX + width > curConfig.partW) {
                         $("#rectRound_width").val(curConfig.partW - realX);
                         svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
-                    } else if ((realY + height) > curConfig.partL) {
+                    } else if (realY + height > curConfig.partL) {
                         $("#rectRound_height").val(curConfig.partL - realY);
                         svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
                     }
 
-                    if (rx > (width / 2))
+                    if (rx > width / 2)
+                        svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                    svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
 
+                    posX = curConfig.realDimensions[0] - realX - width + 100;
+                    posY = curConfig.realDimensions[1] - realY - height + 100;
 
-                        svgCanvas.getSelectedElems()[0].setAttribute("x", cx);
-                    svgCanvas.getSelectedElems()[0].setAttribute("y", cy);
+                    switch (cuadrant) {
+                        case "1":
+                            if (isCenter) {
+                                cX -= (width / 2);
+                                posY += (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                            break;
+                        case "2":
+
+                            if (isCenter) {
+                                posX += (width / 2);
+                                posY += (height / 2);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                            svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                            break;
+                        case "3":
+                            if (isCenter) {
+                                posX += (width / 2);
+                                cY -= (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                            }
+                            svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                            break;
+                        case "4":
+                            if (isCenter) {
+                                cX -= (width / 2);
+                                cY -= (height / 2);
+                                svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                                svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                            }
+                            break;
+                    }
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
@@ -2505,17 +3058,22 @@
                         minValue = parseInt($("#poly_widthX").val());
                     }
 
-                    svgCanvas.getSelectedElems()[0].setAttribute("widthX", $("#poly_widthX").val());
-                    svgCanvas.getSelectedElems()[0].setAttribute("heightY", $("#poly_heightY").val());
+                    svgCanvas
+                        .getSelectedElems()[0]
+                        .setAttribute("widthX", $("#poly_widthX").val());
+                    svgCanvas
+                        .getSelectedElems()[0]
+                        .setAttribute("heightY", $("#poly_heightY").val());
 
                     var side = svgCanvas.getSelectedElems()[0].getAttribute("side");
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
                     var h = svgCanvas.getSelectedElems()[0].getAttribute("heightY");
                     var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
+                    var face = svgCanvas.getSelectedElems()[0].getAttribute("face");
                     var points = svgCanvas.createPolySide(w, h, side);
 
                     svgCanvas.getSelectedElems()[0].setAttribute("points", points);
-                    svgCanvas.editLinesCantoCajeado(side, w, h, id);
+                    svgCanvas.editLinesInEdges(side, w, h, id, face);
                     svgCanvas.selectorManager.requestSelector(selectedElement).resize();
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
@@ -2624,9 +3182,17 @@
 
                     //console.log($(button).parent().parent().hasClass("parent"));
                     if ($(button).parent().parent().hasClass("parent")) {
-                        $(button).parent().parent().css("background-color", "#ffb300")
+                        //$(button).parent().parent().css("background-color", "#ffb300");
+
+                        /*$('#tool_rectTools').attr("id","tool_rectTools");*/
+                        /*$('#tool_rectTools').attr("id", "tool_rectRoundTools");*/
+
+                        $('.tool_rectTools').css("background-color", "#ffb300");
+                        $('.tool_rectRoundTools').css("background-color", "#ffb300");
+
                     } else {
-                        $("#tool_rectTools").css("background-color", "#ccc")
+                        $(".tool_rectTools").css("background-color", "#ccc");
+                        $('.tool_rectRoundTools').css("background-color", "#ccc");
                     }
                     return true;
                 };
@@ -2910,19 +3476,19 @@
                 });
 
                 /*
-      
+
       When a flyout icon is selected
         (if flyout) {
         - Change the icon
         - Make pressing the button run its stuff
         }
         - Run its stuff
-      
+
       When its shortcut key is pressed
         - If not current in list, do as above
         , else:
         - Just run its stuff
-      
+
       */
 
                 // Unfocus text input when workarea is mousedowned.
@@ -2956,7 +3522,6 @@
                 };
                 //add new toll - cflorioluis
                 var clickCajeadoTool = function() {
-
                     if (toolButtonClick("#tool_cajeadoTool")) {
                         svgCanvas.setMode("cajeado");
                     }
@@ -2971,7 +3536,6 @@
                 };
 
                 var clickDrillTool = function() {
-
                     if (toolButtonClick("#tool_drillTool")) {
                         svgCanvas.setMode("drill");
                     }
@@ -3002,6 +3566,9 @@
                     svgCanvas.clearSelection();
                     svgCanvas.clickRectTool(null);
 
+                    $('#tool_rectTools').removeClass("tool_rectRoundTools");
+                    $('#tool_rectTools').removeClass("tool_rectTools");
+                    $('#tool_rectTools').addClass("tool_rectTools");
                 };
 
                 var clickRectRoundTool = function() {
@@ -3010,11 +3577,11 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickRectRoundTool(null);
+
+                    $('#tool_rectTools').removeClass("tool_rectRoundTools");
+                    $('#tool_rectTools').removeClass("tool_rectTools");
+                    $('#tool_rectTools').addClass("tool_rectRoundTools");
                 };
-
-
-
-
 
                 var clickFHPath = function() {
                     if (toolButtonClick("#tool_fhpath")) {
@@ -3098,51 +3665,68 @@
                 // Delete is a contextual tool that only appears in the ribbon if
                 // an element has been selected
                 var deleteSelected = function() {
+                    curConfig.cuadrant = 1;
+                    svgCanvas.updateRulersCuadrant(curConfig.cuadrant, $('#faceSelector').val())
                     if (selectedElement != null || multiselected) {
-                        //mantener los id de la seleccion para ver si son mecanizados y borrar 
+                        //mantener los id de la seleccion para ver si son mecanizados y borrar
                         //sus relacionados de manera correcta para que queden en el historial Ctrl-Z
                         var tempMultiSelected = multiselected;
                         var tempSelected = selectedElement;
                         var isMulti = false;
 
-
                         svgCanvas.deleteSelectedElements();
 
                         if (tempMultiSelected) {
-
                             for (let ii = 0; ii < tempMultiSelected.length; ii++) {
                                 isMulti = true;
 
                                 var element = tempMultiSelected[ii];
                                 //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
-                                if ((element.getAttribute("nameMecanizado") == "cajeado") || (element.getAttribute("nameMecanizado") == "poly")) {
-                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line1")], true);
-                                    svgCanvas.addToSelection([svgCanvas.getElem(element.id + "_line2")], true);
+                                if (
+                                    element.getAttribute("nameMecanizado") == "cajeado" ||
+                                    element.getAttribute("nameMecanizado") == "poly"
+                                ) {
+                                    svgCanvas.addToSelection(
+                                        [svgCanvas.getElem(element.id + "_line1")],
+                                        true
+                                    );
+                                    svgCanvas.addToSelection(
+                                        [svgCanvas.getElem(element.id + "_line2")],
+                                        true
+                                    );
                                     svgCanvas.deleteSelectedElements();
                                 }
                             }
                         }
 
                         if (!isMulti) {
-                            if ((tempSelected.getAttribute("nameMecanizado") == "cajeado") || (tempSelected.getAttribute("nameMecanizado") == "poly")) {
-                                svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line1")], true);
-                                svgCanvas.addToSelection([svgCanvas.getElem(tempSelected.id + "_line2")], true);
+                            if (
+                                tempSelected.getAttribute("nameMecanizado") == "cajeado" ||
+                                tempSelected.getAttribute("nameMecanizado") == "poly"
+                            ) {
+                                svgCanvas.addToSelection(
+                                    [svgCanvas.getElem(tempSelected.id + "_line1")],
+                                    true
+                                );
+                                svgCanvas.addToSelection(
+                                    [svgCanvas.getElem(tempSelected.id + "_line2")],
+                                    true
+                                );
                                 svgCanvas.deleteSelectedElements();
                             }
                         }
-
                     }
                     if (path.getNodePoint()) {
                         path.deletePathNode();
                     }
 
                     /*console.log(multiselected);
-                    if (selectedElement != null || multiselected) {
-                        svgCanvas.deleteSelectedElements();
-                    }
-                    if (path.getNodePoint()) {
-                        path.deletePathNode();
-                    }*/
+                                        if (selectedElement != null || multiselected) {
+                                            svgCanvas.deleteSelectedElements();
+                                        }
+                                        if (path.getNodePoint()) {
+                                            path.deletePathNode();
+                                        }*/
                 };
 
                 var cutSelected = function() {
@@ -3244,50 +3828,55 @@
                             dy *= multi;
                         }
                         $("input").blur();
-                        //cflorioluis - evitar que un mecanizado se mueva correctamente con las flechas del techado 
+                        //cflorioluis - evitar que un mecanizado se mueva correctamente con las flechas del techado
                         switch (selectedElement.getAttribute("nameMecanizado")) {
                             case "hinge":
                             case "poly":
                             case "cajeado":
                                 return;
                             case "drill":
-                                var posX = Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
-                                    posY = Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
+                                var posX =
+                                    Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
+                                    posY =
+                                    Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
 
-                                if (posX < 0 || posX > curConfig.realDimensions[0])
-                                    return;
+                                if (posX < 0 || posX > curConfig.realDimensions[0]) return;
 
-                                if (posY < 0 || posY > curConfig.realDimensions[1])
-                                    return;
+                                if (posY < 0 || posY > curConfig.realDimensions[1]) return;
 
                                 selectedElement.setAttribute("realX", posX);
                                 selectedElement.setAttribute("realY", posY);
                                 break;
                             case "rect":
                             case "rectRound":
-                                var posX = Math.floor(selectedElement.getAttribute("x")) - 100 + dx,
-                                    posY = Math.floor(selectedElement.getAttribute("y")) - 100 - dy,
+                                var posX =
+                                    Math.floor(selectedElement.getAttribute("x")) - 100 + dx,
+                                    posY =
+                                    Math.floor(selectedElement.getAttribute("y")) - 100 - dy,
                                     width = parseInt(selectedElement.getAttribute("width")),
                                     height = parseInt(selectedElement.getAttribute("height"));
 
-                                if (posX < 0 || ((posX + width) > curConfig.realDimensions[0]))
+                                if (posX < 0 || posX + width > curConfig.realDimensions[0])
                                     return;
 
-                                if (posY < 0 || ((posY + height) > curConfig.realDimensions[1]))
+                                if (posY < 0 || posY + height > curConfig.realDimensions[1])
                                     return;
 
                                 selectedElement.setAttribute("realX", posX);
                                 selectedElement.setAttribute("realY", posY);
                                 break;
-
                         }
                         svgCanvas.moveSelectedElements(dx, -dy); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
                     }
                 };
 
                 var scaleRadiusSelected = function(r) {
-
-                    if (selectedElement != null || selectedElement.getAttribute("nameMecanizado") != null || selectedElement.getAttribute("nameMecanizado") != "drill") return;
+                    if (
+                        selectedElement != null ||
+                        selectedElement.getAttribute("nameMecanizado") != null ||
+                        selectedElement.getAttribute("nameMecanizado") != "drill"
+                    )
+                        return;
 
                     var radio = parseInt(selectedElement.getAttribute("r"));
                     selectedElement.setAttribute("r", radio + r);
@@ -3342,6 +3931,33 @@
                     updateContextPanel();
                 };
 
+
+                //cflorioluis - Eliminar Cantos, definicion de la Funcion
+                var clickClearEdges = function() {
+
+                    var dims = curConfig.dimensions;
+                    $.confirm(
+                        `<strong> <h2 id="moveConfirm" style="cursor: move;line-height: normal;">Desea Borrar Todos los Cantos del Tablero?</h2></strong>\nEsta Opcion no se puede deshacer`,
+                        function(ok) {
+                            if (!ok) return;
+
+                            svgCanvas.updateEdges(["", "", "", ""]);
+
+                            var newOrder = JSON.parse(localStorage.newOrder);
+                            var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+
+                            newOrder[currentRowSelected][6] = null;
+                            newOrder[currentRowSelected][7] = null;
+                            newOrder[currentRowSelected][8] = null;
+                            newOrder[currentRowSelected][9] = null;
+                            localStorage.setItem("newOrder", JSON.stringify(newOrder));
+                        },
+                        350,
+                        150,
+                        true
+                    );
+                };
+
                 var clickClear = function() {
                     var dims = curConfig.dimensions;
                     $.confirm(
@@ -3361,11 +3977,22 @@
                             svgCanvas.runExtensions("onNewDocument");
 
                             //crear divisiones
-                            svgCanvas.createDivs(curConfig.cantos);
+                            svgCanvas.createDivs(curConfig.edges);
 
                             changeZoomPiece();
 
-                        }, 350, 250, true
+
+                            var newOrder = JSON.parse(localStorage.newOrder);
+                            var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+
+                            newOrder[currentRowSelected][13] = null;
+                            newOrder[currentRowSelected][14] = null;
+
+                            localStorage.setItem("newOrder", JSON.stringify(newOrder));
+                        },
+                        350,
+                        150,
+                        true
                     );
                 };
 
@@ -3400,16 +4027,17 @@
                     }
                 };
 
-                //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
 
-                var clickExportPartDraw = function() {
+                var generatePartDraw = (this.generatePartDraw = function() {
                     let csv =
-                        `"partMat";"partDText";"partL";"partW";"partqty";"partRef";"partEdge1";"partEdge2";"partEdge3";"partEdge4";"PartFRef";"PartFDate";"partD";"partdraw"
-U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
+                        '"partMat";"partDText";"partL";"partW";"partqty";"partRef";"partEdge1";"partEdge2";"partEdge3";"partEdge4";"PartFRef";"PartFDate";"partD";"partdraw"\n' +
+                        curConfig.row[0] + ';' + curConfig.row[1] + ';' + curConfig.row[2] + ';' + curConfig.row[3] + ';' + curConfig.row[4] + ';' + curConfig.row[5] + ';' + curConfig.row[6] + ';' + curConfig.row[7] + ';' + curConfig.row[8] + ';' + curConfig.row[9] + ';' + curConfig.row[10] + ';' + curConfig.row[11] + ';' + curConfig.row[12] + ';';
+
+                    var partDarw = '';
 
                     var mecanizados = $("[nameMecanizado]");
                     //console.log(mecanizados);
-                    var doc = document.implementation.createDocument("", "", null);
+                    var doc = document.implementation.createDocument('', '', null);
                     var hingeReady = false;
 
                     for (let ii = 0; ii < mecanizados.length; ii++) {
@@ -3428,24 +4056,24 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         switch (mecanizado.getAttribute("nameMecanizado")) {
                             case "cajeado":
                                 functNameElement.append("_Cajeado");
-                                var param = `"DiaFr" VAR "` + mecanizado.getAttribute("radio") + `":"Hoek" VAR "` + mecanizado.getAttribute("side") + `":"StartX" VAR "` + mecanizado.getAttribute("widthX") + `":"StartY" VAR "` + mecanizado.getAttribute("heightY") + `"`
+                                var param = '"DiaFr" VAR "' + mecanizado.getAttribute('radio') + '":"Hoek" VAR "' + mecanizado.getAttribute('side') + '":"StartX" VAR "' + mecanizado.getAttribute('widthX') + '":"StartY" VAR "' + mecanizado.getAttribute("heightY") + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
-                                sideElement.append("0");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
+                                sideElement.append(mecanizado.getAttribute('face'));
                                 break;
                             case "drill":
                                 functNameElement.append("_Taladro");
-                                var param = `"Origine" VAR "0":"Depart_X" VAR "` + mecanizado.getAttribute("realX") + `":"Depart_Y" VAR "` + mecanizado.getAttribute("realY") + `":"diametre" VAR "` + mecanizado.getAttribute("diameter") + `":"profondeur" VAR "` + mecanizado.getAttribute("depth") + `":"debouchant" VAR "` + mecanizado.getAttribute("cross") + `"`
+                                var param = '"Origine" VAR "0":"Depart_X" VAR "' + mecanizado.getAttribute("realX") + '":"Depart_Y" VAR "' + mecanizado.getAttribute("realY") + '":"diametre" VAR "' + mecanizado.getAttribute("diameter") + '":"profondeur" VAR "' + mecanizado.getAttribute("depth") + '":"debouchant" VAR "' + mecanizado.getAttribute("cross") + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
-                                sideElement.append("0");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
+                                sideElement.append(mecanizado.getAttribute('face'));
                                 break;
                             case "hinge":
                                 functNameElement.append("_Cazoleta");
-                                var param = `"Origine" VAR "` + mecanizado.getAttribute("origin") + `":"Depart_X" VAR "` + mecanizado.getAttribute("beginX") + `":"Fin_X" VAR "` + mecanizado.getAttribute("endX") + `":"nombre" VAR "` + mecanizado.getAttribute("hingeCount") + `":"entraxe" VAR "` + mecanizado.getAttribute("axisDist") + `":"Dia_insert" VAR "` + mecanizado.getAttribute("drillDiameter") + `":"Prof_insert" VAR "` + mecanizado.getAttribute("drillDepth") + `":"Dia_charniere" VAR "` + mecanizado.getAttribute("hingeDiameter") + `":"Prof_charn" VAR "` + mecanizado.getAttribute("hingeDepth") + `"`
+                                var param = '"Origine" VAR "' + mecanizado.getAttribute("origin") + '":"Depart_X" VAR "' + mecanizado.getAttribute("beginX") + '":"Fin_X" VAR "' + mecanizado.getAttribute("endX") + '":"nombre" VAR "' + mecanizado.getAttribute("hingeCount") + '":"entraxe" VAR "' + mecanizado.getAttribute("axisDist") + '":"Dia_insert" VAR "' + mecanizado.getAttribute("drillDiameter") + '":"Prof_insert" VAR "' + mecanizado.getAttribute("drillDepth") + '":"Dia_charniere" VAR "' + mecanizado.getAttribute("hingeDiameter") + '":"Prof_charn" VAR "' + mecanizado.getAttribute("hingeDepth") + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
-                                sideElement.append("0");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
+                                sideElement.append(mecanizado.getAttribute('face'));
                                 break;
 
                             case "poly":
@@ -3485,27 +4113,26 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                         default:
                                             break;
                                     }
-
                                 }
 
                                 functNameElement.append("_Anguloenlados");
-                                var param = `"b1" VAR "` + b1 + `":"h1" VAR "` + h1 + `":"b2" VAR "` + b2 + `":"h2" VAR "` + h2 + `":"b3" VAR "` + b3 + `":"h3" VAR "` + h3 + `":"b4" VAR "` + b4 + `":"h4" VAR "` + h4 + `"`
+                                var param = '"b1" VAR "' + b1 + '":"h1" VAR "' + h1 + '":"b2" VAR "' + b2 + '":"h2" VAR "' + h2 + '":"b3" VAR "' + b3 + '":"h3" VAR "' + h3 + '":"b4" VAR "' + b4 + '":"h4" VAR "' + h4 + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
                                 hingeReady = true;
                                 break;
                             case "rect":
                                 functNameElement.append("_Rectangulo");
-                                var param = `"StartX1" VAR "` + mecanizado.getAttribute("realX") + `":"StartY1" VAR "` + mecanizado.getAttribute("realY") + `":"Width" VAR "` + mecanizado.getAttribute("width") + `":"Height" VAR "` + mecanizado.getAttribute("height") + `"`
+                                var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
                                 /*sideElement.append("0");*/
                                 break;
                             case "rectRound":
                                 functNameElement.append("_RectanguloRedondeado");
-                                var param = `"StartX1" VAR "` + mecanizado.getAttribute("realX") + `":"StartY1" VAR "` + mecanizado.getAttribute("realY") + `":"Width" VAR "` + mecanizado.getAttribute("width") + `":"Height" VAR "` + mecanizado.getAttribute("height") + `":"RadiusX" VAR "` + mecanizado.getAttribute("rx") + `":"RadiusY" VAR "` + mecanizado.getAttribute("ry") + `"`
+                                var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '":"RadiusX" VAR "' + mecanizado.getAttribute("rx") + '":"RadiusY" VAR "' + mecanizado.getAttribute("ry") + '"';
                                 paramElement.append(param);
-                                opsideElement.append("2");
+                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
                                 /*sideElement.append("0");*/
                                 break;
                         }
@@ -3513,19 +4140,83 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         doc.appendChild(drawElement);
                         var draw = new XMLSerializer().serializeToString(doc);
                         //console.log(draw);
-                        csv += draw;
+                        partDarw += draw;
                         //console.log(csv);
                         doc.removeChild(drawElement);
                     }
+
+
+                    localStorage.setItem("partDraw", partDarw);
+
+
+                    /*localStorage.removeItem("row");
+                              localStorage.removeItem("partDraw");*/
+
+                    csv += partDarw;
+
+                    return csv;
+
+                });
+
+
+                var saveFileCSV = (this.saveFileCSV = function(partDraw) {
                     // Once we are done looping, download the .csv by creating a link
-                    let link = document.createElement('a');
-                    let idDownload = 'download-csv-' + (new Date().getTime());
-                    link.id = idDownload
-                    link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-                    link.setAttribute('download', curConfig.realDimensions[0] + `x` + curConfig.realDimensions[1] + `.csv`);
-                    document.body.appendChild(link)
-                    document.querySelector('#' + idDownload).click()
+                    let link = document.createElement("a");
+                    let idDownload = "download-csv-" + new Date().getTime();
+                    link.id = idDownload;
+                    link.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(partDraw));
+                    link.setAttribute("download", curConfig.realDimensions[0] + 'x' + curConfig.realDimensions[1] + '.csv');
+                    document.body.appendChild(link);
+                    document.querySelector("#" + idDownload).click();
+                });
+
+                //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
+                /*var clickAutoSaveChanges = function() {
+
+                    svgCanvas.removeDivsExport();
+
+                    var newOrder = JSON.parse(localStorage.newOrder);
+                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+
+                    if (curConfig.currentRowSelected == currentRowSelected) {
+                        newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+                    }
+
+                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
+
+                    svgCanvas.createDivs(curConfig.edges);
+                    generatePartDraw();
+                };*/
+
+                //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
+                var clickSaveChanges = function() {
+
+                    svgCanvas.removeDivsExport();
+
+                    var newOrder = JSON.parse(localStorage.newOrder);
+                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+
+                    newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
+
+                    svgCanvas.createDivs(curConfig.edges);
+                    generatePartDraw();
                 };
+
+                //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
+                var clickExportPartDraw = function() {
+                    svgCanvas.removeDivsExport();
+                    var newOrder = JSON.parse(localStorage.newOrder);
+                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+                    newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+
+                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
+
+                    //localStorage.setItem("svgPreview", svgCanvas.svgCanvasToString());
+                    svgCanvas.createDivs(curConfig.edges);
+                    saveFileCSV(generatePartDraw());
+                };
+
 
                 // by default, svgCanvas.open() is a no-op.
                 // it is up to an extension mechanism (opera widget, etc)
@@ -3611,7 +4302,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                 var zoomImage = function(multiplier) {
                     var res = svgCanvas.getResolution();
-                    console.log(res);
+                    //console.log(res);
 
                     multiplier = multiplier ? res.zoom * multiplier : 1;
                     //    setResolution(res.w * multiplier, res.h * multiplier, true);
@@ -3677,12 +4368,31 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     $("#rulers").toggle(!!curConfig.showRulers);
                 };
 
-                //cflorioluis - Ver todos los Mecanizados
+                //cflorioluis - Auto Guardar, definicion de la funcion
+                var clickAutoSave = function() {
+                    var autoSave = !$("#tool_autosave").hasClass("push_button_pressed");
+                    if (autoSave) {
+                        $("#tool_autosave").addClass("push_button_pressed");
+                        curConfig.autoSave = setInterval(clickAutoSaveChanges, 300);
+
+                        localStorage.setItem("autoSave", true);
+
+                    } else {
+                        $("#tool_autosave").removeClass("push_button_pressed");
+                        clearInterval(curConfig.autoSave);
+
+                        localStorage.removeItem("autoSave");
+                    }
+                };
+
+                //cflorioluis - Ver todos los Mecanizados, definicion de la funcion
                 var clickViewAllMachining = function() {
                     flash($("#view_menu"));
                     var viewAllMachining = !$("#tool_viewAllMachining").hasClass("push_button_pressed");
-                    var face = "0";
-                    if ($("#Face-control").val() == "1") face = "5";
+                    //var face = "0";
+                    //if ($("#faceSelector").val() == "1") face = "5";
+
+                    var face = $("#faceSelector").val();
 
                     var mecanizados = $("[nameMecanizado]");
 
@@ -3749,11 +4459,13 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         round_digits: 6,
                     };
                     svgCanvas.save(saveOpts);
+                    //console.log("clickSave");
                 };
 
                 var saveSourceEditor = function() {
                     if (!editingsource) return;
 
+                    //console.log("saveSourceEditor");
                     var saveChanges = function() {
                         svgCanvas.clearSelection();
                         hideSourceEditor();
@@ -3946,10 +4658,15 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     if (editingsource) {
                         if (orig_source !== $("#svg_source_textarea").val()) {
-                            $.confirm("Ignore changes made to SVG source?", function(ok) {
+                            $.confirm(
+                                "Ignore changes made to SVG source?",
+                                function(ok) {
                                     if (ok) hideSourceEditor();
                                 },
-                                350, 250, true);
+                                350,
+                                250,
+                                true
+                            );
                         } else {
                             hideSourceEditor();
                         }
@@ -3976,18 +4693,18 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
       if(svgedit.browser.isIE()) {
         (function() {
           resetScrollPos = function() {
-            if(workarea[0].scrollLeft === 0 
+            if(workarea[0].scrollLeft === 0
             && workarea[0].scrollTop === 0) {
               workarea[0].scrollLeft = curScrollPos.left;
               workarea[0].scrollTop = curScrollPos.top;
             }
           }
-        
+
           curScrollPos = {
             left: workarea[0].scrollLeft,
             top: workarea[0].scrollTop
           };
-          
+
           $(window).resize(resetScrollPos);
           methodDraw.ready(function() {
             // TODO: Find better way to detect when to do this to minimize
@@ -3996,7 +4713,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
               resetScrollPos();
             }, 500);
           });
-          
+
           workarea.scroll(function() {
             curScrollPos = {
               left: workarea[0].scrollLeft,
@@ -4259,17 +4976,23 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                 // Test for embedImage support (use timeout to not interfere with page load)
                 setTimeout(function() {
-                    svgCanvas.embedImage("images/placeholder.svg", function(datauri) {
-                        if (!datauri) {
-                            // Disable option
-                            $("#image_save_opts [value=embed]").attr("disabled", "disabled");
-                            $("#image_save_opts input").val(["ref"]);
-                            curPrefs.img_save = "ref";
-                            $("#image_opt_embed")
-                                .css("color", "#666")
-                                .attr("title", "Feature not supported");
+                    svgCanvas.embedImage(
+                        "images/placeholder.svg",
+                        function(datauri) {
+                            if (!datauri) {
+                                // Disable option
+                                $("#image_save_opts [value=embed]").attr(
+                                    "disabled",
+                                    "disabled"
+                                );
+                                $("#image_save_opts input").val(["ref"]);
+                                curPrefs.img_save = "ref";
+                                $("#image_opt_embed")
+                                    .css("color", "#666")
+                                    .attr("title", "Feature not supported");
+                            }
                         }
-                    });
+                    );
                 }, 1000);
 
                 $("#tool_fill").click(function() {
@@ -4292,8 +5015,8 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                 //cflorioluis - quitar funcion para pintar hoja (pieza)
                 /*$("#tool_canvas").on("click touchstart", function() {
-                                                                                                                                            colorPicker($("#canvas_color"));
-                                                                                                                                        });*/
+                                                                                                                                                            colorPicker($("#canvas_color"));
+                                                                                                                                                        });*/
 
                 $("#tool_stroke").on("touchstart", function() {
                     $("#tool_stroke").addClass("active");
@@ -4468,8 +5191,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     changeZoom(this);
                 });
 
-
-
                 //Prevent browser from erroneously repopulating fields
                 $("input,select").attr("autocomplete", "off");
 
@@ -4527,8 +5248,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             key: [modKey + "Shift+8"],
                         },
 
-
-
                         {
                             sel: "#tool_fhpath",
                             fn: clickFHPath,
@@ -4582,6 +5301,13 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             evt: "mouseup",
                             key: [modKey + "N", true],
                         },
+                        //cflorioluis - Eliminar Cantos, definicion del evento
+                        {
+                            sel: "#tool_edges_clear",
+                            fn: clickClearEdges,
+                            evt: "mouseup",
+                            key: [modKey + "N", true],
+                        },
                         {
                             sel: "#tool_save",
                             fn: function() {
@@ -4592,7 +5318,24 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         },
                         { sel: "#tool_export", fn: clickExport, evt: "mouseup" },
                         //cflorioluis - evento al seleccionar exportar a partDraw, definicion del evento
-                        { sel: "#tool_export_part_draw", fn: clickExportPartDraw, evt: "mouseup" },
+                        {
+                            sel: "#tool_export_part_draw",
+                            fn: clickExportPartDraw,
+                            evt: "mouseup",
+                        },
+
+                        //cflorioluis - evento al seleccionar guardar los cambios, definicion del evento
+                        {
+                            sel: "#tool_save_changes",
+                            fn: clickSaveChanges,
+                            evt: "mouseup",
+                        },
+                        //cflorioluis - Auto Guardar, definicion del evento
+                        {
+                            sel: "#tool_autosave",
+                            fn: clickAutoSave,
+                            evt: "click",
+                        },
 
                         { sel: "#tool_open", fn: clickOpen, evt: "mouseup" },
                         { sel: "#tool_import", fn: clickImport, evt: "mouseup" },
@@ -4605,8 +5348,12 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         { sel: "#tool_wireframe", fn: clickWireframe, evt: "click" },
                         { sel: "#tool_snap", fn: clickSnapGrid, evt: "click" },
                         { sel: "#tool_rulers", fn: clickRulers, evt: "click" },
-                        //cflorioluis - Ver todos los Mecanizados
-                        { sel: "#tool_viewAllMachining", fn: clickViewAllMachining, evt: "click" },
+                        //cflorioluis - Ver todos los Mecanizados, definicion del evento
+                        {
+                            sel: "#tool_viewAllMachining",
+                            fn: clickViewAllMachining,
+                            evt: "click",
+                        },
                         {
                             sel: "#tool_source_cancel,#svg_source_overlay,#tool_docprops_cancel,#tool_prefs_cancel",
                             fn: cancelOverlays,
@@ -4927,7 +5674,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                                 // Bind function to shortcut key
                                 if (opts.key) {
-
                                     // Set shortcut based on options
                                     var keyval,
                                         shortcut = "",
@@ -4947,8 +5693,8 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                         if (modifier_key == "ctrl") keyval.replace("ctrl", "cmd");
                                     }
 
-
                                     $.each(keyval.split("/"), function(i, key) {
+                                        //console.log(key);
                                         $(document).bind("keydown", key, function(e) {
                                             fn();
                                             if (pd) {
@@ -4975,7 +5721,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             // Setup flyouts
                             setupFlyouts(flyouts);
 
-                            $(window)
+                            /*$(window)
                                 .bind("keydown", "tab", function(e) {
                                     if (ui_context === "canvas") {
                                         e.preventDefault();
@@ -4987,7 +5733,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                         e.preventDefault();
                                         selectPrev();
                                     }
-                                });
+                                });*/
 
                             $("#tool_zoom").dblclick(dblclickZoom);
                         },
@@ -5040,13 +5786,13 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         pre_tool = container.find("#tool_" + itool),
                         reg_tool = container.find("#" + itool);
                     /*console.log("itool");
-                                                  console.log(itool);
-                                                  console.log("container");
-                                                  console.log(container);
-                                                  console.log("pre_tool");
-                                                  console.log(pre_tool);*/
+                                                                      console.log(itool);
+                                                                      console.log("container");
+                                                                      console.log(container);
+                                                                      console.log("pre_tool");
+                                                                      console.log(pre_tool);*/
                     /*console.log()
-                                                                console.log()*/
+                                                                                    console.log()*/
                     if (pre_tool.length) {
                         tool = pre_tool;
                     } else if (reg_tool.length) {
@@ -5086,19 +5832,19 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     dragAdjust: 0,
                 });
                 /*$("#rect_width").dragInput({
-                    min: 1,
-                    max: null,
-                    step: 1,
-                    callback: changeAttribute,
-                    cursor: false,
-                });
-                $("#rect_height").dragInput({
-                    min: 1,
-                    max: null,
-                    step: 1,
-                    callback: changeAttribute,
-                    cursor: false,
-                });*/
+                                    min: 1,
+                                    max: null,
+                                    step: 1,
+                                    callback: changeAttribute,
+                                    cursor: false,
+                                });
+                                $("#rect_height").dragInput({
+                                    min: 1,
+                                    max: null,
+                                    step: 1,
+                                    callback: changeAttribute,
+                                    cursor: false,
+                                });*/
                 $("#ellipse_cx").dragInput({
                     min: 1,
                     max: null,
@@ -5376,7 +6122,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     cursor: true,
                 });
 
-
                 $("#g_x").dragInput({
                     min: null,
                     max: null,
@@ -5530,7 +6275,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                 canv_menu.enableContextMenuItems("#delete,#cut,#copy");
 
                 window.onbeforeunload = function() {
-                    // Suppress warning if page is empty
+                    /*// Suppress warning if page is empty
                     if (undoMgr.getUndoStackSize() === 0) {
                         Editor.show_save_warning = false;
                     }
@@ -5539,7 +6284,13 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     if (!curConfig.no_save_warning && Editor.show_save_warning) {
                         // Browser already asks question about closing the page
                         return "There are unsaved changes.";
-                    }
+                    }*/
+
+                    /*alert('Please press the Logout button to logout.');
+
+                    $.alert("Error: Unable to load SVG data", function() {
+                        callback(false);
+                    });*/
                 };
 
                 Editor.openPrep = function(func) {
@@ -5549,7 +6300,10 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     } else {
                         $.confirm(
                             "Do you want to open a new file?\nThis will also erase your undo history",
-                            func, 350, 250, true
+                            func,
+                            350,
+                            250,
+                            true
                         );
                     }
                 };
@@ -5674,7 +6428,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     $("#tool_import").show().prepend(img_import);
                 }
 
-                var updateCanvas = Editor.updateCanvas = function(center, new_ctr) {
+                var updateCanvas = (Editor.updateCanvas = function(center, new_ctr) {
                     var w = workarea.width(),
                         h = workarea.height();
                     var w_orig = w,
@@ -5685,7 +6439,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                     var old_ctr = {
                         x: w_area[0].scrollLeft + w_orig / 2,
-                        y: w_area[0].scrollTop + h_orig / 2
+                        y: w_area[0].scrollTop + h_orig / 2,
                     };
 
                     var multi = curConfig.canvas_expansion;
@@ -5693,9 +6447,9 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     h = Math.max(h_orig, svgCanvas.contentH * zoom * multi);
 
                     if (w == w_orig && h == h_orig) {
-                        workarea.css('overflow', 'hidden');
+                        workarea.css("overflow", "hidden");
                     } else {
-                        workarea.css('overflow', 'scroll');
+                        workarea.css("overflow", "scroll");
                     }
 
                     var old_can_y = cnvs.height() / 2;
@@ -5711,7 +6465,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     var scroll_y = h / 2 - h_orig / 2;
 
                     if (!new_ctr) {
-
                         var old_dist_x = old_ctr.x - old_can_x;
                         var new_x = new_can_x + old_dist_x * ratio;
 
@@ -5720,12 +6473,10 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                         new_ctr = {
                             x: new_x,
-                            y: new_y
+                            y: new_y,
                         };
-
                     } else {
-                        new_ctr.x += offset.x,
-                            new_ctr.y += offset.y;
+                        (new_ctr.x += offset.x), (new_ctr.y += offset.y);
                     }
 
                     //width.val(offset.x)
@@ -5747,20 +6498,27 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         w_area[0].scrollTop = new_ctr.y - h_orig / 2;
                     }
                     if (curConfig.showRulers) {
-                        updateRulers(cnvs, zoom);
+                        /*console.log("ruler");
+                        console.log(zoom);
+                        console.log(cnvs);*/
+
+                        //console.log(svgCanvas.getCuadrant());
+
+                        updateRulers(svgCanvas.getCuadrant(), cnvs, zoom);
+                        //svgCanvas.updateRulersCuadrant(curConfig.cuadrant, cnvs, zoom)
                         workarea.scroll();
                     }
-                }
+                });
 
                 // Make [1,2,5] array
                 var r_intervals = [];
-                for (var i = .1; i < 1E5; i *= 10) {
+                for (var i = 0.1; i < 1e5; i *= 10) {
                     r_intervals.push(1 * i);
                     r_intervals.push(2 * i);
                     r_intervals.push(5 * i);
                 }
 
-                function updateRulers(scanvas, zoom) {
+                function updateRulers(cuadrant, scanvas, zoom) {
                     var workarea = document.getElementById("workarea");
                     var title_show = document.getElementById("title_show");
                     var offset_x = 66;
@@ -5783,9 +6541,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                         //console.log(c_elem);
 
-
                         var $hcanv_orig = $("#ruler_" + dim + " canvas:first");
-
 
                         // Bit of a hack to fully clear the canvas in Safari & IE9
                         $hcanv = $hcanv_orig.clone();
@@ -5837,7 +6593,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                         var raw_m = 50 / u_multi;
                         var multi = 1;
 
-
                         //console.log(total_len);
                         for (var i = 0; i < r_intervals.length; i++) {
                             var num = r_intervals[i];
@@ -5856,7 +6611,7 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
 
                         var ruler_d = ((content_d / u_multi) % multi) * u_multi;
 
-                        var label_pos = (ruler_d - big_int);
+                        var label_pos = ruler_d - big_int;
 
                         for (; ruler_d < total_len; ruler_d += big_int) {
                             label_pos += big_int;
@@ -5871,15 +6626,55 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                 ctx.lineTo(0, cur_d);
                             }
 
-                            var num = ((label_pos - content_d) / u_multi);
+                            var num = (label_pos - content_d) / u_multi;
                             var label;
-                            if (multi >= 1) { //cflorioluis ajustar regla para que diga 0,0 abajo a la izquierda
-                                if (dim == "y") {
-                                    label = -1 * (Math.round(num) - curConfig.dimensions[1] + 100);
-                                } else {
-                                    label = Math.round(num) - 100;
+                            if (multi >= 1) {
+                                //cflorioluis ajustar regla para que diga 0,0 abajo a la izquierda
+                                var cuad = null
+                                    //cflorioluis - Cambiar la Regla dependiendo del cuadrante
+                                if (cuadrant) {
+                                    cuad = cuadrant;
+                                    curConfig.cuadrant = cuadrant;
+                                    //console.log("cuadrante actualizado");
                                 }
 
+                                $('#svg__cuadrant_1').attr('fill', '#3F3F3F');
+                                $('#svg__cuadrant_2').attr('fill', '#3F3F3F');
+                                $('#svg__cuadrant_3').attr('fill', '#3F3F3F');
+                                $('#svg__cuadrant_4').attr('fill', '#3F3F3F');
+
+                                console.log(svgCanvas.getSelectedElems()[0]);
+
+                                switch (cuad) {
+                                    case 1: //Abajo a la Izquierda
+                                        if (dim == "y") {
+                                            label = -1 * (Math.round(num) - curConfig.dimensions[1] + 100);
+                                        } else {
+                                            label = Math.round(num) - 100;
+                                        }
+                                        $('#svg__cuadrant_1').attr('fill', '#0F0');
+                                        break;
+                                    case 2: //Abajo a la Derecha
+                                        if (dim == "y") {
+                                            label = -1 * (Math.round(num) - curConfig.dimensions[1] + 100);
+                                        } else {
+                                            label = -1 * (Math.round(num) - curConfig.dimensions[0] + 100);
+                                        }
+                                        $('#svg__cuadrant_2').attr('fill', '#0F0');
+                                        break;
+                                    case 3: //Arriba a la Derecha
+                                        if (dim == "y") {
+                                            label = Math.round(num) - 100;
+                                        } else {
+                                            label = -1 * (Math.round(num) - curConfig.dimensions[0] + 100);
+                                        }
+                                        $('#svg__cuadrant_3').attr('fill', '#0F0');
+                                        break;
+                                    case 4: //Arriba a la Izquierda
+                                        label = Math.round(num) - 100;
+                                        $('#svg__cuadrant_4').attr('fill', '#0F0');
+                                        break;
+                                }
                             } else {
                                 var decs = (multi + "").split(".")[1].length;
                                 label = num.toFixed(decs) - 0;
@@ -5936,7 +6731,6 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     }
                 }
 
-
                 //      $(function() {
                 updateCanvas(true);
                 //      });
@@ -5985,18 +6779,18 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     window.addEventListener(
                         "message",
                         function(e) {
-                            var cbid = parseInt(e.data.substr(0, e.data.indexOf(";")));
-                            try {
-                                e.source.postMessage(
-                                    "SVGe" + cbid + ";" + json_encode(eval(e.data)),
-                                    "*"
-                                );
-                            } catch (err) {
-                                e.source.postMessage(
-                                    "SVGe" + cbid + ";error:" + err.message,
-                                    "*"
-                                );
-                            }
+                            /*var cbid = parseInt(e.data.substr(0, e.data.indexOf(";"))); //cflorioluis - comentario de emergencia
+                                                        try {
+                                                            e.source.postMessage(
+                                                                "SVGe" + cbid + ";" + json_encode(eval(e.data)),
+                                                                "*"
+                                                            );
+                                                        } catch (err) {
+                                                            e.source.postMessage(
+                                                                "SVGe" + cbid + ";error:" + err.message,
+                                                                "*"
+                                                            );
+                                                        }*/
                         },
                         false
                     );
@@ -6009,36 +6803,53 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                     window.svgCanvas = svgCanvas;
                     svgCanvas.ready = methodDraw.ready;
 
+                    $("#svgcontent").change(function() {
+                        alert("Handler for .change() called.");
+                    });
+
                     $("#color_tools").remove(); //cflorioluis - quitar seleccionador de color
 
-                    svgCanvas.createDivs(curConfig.cantos); //crear divisiones originales para ver los cantos
+                    svgCanvas.createDivs(curConfig.edges); //crear divisiones originales para ver los cantos
 
-                    $('#Face-control').on('change', function() {
-                        var flip = 0;
-                        if ($(this).val() == "5")
-                            flip = 1;
+                    //cflorioluis - si hay informacion en la columa partDraw hacer dibujo de las piezas ya existentes
+                    if (curConfig.row[13]) {
 
-                        var rotation = (flip * 180) + 180;
+                        var svgContent = $("#svgcontent").children()[1] //ubicarse donde hay que insertar los elementos
+                        var svgPreview = curConfig.row[14];
+                        var parser = new DOMParser();
+                        var xmlSvg = parser.parseFromString(svgPreview, "text/xml");
+                        var machinnings = xmlSvg.getElementsByTagName("g");
 
+                        var svgContent = $('#svgcontent').children()[1] //ubicarse donde hay que insertar los elementos
 
-                        //$("text").css("transform", "rotateX(" + rotation + "deg)");
+                        for (let ii = 1; ii < machinnings[2].childNodes.length; ii += 2) {
+                            const element = machinnings[2].childNodes[ii];
+                            if (element.hasAttribute("nameMecanizado"))
+                                svgContent.appendChild(element.cloneNode(true))
+                        }
+                    }
 
+                    //cflorioluis - hacer animacion de cambio de cara
+                    $("#faceSelector").on("change", function() {
+
+                        svgCanvas.updateRulersCuadrant(curConfig.cuadrant, $('#faceSelector').val())
+                        var rotation = 0;
+                        if ($(this).val() == "5") rotation = 180;
 
                         $("#svgroot").css("transform", "rotateX(" + rotation + "deg)");
                         $("#svgroot").css("transition", "0.6s");
                         $("#svgroot").css("transform-style", "preserve-3d");
                         $("#svgroot").css("position", "relative");
 
-
                         //console.log();
                         //bloquear cajeado para que no se haga por la cara tracera
                         var regExp = /\(([^)]+)\)/; //get command short for cajeado
+                        var command = regExp.exec($("#tool_cajeadoTool")[0].title);
 
-                        var command = regExp.exec($('#tool_cajeadoTool')[0].title);
-                        if (rotation == 360) { //en cara tracera
+                        var mecanizados = $("[nameMecanizado]");
 
-                            var mecanizados = $("[nameMecanizado]");
-
+                        if (rotation == 180) {
+                            //en cara tracera
                             for (let ii = 0; ii < mecanizados.length; ii++) {
                                 var mecanizado = mecanizados[ii];
                                 if (mecanizado.getAttribute("cross") == "0") {
@@ -6053,7 +6864,8 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                                     }
                                 }
                             }
-                        } else { //en cara delantera
+                        } else {
+                            //en cara delantera
                             var mecanizados = $("[nameMecanizado]");
 
                             for (let ii = 0; ii < mecanizados.length; ii++) {
@@ -6071,23 +6883,21 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                             }
                         }
                         /*fill: "#3F3F3F",
-                                                "stroke-width": "0",
+                                                                        "stroke-width": "0",
 
-                                                fill="transparent"  stroke-width="1" */
-
+                                                                        fill="transparent"  stroke-width="1" */
 
                         //$('#tool_cajeadoTool').off('keydown');
 
                         /*$(document).bind("keydown", key, function(e) {
-                            fn();
-                            if (pd) {
-                                e.preventDefault();
-                            }
-                            // Prevent default on ALL keys?
-                            return false;
-                        });*/
+                                                    fn();
+                                                    if (pd) {
+                                                        e.preventDefault();
+                                                    }
+                                                    // Prevent default on ALL keys?
+                                                    return false;
+                                                });*/
                     });
-
                 });
 
                 Editor.setLang = function(lang, allStrings) {
@@ -6199,18 +7009,9 @@ U767ST9.10;;1500;700;1;;;;;;"a;a";020720;;`;
                 });
             };
 
-
-
-
             return Editor;
         })(jQuery);
 
-
-
     // Run init once DOM is loaded
     $(methodDraw.init);
-
-
-
-
 })();

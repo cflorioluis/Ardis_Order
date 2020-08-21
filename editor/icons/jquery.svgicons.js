@@ -12,10 +12,10 @@ How to use:
 
 1. Create the SVG master file that includes all icons:
 
-The master SVG icon-containing file is an SVG file that contains 
+The master SVG icon-containing file is an SVG file that contains
 <g> elements. Each <g> element should contain the markup of an SVG
-icon. The <g> element has an ID that should 
-correspond with the ID of the HTML element used on the page that should contain 
+icon. The <g> element has an ID that should
+correspond with the ID of the HTML element used on the page that should contain
 or optionally be replaced by the icon. Additionally, one empty element should be
 added at the end with id "svg_eof".
 
@@ -37,10 +37,10 @@ All options are optional and can include:
 
 - 'fallback (object literal)': List of raster images with each
   key being the SVG icon ID to replace, and the value the image file name.
-  
+
 - 'fallback_path (string)': The path to use for all images
   listed under "fallback"
-  
+
 - 'replace (boolean)': If set to true, HTML elements will be replaced by,
   rather than include the SVG icon.
 
@@ -49,14 +49,14 @@ All options are optional and can include:
 
 - 'resize (object literal)': List with selectors for keys and numbers
   as values. This allows an easy way to resize specific icons.
-  
-- 'callback (function)': A function to call when all icons have been loaded. 
-  Includes an object literal as its argument with as keys all icon IDs and the 
+
+- 'callback (function)': A function to call when all icons have been loaded.
+  Includes an object literal as its argument with as keys all icon IDs and the
   icon as a jQuery object as its value.
 
 - 'id_match (boolean)': Automatically attempt to match SVG icon ids with
   corresponding HTML id (default: true)
-  
+
 - 'no_img (boolean)': Prevent attempting to convert the icon into an <img>
   element (may be faster, help for browser consistency)
 
@@ -68,7 +68,7 @@ All options are optional and can include:
   $.getSvgIcon(id (string));
 
 This will return the icon (as jQuery object) with a given ID.
-  
+
 6. To resize icons at a later point without using the callback, use this:
   $.resizeSvgIcons(resizeOptions) (use the same way as the "resize" parameter)
 
@@ -77,8 +77,8 @@ Example usage #1:
 
 $(function() {
   $.svgIcons('my_icon_set.svg'); // The SVG file that contains all icons
-  // No options have been set, so all icons will automatically be inserted 
-  // into HTML elements that match the same IDs. 
+  // No options have been set, so all icons will automatically be inserted
+  // into HTML elements that match the same IDs.
 });
 
 Example usage #2:
@@ -114,19 +114,17 @@ $(function() {
     resize: function() {
       '#save_icon .svg_icon': 64  // The "save" icon will be resized to 64 x 64px
     },
-    
-    callback: function(icons) { // Sets background color for "close" icon 
+
+    callback: function(icons) { // Sets background color for "close" icon
       icons['close'].css('background','red');
     },
-    
+
     svgz: true // Indicates that an SVGZ file is being used
-    
+
   })
 });
 
 */
-
-
 (function($) {
     var svg_icons = {},
         fixIDs;
@@ -196,7 +194,7 @@ $(function() {
             if (evt !== 'ajax') {
                 if (data_loaded) return;
                 // Webkit sometimes says svgdoc is undefined, other times
-                // it fails to load all nodes. Thus we must make sure the "eof" 
+                // it fails to load all nodes. Thus we must make sure the "eof"
                 // element is loaded.
                 svgdoc = data_el[0].contentDocument; // Needed again for Webkit
                 var isReady = (svgdoc && svgdoc.getElementById('svg_eof'));
@@ -292,8 +290,10 @@ $(function() {
                     var id = elem.id;
                     if (id === 'svg_eof') break;
                     holder = $('#' + id);
-                    console.log(svg);
+
                     var svg = elem.getElementsByTagNameNS(svgns, 'svg')[0];
+
+                    if (svg == null) continue;
                     var svgroot = document.createElementNS(svgns, "svg");
                     svgroot.setAttributeNS(svgns, 'viewBox', [0, 0, icon_w, icon_h].join(' '));
                     // Make flexible by converting width/height to viewBox
