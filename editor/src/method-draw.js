@@ -29,6 +29,7 @@
 
 
 
+
     //import * as mathjs from "../lib/math/math.min.js";
 
     /*import { create, all } from 'mathjs'
@@ -545,16 +546,7 @@
                         btn_holder = $("#dialog_buttons");
 
                     //cflorioluis - editando dialogo para validaciones de los mecanizados
-                    var dbox = function(
-                        type,
-                        msg,
-                        callback,
-                        width,
-                        height,
-                        custom,
-                        mecanizadoType,
-                        defText
-                    ) {
+                    var dbox = function(type, msg, callback, width, height, custom, mecanizadoType, defText) {
                         //cflorioluis - custom dialog
                         if (custom !== undefined) {
                             btn_holder = $("#dialog_buttons_custom");
@@ -592,6 +584,8 @@
                                 left: "",
                                 right: "2%",
                                 position: "absolute",
+                                /*opacity: "0.75",*/
+
                                 /*"margin-left": (width / 2) * -1 + "px !important",*/
                                 /*"margin-top:": (height / 2) * -1 + "px !important",*/
                             });
@@ -631,7 +625,6 @@
                                             x: event.clientX,
                                             y: event.clientY,
                                         };
-
                                         div.style.left = mousePosition.x + offset[0] + 150 + "px";
                                         div.style.top = mousePosition.y + offset[1] + 80 + "px";
                                     }
@@ -664,6 +657,7 @@
                         switch (mecanizadoType) {
                             case "cajeado":
                                 var rectRoundInputs = 0;
+                                var errorInput = false;
                                 $("#dialog_buttons_custom").children().first().click(function(event) {
                                     rectRoundInputs = $(
                                         'input[machiningOption="cajeado"]:checked'
@@ -687,6 +681,11 @@
                                         $('#dialog_content_custom').height("-=15");
                                     }
 
+                                    if (errorInput) {
+                                        $('#dialog_container_custom').width("-=60");
+                                        $('#dialog_content_custom').width("-=60");
+                                    }
+
                                     $('input[mecanizadoInput="cajeado"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).val() != "") {
@@ -706,9 +705,11 @@
                                             } catch (error) {
                                                 //console.log(error.split('/n')[0]);
                                                 $(this).addClass("input-error");
+                                                errorInput = true;
 
                                                 if ($(this).hasClass("inputErrorWCajeado"))
                                                     $('#inputErrorWCajeado').show();
+
 
                                                 if ($(this).hasClass("inputErrorHCajeado"))
                                                     $('#inputErrorHCajeado').show();
@@ -720,13 +721,14 @@
                                                 $('#dialog_container_custom').height("+=15");
                                                 $('#dialog_content_custom').height("+=15");
                                             }
-
-
-
                                         } else {
                                             $(this).addClass("input-error");
                                         }
                                     });
+                                    if (errorInput) {
+                                        $('#dialog_container_custom').width("+=60");
+                                        $('#dialog_content_custom').width("+=60");
+                                    }
 
                                     if (rectRoundInputs == 4) {
                                         box.hide();
@@ -739,6 +741,7 @@
                                 var drillInputs = 0;
                                 var inputs = 0;
                                 var error = 0;
+
                                 $("#dialog_buttons_custom").children().first().click(function(event) {
                                     drillInputs = $('input[machiningOption="drill"]:checked').length;
                                     //console.log(drillInputs);
@@ -853,14 +856,10 @@
                                 break;
                             case "hinge":
                                 $("#dialog_buttons_custom").children().first().click(function(event) {
-                                    var hingeInputs = 0,
+                                    /**var hingeInputs = 0,
                                         existsHinge = $("[nameMecanizado=hinge]").length;
 
                                     $("#dialog_buttons_custom").removeClass("input-error");
-
-                                    //$("#errorExistsHinde").remove();
-
-
 
                                     $('input[mecanizadoInput="hinge"]').each(function() {
                                         $(this).removeClass("input-error");
@@ -875,16 +874,11 @@
                                         }
                                     });
 
-                                    /*if (existsHinge) {
-                                                                            $("#dialog_buttons_custom").addClass('input-error');
-                                                                            $("#dialog_buttons_custom").children().last().before('<h6 id="errorExistsHinde" style="font-size: large; text-align: center; margin: 20px;">Elimine Existente</h6>');
-                                                                        }*/
-
-                                    if (hingeInputs == 7 /*&& !existsHinge*/ ) {
-                                        box.hide();
-                                        var resp = type == "prompt" ? input.val() : true;
-                                        if (callback) callback(resp);
-                                    }
+                                    if (hingeInputs == 7 ) {*/
+                                    box.hide();
+                                    var resp = type == "prompt" ? input.val() : true;
+                                    if (callback) callback(resp);
+                                    //}
                                 });
                                 break;
                             case "poly":
@@ -1193,14 +1187,7 @@
                     $.alert = function(msg, cb) {
                         dbox("alert", msg, cb);
                     };
-                    $.confirm = function(
-                        msg,
-                        cb,
-                        width,
-                        height,
-                        custom,
-                        mecanizadoType
-                    ) {
+                    $.confirm = function(msg, cb, width, height, custom, mecanizadoType) {
                         dbox("confirm", msg, cb, width, height, custom, mecanizadoType);
                     };
                     $.process_cancel = function(msg, cb) {
@@ -2800,89 +2787,31 @@
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
                         cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant");
 
-
-
-
                     svgCanvas.getSelectedElems()[0].setAttribute("r", diameter / 2);
 
 
-                    switch (face) {
-                        case "0":
-                            svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
-                            svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
-                            switch (cuadrant) {
-                                case "1":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
-                                    break;
-                                case "2":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
-                                    break;
-                                case "3":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
-                                    break;
-                                case "4":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
-                                    break;
-                            }
-                            break;
+                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
+                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
 
-                        case "5":
+                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                        case 1:
+                            svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                            break;
+                        case 2:
+                            svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                            svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
+                            break;
+                        case 3:
+                            svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
+                            break;
+                        case 4:
                             svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
                             svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
-                            switch (cuadrant) {
-                                case "4":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
-                                    break;
-                                case "3":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
-                                    break;
-                                case "2":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", curConfig.realDimensions[0] - realX + 100);
-                                    break;
-                                case "1":
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
-                                    svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
-                                    break;
-                            }
                             break;
                     }
-
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                     //var r = parseInt(svgCanvas.getSelectedElems()[0].getAttribute("r"));
-
-
-                    switch (face) {
-                        case "0":
-                            /*if (realX < 0) {
-                                $("#drill_realX").val(r);
-                            }
-                            if (realX > curConfig.realDimensions[0]) {
-                                $("#drill_realX").val(curConfig.realDimensions[0]);
-                            }
-                            //hacer que no se exceda verticalmente
-                            if (realY < 0) {
-                                $("#drill_realY").val(r);
-                            }
-                            if (realY > curConfig.realDimensions[1]) {
-                                $("#drill_realY").val(curConfig.realDimensions[1]);
-                            }*/
-                            break;
-                        case "1":
-                            break;
-                        case "2":
-                            break;
-                        case "3":
-                            break;
-                        case "4":
-                            break;
-
-                        default:
-                            break;
-                    }
                 };
 
                 changeAttributeRect = function(el, completed) {
@@ -2908,11 +2837,13 @@
                         posX, posY;
 
                     if (realX + width > curConfig.partW) {
-                        $("#rect_width").val(curConfig.partW - realX);
-                        svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
+                        //$("#rect_width").val(curConfig.partW - realX);
+                        //svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
+                        return
                     } else if (realY + height > curConfig.partL) {
-                        $("#rect_height").val(curConfig.partL - realY);
-                        svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
+                        //$("#rect_height").val(curConfig.partL - realY);
+                        //svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
+                        return
                     }
 
                     svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
@@ -2921,8 +2852,9 @@
                     posX = curConfig.realDimensions[0] - realX - width + 100;
                     posY = curConfig.realDimensions[1] - realY - height + 100;
 
-                    switch (cuadrant) {
-                        case "1":
+
+                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                        case 1:
                             if (isCenter) {
                                 cX -= (width / 2);
                                 posY += (height / 2);
@@ -2930,7 +2862,7 @@
                             }
                             svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
                             break;
-                        case "2":
+                        case 2:
 
                             if (isCenter) {
                                 posX += (width / 2);
@@ -2939,7 +2871,7 @@
                             svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
                             svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
                             break;
-                        case "3":
+                        case 3:
                             if (isCenter) {
                                 posX += (width / 2);
                                 cY -= (height / 2);
@@ -2947,7 +2879,7 @@
                             }
                             svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
                             break;
-                        case "4":
+                        case 4:
                             if (isCenter) {
                                 cX -= (width / 2);
                                 cY -= (height / 2);
@@ -2956,9 +2888,6 @@
                             }
                             break;
                     }
-
-                    //console.log(realX + width);
-
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
 
@@ -2987,11 +2916,13 @@
                         cY = realY + 100;
 
                     if (realX + width > curConfig.partW) {
-                        $("#rectRound_width").val(curConfig.partW - realX);
-                        svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);
+                        /*$("#rectRound_width").val(curConfig.partW - realX);
+                        svgCanvas.getSelectedElems()[0].setAttribute("width", curConfig.partW - realX);*/
+                        return
                     } else if (realY + height > curConfig.partL) {
-                        $("#rectRound_height").val(curConfig.partL - realY);
-                        svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);
+                        /*$("#rectRound_height").val(curConfig.partL - realY);
+                        svgCanvas.getSelectedElems()[0].setAttribute("height", curConfig.partL - realY);*/
+                        return
                     }
 
                     if (rx > width / 2)
@@ -3001,8 +2932,9 @@
                     posX = curConfig.realDimensions[0] - realX - width + 100;
                     posY = curConfig.realDimensions[1] - realY - height + 100;
 
-                    switch (cuadrant) {
-                        case "1":
+
+                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                        case 1:
                             if (isCenter) {
                                 cX -= (width / 2);
                                 posY += (height / 2);
@@ -3010,7 +2942,7 @@
                             }
                             svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
                             break;
-                        case "2":
+                        case 2:
 
                             if (isCenter) {
                                 posX += (width / 2);
@@ -3019,7 +2951,7 @@
                             svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
                             svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
                             break;
-                        case "3":
+                        case 3:
                             if (isCenter) {
                                 posX += (width / 2);
                                 cY -= (height / 2);
@@ -3027,7 +2959,7 @@
                             }
                             svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
                             break;
-                        case "4":
+                        case 4:
                             if (isCenter) {
                                 cX -= (width / 2);
                                 cY -= (height / 2);
@@ -3036,6 +2968,52 @@
                             }
                             break;
                     }
+
+                    /*switch (face) {
+                        case "0":
+                            switch (cuadrant) {
+
+                            }
+                            break;
+
+                        case "5":
+                            switch (cuadrant) {
+                                case "4":
+                                    if (isCenter) {
+                                        cX -= (width / 2);
+                                        posY += (height / 2);
+                                        svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                                    }
+                                    svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                                    break;
+                                case "3":
+
+                                    if (isCenter) {
+                                        posX += (width / 2);
+                                        posY += (height / 2);
+                                    }
+                                    svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                                    svgCanvas.getSelectedElems()[0].setAttribute("y", posY);
+                                    break;
+                                case "2":
+                                    if (isCenter) {
+                                        posX += (width / 2);
+                                        cY -= (height / 2);
+                                        svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                                    }
+                                    svgCanvas.getSelectedElems()[0].setAttribute("x", posX);
+                                    break;
+                                case "1":
+                                    if (isCenter) {
+                                        cX -= (width / 2);
+                                        cY -= (height / 2);
+                                        svgCanvas.getSelectedElems()[0].setAttribute("x", cX);
+                                        svgCanvas.getSelectedElems()[0].setAttribute("y", cY);
+                                    }
+                                    break;
+                            }
+                            break;
+                    }*/
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
@@ -3168,6 +3146,7 @@
                 // - hides any flyouts
                 // - adds the tool_button_current class to the button passed in
                 var toolButtonClick = function(button, noHiding) {
+
                     if ($(button).hasClass("disabled")) return false;
                     if ($(button).parent().hasClass("tools_flyout")) return true;
                     var fadeFlyouts = fadeFlyouts || "normal";
@@ -3472,7 +3451,7 @@
                     this.addEventListener("mouseup", function() {
                         var letter = this.id.replace("tool_pos", "").charAt(0);
                         svgCanvas.alignSelectedElements(letter, "page");
-                    });
+                    }, { passive: true });
                 });
 
                 /*
@@ -3527,12 +3506,16 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickCajeadoTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickCajeadoTool)
                 };
 
                 var clickCremalleraTool = function() {
                     if (toolButtonClick("#tool_cremalleraTool")) {
                         svgCanvas.setMode("cremalleraToolCanvas");
                     }
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickCremalleraTool)
                 };
 
                 var clickDrillTool = function() {
@@ -3541,6 +3524,8 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickDrillTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickDrillTool)
                 };
 
                 var clickHingeTool = function() {
@@ -3549,6 +3534,8 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickHingeTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickHingeTool)
                 };
 
                 var clickPolyTool = function() {
@@ -3557,6 +3544,8 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickPolyTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickPolyTool)
                 };
 
                 var clickRectTool = function() {
@@ -3565,6 +3554,8 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickRectTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickRectTool)
 
                     $('#tool_rectTools').removeClass("tool_rectRoundTools");
                     $('#tool_rectTools').removeClass("tool_rectTools");
@@ -3577,6 +3568,8 @@
                     }
                     svgCanvas.clearSelection();
                     svgCanvas.clickRectRoundTool(null);
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                    repeatFn(clickRectRoundTool)
 
                     $('#tool_rectTools').removeClass("tool_rectRoundTools");
                     $('#tool_rectTools').removeClass("tool_rectTools");
@@ -3835,38 +3828,105 @@
                             case "cajeado":
                                 return;
                             case "drill":
-                                var posX =
-                                    Math.floor(selectedElement.getAttribute("cx")) - 100 + dx,
-                                    posY =
-                                    Math.floor(selectedElement.getAttribute("cy")) - 100 - dy;
+                                var posX = parseInt(selectedElement.getAttribute("cx")) - 100,
+                                    posY = parseInt(selectedElement.getAttribute("cy")) - 100,
+                                    face = parseInt(selectedElement.getAttribute("face")),
+                                    cuadrant = parseInt(selectedElement.getAttribute("cuadrant")),
+                                    DY = dy;
 
-                                if (posX < 0 || posX > curConfig.realDimensions[0]) return;
+                                if ($('#faceSelector').val() == "5")
+                                    DY = -dy
 
-                                if (posY < 0 || posY > curConfig.realDimensions[1]) return;
+                                posX += dx
+                                posY += DY
 
-                                selectedElement.setAttribute("realX", posX);
-                                selectedElement.setAttribute("realY", posY);
+                                if (posX < 0 || posY < 0 || posX > curConfig.realDimensions[0] || posY > curConfig.realDimensions[1]) return;
+
+                                switch (Math.abs(parseInt(face) - cuadrant)) {
+                                    case 1:
+                                        selectedElement.setAttribute("realX", posX);
+                                        selectedElement.setAttribute("realY", curConfig.realDimensions[1] - posY);
+                                        break;
+                                    case 2:
+                                        selectedElement.setAttribute("realX", curConfig.realDimensions[0] - posX);
+                                        selectedElement.setAttribute("realY", curConfig.realDimensions[1] - posY);
+                                        break;
+                                    case 3:
+                                        selectedElement.setAttribute("realX", curConfig.realDimensions[0] - posX);
+                                        selectedElement.setAttribute("realY", posY);
+                                        break;
+                                    case 4:
+                                        selectedElement.setAttribute("realX", posX);
+                                        selectedElement.setAttribute("realY", posY);
+                                        break;
+                                }
+
+                                svgCanvas.moveSelectedElements(dx, DY); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
                                 break;
                             case "rect":
                             case "rectRound":
-                                var posX =
-                                    Math.floor(selectedElement.getAttribute("x")) - 100 + dx,
-                                    posY =
-                                    Math.floor(selectedElement.getAttribute("y")) - 100 - dy,
-                                    width = parseInt(selectedElement.getAttribute("width")),
-                                    height = parseInt(selectedElement.getAttribute("height"));
+                                var posX = parseInt(selectedElement.getAttribute("x")) - 100,
+                                    posY = parseInt(selectedElement.getAttribute("y")) - 100,
+                                    face = parseInt(selectedElement.getAttribute("face")),
+                                    cuadrant = parseInt(selectedElement.getAttribute("cuadrant")),
+                                    isCenter = selectedElement.getAttribute("lw") == "2" ? true : false,
+                                    DY = dy;
 
-                                if (posX < 0 || posX + width > curConfig.realDimensions[0])
-                                    return;
+                                var width = parseInt(selectedElement.getAttribute("width")),
+                                    height = parseInt(selectedElement.getAttribute("height")),
+                                    cX = curConfig.realDimensions[0] - posX - width,
+                                    cY = curConfig.realDimensions[1] - posY - height;
 
-                                if (posY < 0 || posY + height > curConfig.realDimensions[1])
-                                    return;
 
-                                selectedElement.setAttribute("realX", posX);
-                                selectedElement.setAttribute("realY", posY);
+                                if ($('#faceSelector').val() == "5")
+                                    DY = -dy
+
+                                posX += dx
+                                posY += DY
+                                cX -= dx
+                                cY -= DY
+
+                                if ((posX < 0 || posY < 0 || posX > curConfig.realDimensions[0] || posY > curConfig.realDimensions[1])) return;
+                                if ((cX < 0 || cY < 0 || cX > curConfig.realDimensions[0] || cY > curConfig.realDimensions[1])) return;
+
+                                switch (Math.abs(parseInt(face) - cuadrant)) {
+                                    case 1:
+                                        if (isCenter) {
+                                            posX += (width / 2);
+                                            cY += (height / 2);
+                                        }
+                                        selectedElement.setAttribute("realX", posX);
+                                        selectedElement.setAttribute("realY", cY);
+                                        break;
+                                    case 2:
+                                        if (isCenter) {
+                                            cX += (width / 2);
+                                            cY += (height / 2);
+                                        }
+                                        selectedElement.setAttribute("realX", cX);
+                                        selectedElement.setAttribute("realY", cY);
+                                        break;
+                                    case 3:
+                                        if (isCenter) {
+                                            cX += (width / 2);
+                                            posY += (height / 2);
+                                        }
+                                        selectedElement.setAttribute("realX", cX);
+                                        selectedElement.setAttribute("realY", posY);
+                                        break;
+                                    case 4:
+                                        if (isCenter) {
+                                            posX += (width / 2);
+                                            posY += (height / 2);
+                                        }
+                                        selectedElement.setAttribute("realX", posX);
+                                        selectedElement.setAttribute("realY", posY);
+                                        break;
+                                }
+                                svgCanvas.moveSelectedElements(dx, DY);
                                 break;
                         }
-                        svgCanvas.moveSelectedElements(dx, -dy); //-dy ya que la cordenada inicial 0,0 se cambio a abajo a la izquierda
+
                     }
                 };
 
@@ -4047,6 +4107,7 @@
                         var paramElement = doc.createElement("PARAM");
                         var opsideElement = doc.createElement("OPSIDE");
                         var sideElement = doc.createElement("SIDE");
+                        var lwElement = doc.createElement("LW");
 
                         drawElement.appendChild(functNameElement);
                         drawElement.appendChild(paramElement);
@@ -4126,14 +4187,18 @@
                                 var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '"';
                                 paramElement.append(param);
                                 opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                /*sideElement.append("0");*/
+                                drawElement.appendChild(lwElement);
+                                lwElement.append(mecanizado.getAttribute('lw'));
+                                sideElement.append(mecanizado.getAttribute('face'));
                                 break;
                             case "rectRound":
                                 functNameElement.append("_RectanguloRedondeado");
                                 var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '":"RadiusX" VAR "' + mecanizado.getAttribute("rx") + '":"RadiusY" VAR "' + mecanizado.getAttribute("ry") + '"';
                                 paramElement.append(param);
                                 opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                /*sideElement.append("0");*/
+                                drawElement.appendChild(lwElement);
+                                lwElement.append(mecanizado.getAttribute('lw'));
+                                sideElement.append(mecanizado.getAttribute('face'));
                                 break;
                         }
 
@@ -4191,7 +4256,7 @@
                 //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
                 var clickSaveChanges = function() {
 
-                    /*svgCanvas.removeDivsExport();
+                    svgCanvas.removeDivsExport();
 
                     var newOrder = JSON.parse(localStorage.newOrder);
                     var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
@@ -4199,7 +4264,7 @@
                     newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
                     localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
-                    svgCanvas.createDivs(curConfig.edges);*/
+                    svgCanvas.createDivs(curConfig.edges);
                     generatePartDraw();
                 };
 
@@ -4373,7 +4438,7 @@
                     var autoSave = !$("#tool_autosave").hasClass("push_button_pressed");
                     if (autoSave) {
                         $("#tool_autosave").addClass("push_button_pressed");
-                        curConfig.autoSave = setInterval(clickAutoSaveChanges, 300);
+                        curConfig.autoSave = setInterval(clickAutoSaveChanges, 1000);
 
                         localStorage.setItem("autoSave", true);
 
@@ -6643,8 +6708,6 @@
                                 $('#svg__cuadrant_3').attr('fill', '#3F3F3F');
                                 $('#svg__cuadrant_4').attr('fill', '#3F3F3F');
 
-                                console.log(svgCanvas.getSelectedElems()[0]);
-
                                 switch (cuad) {
                                     case 1: //Abajo a la Izquierda
                                         if (dim == "y") {
@@ -6848,36 +6911,62 @@
 
                         var mecanizados = $("[nameMecanizado]");
 
-                        if (rotation == 180) {
-                            //en cara tracera
+                        var viewAllMachining = $("#tool_viewAllMachining").hasClass("push_button_pressed");
+
+
+                        var face = $("#faceSelector").val();
+
+                        if (viewAllMachining) {
                             for (let ii = 0; ii < mecanizados.length; ii++) {
                                 var mecanizado = mecanizados[ii];
                                 if (mecanizado.getAttribute("cross") == "0") {
-                                    if (mecanizado.getAttribute("face") == "0") {
-                                        //$(mecanizado).slideToggle("fast");
-                                        $(mecanizado).hide();
+                                    $(mecanizado).attr("fill", "#3F3F3F");
+                                    $(mecanizado).attr("stroke-width", "0");
+                                    $(mecanizado).hide();
+                                    if (mecanizado.getAttribute("face") != face) {
+                                        $(mecanizado).show();
                                         $(mecanizado).attr("fill", "transparent");
                                         $(mecanizado).attr("stroke-width", "1");
-                                    }
-                                    if (mecanizado.getAttribute("face") == "5") {
+                                    } else {
                                         $(mecanizado).show();
                                     }
+
                                 }
                             }
                         } else {
-                            //en cara delantera
-                            var mecanizados = $("[nameMecanizado]");
-
-                            for (let ii = 0; ii < mecanizados.length; ii++) {
-                                var mecanizado = mecanizados[ii];
-                                if (mecanizado.getAttribute("cross") == "0") {
-                                    if (mecanizado.getAttribute("face") == "0") {
-                                        $(mecanizado).show();
-                                        $(mecanizado).attr("fill", "#3F3F3F");
-                                        $(mecanizado).attr("stroke-width", "0");
+                            if (rotation == 180) {
+                                //en cara tracera
+                                for (let ii = 0; ii < mecanizados.length; ii++) {
+                                    var mecanizado = mecanizados[ii];
+                                    if (mecanizado.getAttribute("cross") == "0") {
+                                        switch (mecanizado.getAttribute("face")) {
+                                            case "0":
+                                                //$(mecanizado).slideToggle("fast");
+                                                $(mecanizado).hide();
+                                                $(mecanizado).attr("fill", "transparent");
+                                                $(mecanizado).attr("stroke-width", "1");
+                                                break;
+                                            case "5":
+                                                $(mecanizado).show();
+                                                break;
+                                        }
                                     }
-                                    if (mecanizado.getAttribute("face") == "5") {
-                                        $(mecanizado).hide();
+                                }
+                            } else {
+                                //en cara delantera
+                                for (let ii = 0; ii < mecanizados.length; ii++) {
+                                    var mecanizado = mecanizados[ii];
+                                    if (mecanizado.getAttribute("cross") == "0") {
+                                        switch (mecanizado.getAttribute("face")) {
+                                            case "0":
+                                                $(mecanizado).show();
+                                                $(mecanizado).attr("fill", "#3F3F3F");
+                                                $(mecanizado).attr("stroke-width", "0");
+                                                break;
+                                            case "5":
+                                                $(mecanizado).hide();
+                                                break;
+                                        }
                                     }
                                 }
                             }
@@ -7014,4 +7103,9 @@
 
     // Run init once DOM is loaded
     $(methodDraw.init);
+
+    //cflorioluis - al presionar r se repite la ultima funcion
+    var repeatFn = (this.repeatFn = function(fn) {
+        $(document).bind("keydown", "r", () => { fn(); });
+    });
 })();

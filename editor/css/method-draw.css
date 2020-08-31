@@ -209,6 +209,22 @@ body {
     /*background: #edf1f7;*/
 }
 
+
+/*cflorioluis*/
+
+
+/*#tools_center {
+    top: 30px;
+    left: 50px;
+    width: 100%;
+    height: 40px;
+    border: solid #444 1px;
+    z-index: 2;
+}*/
+
+
+/**/
+
 #rulers>div {
     position: absolute;
     background: #2f2f2c;
@@ -219,6 +235,7 @@ body {
 
 #rulers #ruler_corner {
     top: 30px;
+    /*55*/
     left: 50px;
     width: 15px;
     height: 15px;
@@ -229,6 +246,7 @@ body {
 #ruler_x {
     height: 15px;
     top: 30px;
+    /*55*/
     left: 66px;
     right: 175px;
     border-top: solid #444 1px;
@@ -245,6 +263,7 @@ body {
 #ruler_y_cursor {
     width: 15px;
     border-top: dotted #999 1px;
+    /*border-top: dotted #999 0px;*/
     position: absolute;
     background: #2f2f2c;
 }
@@ -257,6 +276,7 @@ body {
 #ruler_y {
     width: 15px;
     top: 46px;
+    /*top: 70px;*/
     left: 50px;
     bottom: 40px;
     border-left: solid #444 1px;
@@ -2430,12 +2450,12 @@ input[readonly=readonly]:focus {
 }
 
 .columnHinge.wide {
-    width: 98px;
+    width: 102px;
     padding-left: 1px;
 }
 
 .columnHinge {
-    width: 14px;
+    width: 16px;
 }
 
 .grid>div {
@@ -2451,6 +2471,10 @@ input[readonly=readonly]:focus {
     width: 40%;
     text-align: right;
     padding-right: 10%;*/
+}
+
+.columnFormMachining.mini30 {
+    width: 100px !important;
 }
 
 
@@ -2480,7 +2504,12 @@ input[readonly=readonly]:focus {
 
 .columnFromHinge {
     float: left;
-    width: 45%;
+    width: 35%;
+}
+
+.columnFromHinge.hide {
+    float: left;
+    width: 60%;
 }
 
 
@@ -2513,13 +2542,14 @@ input[readonly=readonly]:focus {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;
-    width: 100px !important;
+    width: 120px !important;
 }
 
 .input-error {
     background: #fff;
     border: 1px solid red;
-    border-width: medium;
+    border-width: revert;
+    border-radius: 4px;
 }
 
 .dialogRight {
@@ -2630,3 +2660,330 @@ input[right][type="text"]::placeholder {
 #tool_rectRoundTools:hover div {
     display: block;
 }
+
+
+/*cflorioluis hinge form*/
+
+.hingeFig {
+    position: relative;
+    left: calc(50% - 150px);
+}
+
+.parentSquare {
+    width: 300px;
+    height: 150px;
+    background-color: #ccc;
+    vertical-align: middle;
+    position: relative;
+}
+
+.parentSquareEdge {
+    width: 300px;
+    height: 40px;
+    background-color: #ccC;
+    vertical-align: middle;
+    top: 160px;
+    /*calc(50% - 25px);*/
+    position: absolute;
+}
+
+.distanceDrillHinge {
+    width: 120px;
+    height: 20px;
+    background-color: transparent;
+    position: absolute;
+    top: 120px;
+    /*calc(50% - 25px);*/
+    left: calc(50% - 60px);
+    align-items: center;
+    text-align: center;
+    display: flex;
+    /*width: 100%;*/
+    /*margin: 20px auto;*/
+    align-items: center;
+}
+
+.hingeRadius {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    background-color: white;
+    position: absolute;
+    top: 25px;
+    /*calc(50% - 25px);*/
+    left: calc(50% - 40px);
+    align-items: center;
+    text-align: center;
+    display: flex;
+    /*width: 100%;*/
+    /*margin: 20px auto;*/
+    align-items: center;
+}
+
+.hingeDrillRadiusLeft {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    background-color: white;
+    position: absolute;
+    top: calc(50% + 10px);
+    left: calc(50% - 70px);
+    align-items: center;
+    text-align: center;
+}
+
+.hingeDrillRadiusRight {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    background-color: white;
+    position: absolute;
+    top: calc(50% + 10px);
+    left: calc(50% + 50px);
+    align-items: center;
+    text-align: center;
+}
+
+.edgeDrillLeft {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    position: absolute;
+    left: calc(50% - 70px);
+}
+
+.edgeDrillRight {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    position: absolute;
+    left: calc(50% + 50px);
+}
+
+.edgeDrillHinge {
+    width: 80px;
+    height: 30px;
+    background-color: white;
+    position: absolute;
+    left: calc(50% - 40px);
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background: black;
+    position: relative;
+}
+
+.lineV {
+    border-left: 1px solid black;
+    height: 20px;
+    position: absolute;
+    top: calc(50% + 4px);
+    left: 100%;
+}
+
+.lineVEdgeDrill {
+    border-left: 1px solid black;
+    height: 10px;
+    position: absolute;
+    top: calc(50% + 4px);
+    right: 15px;
+}
+
+.input-box.rightLine {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 5px);
+}
+
+.topLine {
+    position: absolute;
+    top: -20px;
+    left: 100%;
+}
+
+.topLine25 {
+    position: absolute;
+    top: -25px !important;
+    left: 100%;
+}
+
+.input-box.leftLine {
+    position: absolute;
+    top: 0px;
+    right: 25px
+}
+
+.line.arrow-right:after {
+    position: absolute;
+    content: '';
+    bottom: -5px;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid black;
+}
+
+.arrow-up:after {
+    position: absolute;
+    content: '';
+    top: -5px;
+    right: -5px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid black;
+}
+
+.arrow-down:after {
+    position: absolute;
+    content: '';
+    bottom: -5px;
+    right: -5px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid black;
+}
+
+.line.arrow-left:after {
+    position: absolute;
+    content: '';
+    top: -5px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid black;
+}
+
+.verticalDashLine {
+    border-left: 1px dashed;
+    height: 50px;
+    position: absolute;
+}
+
+.horizontalDashLine {
+    border-top: 1px dashed;
+    width: 30px;
+    position: absolute;
+}
+
+.drillL {
+    left: calc(50% - 60px);
+    top: calc(50% + 5px);
+}
+
+.drillR {
+    left: calc(50% + 60px);
+    top: calc(50% + 5px);
+}
+
+.hDrillL {
+    left: calc(50% - 75px);
+    top: calc(50% + 20px);
+}
+
+.hDrillR {
+    left: calc(50% + 45px);
+    top: calc(50% + 20px);
+    width: 50px;
+}
+
+.centerHinge {
+    left: calc(50% + 45px);
+    top: 65px;
+    width: 50px;
+}
+
+.centerHingeEdge {
+    left: calc(50% + 40px);
+    top: 0px;
+    width: 50px;
+}
+
+.centerHingeDrillEdge {
+    right: calc(50% + 70px);
+    top: 0px;
+    width: 15px;
+}
+
+.hDrillREdge {
+    left: calc(50% + 40px);
+    top: 30px;
+    width: 50px;
+}
+
+.hDrillLEdge {
+    left: calc(50% - 85px);
+    top: 20px;
+    width: 15px;
+}
+
+label.hingeFig {
+    margin: 0 5px;
+}
+
+.input-box {
+    width: 20px
+}
+
+.vertical-line {
+    border-bottom: 1px dashed #000;
+    text-align: center;
+    height: 10px;
+    margin-bottom: 10px;
+}
+
+.deg45 {
+    position: absolute;
+    height: 35px;
+    left: 73px;
+    top: 60px;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    -moz-transform: skew(45deg);
+    -webkit-transform: skew(45deg);
+    transform: skew(45deg);
+}
+
+.arrow-right45 {
+    position: absolute;
+    left: 85px;
+    top: 87px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid black;
+    -moz-transform: rotateZ(45deg);
+    -webkit-transform: rotateZ(45deg);
+    transform: rotateZ(45deg);
+}
+
+.leftLine45 {
+    position: absolute;
+    top: 39px;
+    left: 16px;
+}
+
+.horizontalLineC {
+    border-top: 1px solid black;
+    width: 100%;
+    position: absolute;
+}
+
+.horizontalLineC2 {
+    border-top: 1px solid black;
+    width: 25%;
+    top: 25px;
+    left: 50%;
+    position: absolute;
+}
+
+
+/*cflorioluis END hinge form*/
