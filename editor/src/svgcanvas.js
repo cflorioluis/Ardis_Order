@@ -11554,6 +11554,9 @@ $.SvgCanvas = function(container, config) {
                 drillDepth = elem.getAttribute("drillDepth"),
                 hingeDiameter = elem.getAttribute("hingeDiameter"),
                 hingeDepth = elem.getAttribute("hingeDepth"),
+                cDistance = elem.getAttribute("cDistance"),
+                drillDistanceFromCenter = elem.getAttribute("drillDistanceFromCenter"),
+                drillDistance = elem.getAttribute("drillDistance"),
                 isNewTitle = false;
 
             switch (elem.getAttribute("origin")) {
