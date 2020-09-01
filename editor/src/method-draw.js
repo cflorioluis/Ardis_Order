@@ -560,6 +560,19 @@
 
                             $("#dialog_container").hide();
                             $("#dialog_container_custom").show();
+                            //cflorioluis - hacer click fuera del cuadro de dialogo para aceptar cambios
+                            $("#dialog_box").bind('click', (evt) => {
+                                const flyoutElement = document.getElementById("dialog_box_overlay");
+                                let targetElement = evt.target;
+                                do {
+                                    if (targetElement == flyoutElement) {
+                                        // This is a click outside just return.
+                                        $('#buttonDialogOK').trigger('click');
+                                        return;
+                                    }
+                                    targetElement = targetElement.parentNode;
+                                } while (targetElement);
+                            });
                         } else {
                             //console.log("original");
                             $("#dialog_content")
@@ -4280,22 +4293,22 @@
                                 for (let jj = 0; jj < polys.length; jj++) {
                                     const poly = polys[jj];
 
-                                    switch (poly.getAttribute("realCorner")) {
+                                    switch (poly.getAttribute("side")) {
                                         case "1":
                                             b1 = poly.getAttribute("widthX");
                                             h1 = poly.getAttribute("heightY");
                                             break;
                                         case "2":
-                                            b2 = poly.getAttribute("widthX");
-                                            h2 = poly.getAttribute("heightY");
-                                            break;
-                                        case "3":
                                             b3 = poly.getAttribute("widthX");
                                             h3 = poly.getAttribute("heightY");
                                             break;
-                                        case "4":
+                                        case "3":
                                             b4 = poly.getAttribute("widthX");
                                             h4 = poly.getAttribute("heightY");
+                                            break;
+                                        case "4":
+                                            b2 = poly.getAttribute("widthX");
+                                            h2 = poly.getAttribute("heightY");
                                             break;
 
                                         default:
