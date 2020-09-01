@@ -4397,15 +4397,15 @@
 
                 //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
                 var clickExportPartDraw = function() {
-                    svgCanvas.removeDivsExport();
-                    var newOrder = JSON.parse(localStorage.newOrder);
-                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
-                    newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+                    //svgCanvas.removeDivsExport();
+                    //var newOrder = JSON.parse(localStorage.newOrder);
+                    //var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+                    //newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
 
-                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
+                    //localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
                     //localStorage.setItem("svgPreview", svgCanvas.svgCanvasToString());
-                    svgCanvas.createDivs(curConfig.edges);
+                    //svgCanvas.createDivs(curConfig.edges);
                     saveFileCSV(generatePartDraw());
                 };
 
