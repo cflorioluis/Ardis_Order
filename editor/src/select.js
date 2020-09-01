@@ -407,9 +407,6 @@ var svgedit = svgedit || {};
         //cflorioluis - Ocultar el selector de Rotacion
         $("[id*='selectorGrip_rotate_']").hide();
         //$( "[id*='selectorGrip_rotate_']" ).show();
-
-        console.log("test");
-
         // add the corner grips
         for (var dir in this.selectorGrips) {
             var grip = svgFactory_.createSVGElement({

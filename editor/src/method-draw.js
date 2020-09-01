@@ -29,7 +29,6 @@
 
 
 
-
     //import * as mathjs from "../lib/math/math.min.js";
 
     /*import { create, all } from 'mathjs'
@@ -592,6 +591,7 @@
 
                             $("#dialog_content_custom").css({
                                 height: height - 65 + "px",
+                                overflow: "visible",
                             });
 
                             //cflorioluis - hacer que la ventana se mueva con el mouse
@@ -3571,9 +3571,136 @@
                     //cflorioluis - al presionar r se repite la ultima funcion
                     repeatFn(clickRectRoundTool)
 
+
+
+
+                    /**/
+
+                    /*
+                                        $.svgIcons(curConfig.imgPath + "svg_edit_icons.svg", {
+                                            w: 27,
+                                            h: 27,
+                                            id_match: false,
+                                            no_img: true, // Opera & Firefox 4 gives odd behavior w/images
+                                            fallback_path: curConfig.imgPath,
+                                            fallback: {
+                                                logo: "logo.png",
+                                                select: "select.png",
+                                                //add new toll - cflorioluis - se usa el mismo nombre que en el item de placement
+                                                cajeadoTool: "cajeadoTool.png",
+                                                cremalleraTool: "cremallera.png",
+                                                drillTool: "drill.png",
+                                                hingeTool: "hinge.png",
+                                                polyTool: "poly.png",
+                                                rectTools: "rectRound.png",
+                                                rectTool: "rectTool.png",
+                                                rectRoundTool: "rectRound.png",
+                                                select_node: "select_node.png",
+                                                pencil: "pencil.png",
+                                                pen: "line.png",
+                                                rect: "square.png",
+                                                ellipse: "ellipse.png",
+                                                path: "path.png",
+                                                text: "text.png",
+                                                image: "image.png",
+                                                zoom: "zoom.png",
+                                                delete: "delete.png",
+                                                spapelib: "shapelib.png",
+                                                node_delete: "node_delete.png",
+                                                align_left: "align-left.png",
+                                                align_center: "align-center.png",
+                                                align_right: "align-right.png",
+                                                align_top: "align-top.png",
+                                                align_middle: "align-middle.png",
+                                                align_bottom: "align-bottom.png",
+                                                arrow_right: "flyouth.png",
+                                                arrow_down: "dropdown.gif",
+                                            },
+                                            placement: {
+                                                "#logo": "logo",
+                                                "#tool_select": "select",
+                                                //add new toll - cflorioluis - Elegir el nombre de la Herramienta, este se usara para elegir la imagen de la misma
+                                                "#tool_cajeadoTool": "cajeadoTool",
+                                                "#tool_cremalleraTool": "cremalleraTool",
+                                                "#tool_drillTool": "drillTool",
+                                                "#tool_hingeTool": "hingeTool",
+                                                "#tool_polyTool": "polyTool",
+                                                "#tool_rectTools": "rectRoundTool",
+                                                "#tool_rectTool": "rectTool",
+                                                "#tool_rectRoundTool": "rectRoundTool",
+
+                                                //
+                                                "#tool_fhpath": "pencil",
+                                                "#tool_line": "pen",
+                                                "#tool_rect,#tools_rect_show": "rect",
+                                                "#tool_ellipse,#tools_ellipse_show": "ellipse",
+                                                "#tool_path": "path",
+                                                "#tool_text,#layer_rename": "text",
+                                                "#tool_image": "image",
+                                                "#tool_zoom": "zoom",
+                                                "#tool_node_clone": "node_clone",
+                                                "#tool_node_delete": "node_delete",
+                                                "#tool_add_subpath": "add_subpath",
+                                                "#tool_openclose_path": "open_path",
+                                                "#tool_alignleft, #tool_posleft": "align_left",
+                                                "#tool_aligncenter, #tool_poscenter": "align_center",
+                                                "#tool_alignright, #tool_posright": "align_right",
+                                                "#tool_aligntop, #tool_postop": "align_top",
+                                                "#tool_alignmiddle, #tool_posmiddle": "align_middle",
+                                                "#tool_alignbottom, #tool_posbottom": "align_bottom",
+                                                "#cur_position": "align",
+                                                "#zoomLabel": "zoom",
+                                            },
+                                            resize: {
+                                                "#logo .svg_icon": 15,
+                                                ".flyout_arrow_horiz .svg_icon": 5,
+                                                "#fill_bg .svg_icon, #stroke_bg .svg_icon": svgedit.browser.isTouch() ?
+                                                    24 : 24,
+                                                ".palette_item:first .svg_icon": svgedit.browser.isTouch() ?
+                                                    30 : 16,
+                                                "#zoomLabel .svg_icon": 16,
+                                                "#zoom_dropdown .svg_icon": 7,
+                                            },
+                                            callback: function(icons) {
+                                                $(
+                                                    ".toolbar_button button > svg, .toolbar_button button > img"
+                                                ).each(function() {
+                                                    $(this).parent().prepend(this);
+                                                });
+                                                $(".tool_button, .tool_button_current").addClass("loaded");
+                                                var tleft = $("#tools_left");
+                                                if (tleft.length != 0) {
+                                                    var min_height = tleft.offset().top + tleft.outerHeight();
+                                                }
+
+                                                // Look for any missing flyout icons from plugins
+                                                $(".tools_flyout").each(function() {
+                                                    var shower = $("#" + this.id + "_show");
+                                                    var sel = shower.attr("data-curopt");
+                                                    // Check if there's an icon here
+                                                    if (!shower.children("svg, img").length) {
+                                                        var clone = $(sel).children().clone();
+                                                        if (clone.length) {
+                                                            clone[0].removeAttribute("style"); //Needed for Opera
+                                                            shower.append(clone);
+                                                        }
+                                                    }
+                                                });
+                                                methodDraw.runCallbacks();
+
+                                                setTimeout(function() {
+                                                    $(".flyout_arrow_horiz:empty").each(function() {
+                                                        $(this).append($.getSvgIcon("arrow_right").width(5).height(5));
+                                                    });
+                                                }, 1);
+                                            },
+                                        });
+                    */
                     $('#tool_rectTools').removeClass("tool_rectRoundTools");
                     $('#tool_rectTools').removeClass("tool_rectTools");
                     $('#tool_rectTools').addClass("tool_rectRoundTools");
+
+
                 };
 
                 var clickFHPath = function() {
