@@ -10679,7 +10679,7 @@ $.SvgCanvas = function(container, config) {
                     <div class="columnFormMachining" id="inputErrorRCajeado"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
                     </div>
-                </div>
+                </div> 
             </form>
             <script id="scriptCajeado" src="src/machining-script/create-edit/cajeado.js" side="` + side + `" face="` + face + `"></script>
             `,
