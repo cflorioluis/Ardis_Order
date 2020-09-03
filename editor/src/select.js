@@ -208,8 +208,8 @@ var svgedit = svgedit || {};
             nbah = aabox.height + offset * 2;
 
         //cflorioluis - Ajustar Selector si se trata de un Drill menor a 25 de diametro
-        if (selected.getAttribute("nameMecanizado") != null &&
-            (selected.getAttribute("nameMecanizado") == "drill") && parseInt(selected.getAttribute("r")) < 14) {
+        if (selected.getAttribute("machining") != null &&
+            (selected.getAttribute("machining") == "drill") && parseInt(selected.getAttribute("r")) < 14) {
             nbax = aabox.x - offset - 10,
                 nbay = aabox.y - offset - 10,
                 nbaw = 20 + aabox.width + offset * 2,
@@ -649,14 +649,11 @@ var svgedit = svgedit || {};
     //
     // Parameters:
     // elem - DOM element to remove the selector for
-    svgedit.select.SelectorManager.prototype.releaseSelector = function(
-        elem,
-        mecanizado
-    ) {
+    svgedit.select.SelectorManager.prototype.releaseSelector = function(elem, machining) {
         if (elem == null) return;
         var N = this.selectors.length,
             sel = this.selectorMap[elem.id];
-        //console.log("mecaniozado" + mecanizado);
+        //console.log("mecaniozado" + machining);
         for (var i = 0; i < N; ++i) {
             if (this.selectors[i] && this.selectors[i] == sel) {
                 //console.log(this.selectors[i]);

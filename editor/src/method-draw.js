@@ -25,7 +25,7 @@
         currentRowSelected = JSON.parse(localStorage.currentRowSelected);
         row = newOrder[currentRowSelected];
     } else
-        row = [null, null, 1500, 500, null, null, null, null, null, null, null, null, null, null, null]
+        row = [null, null, 1500, 800, null, null, null, null, null, null, null, null, null, null, null]
 
 
 
@@ -69,7 +69,7 @@
                 partW: partW,
                 partL: partL,
                 veta: row[1],
-                cuadrant: 1,
+                quadrant: 1,
                 canvas_expansion: 1,
                 realDimensions: [partW, partL],
                 //cflorioluis aqui esta el tamaño de la pieza
@@ -93,6 +93,7 @@
                 baseUnit: "px",
                 snappingStep: 10,
                 showRulers: svgedit.browser.isTouch() ? false : true,
+                viewAllMachining: true,
                 show_outside_canvas: false,
                 no_save_warning: true,
                 initFont: "Helvetica, Arial, sans-serif",
@@ -155,9 +156,6 @@
                     }
                 })();
 
-
-
-
                 //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
                 var clickAutoSaveChanges = (this.clickAutoSaveChanges = function() {
                     svgCanvas.removeDivsExport();
@@ -175,7 +173,6 @@
                     generatePartDraw();
                 });
 
-
                 if (localStorage.autoSave) {
                     $("#tool_autosave").addClass("push_button_pressed");
                     curConfig.autoSave = setInterval(clickAutoSaveChanges, 300);
@@ -184,39 +181,16 @@
                     $("#tool_autosave").removeClass("push_button_pressed");
                 }
 
-
                 //evento si cambia el currentRowSelect se actualiza el mecanizado
                 window.addEventListener(
                     "storage",
                     (evt) => {
-                        //alert("storage event called key: " + evt.key);
                         if (evt.key == "currentRowSelected" && evt.newValue) {
-                            //clearInterval(curConfig.autoSave);
-
                             location.reload();
-
-
                         }
                         if (evt.key == "reload" && evt.newValue) {
                             location.reload();
                         }
-                        /*if (evt.key == "updateEdges" && evt.newValue) {
-                            //location.reload();
-
-                            var newOrder = JSON.parse(localStorage.newOrder);
-                            var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
-                            var row = newOrder[currentRowSelected];
-                            curConfig.edges[0] = row[6]
-                            curConfig.edges[1] = row[7]
-                            curConfig.edges[2] = row[8]
-                            curConfig.edges[3] = row[9]
-
-                            svgCanvas.updateEdges(curConfig.edges)
-
-                        }*/
-                        /*if (evt.key == "newOrder" && !evt.oldValue && evt.newValue) {
-                            location.reload();
-                        }*/
                         if (evt.key == "newOrder" && evt.newValue) {
                             var newOrder = JSON.parse(localStorage.newOrder);
                             var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
@@ -249,6 +223,17 @@
                     lowDimension = curConfig.dimensions[0];
                 }
 
+                /*var flash = function($menu) {
+                    var menu_title = $menu.prev();
+                    menu_title.css({
+                        background: "white",
+                        color: "black",
+                    });
+                    setTimeout(function() {
+                        menu_title.removeAttr("style");
+                    }, 200);
+                };*/
+
                 var extFunc = function() {
                     $.each(curConfig.extensions, function() {
                         var extname = this;
@@ -280,8 +265,8 @@
                         logo: "logo.png",
                         select: "select.png",
                         //add new toll - cflorioluis - se usa el mismo nombre que en el item de placement
-                        cajeadoTool: "cajeadoTool.png",
-                        cremalleraTool: "cremallera.png",
+                        pocketTool: "pocket.png",
+                        multiDrillingTool: "multiDrilling.png",
                         drillTool: "drill.png",
                         hingeTool: "hinge.png",
                         polyTool: "poly.png",
@@ -313,8 +298,8 @@
                         "#logo": "logo",
                         "#tool_select": "select",
                         //add new toll - cflorioluis - Elegir el nombre de la Herramienta, este se usara para elegir la imagen de la misma
-                        "#tool_cajeadoTool": "cajeadoTool",
-                        "#tool_cremalleraTool": "cremalleraTool",
+                        "#tool_pocketTool": "pocketTool",
+                        "#tool_multiDrillingTool": "multiDrillingTool",
                         "#tool_drillTool": "drillTool",
                         "#tool_hingeTool": "hingeTool",
                         "#tool_polyTool": "polyTool",
@@ -545,7 +530,7 @@
                         btn_holder = $("#dialog_buttons");
 
                     //cflorioluis - editando dialogo para validaciones de los mecanizados
-                    var dbox = function(type, msg, callback, width, height, custom, mecanizadoType, defText) {
+                    var dbox = function(type, msg, callback, width, height, custom, machiningType, defText) {
                         //cflorioluis - custom dialog
                         if (custom !== undefined) {
                             btn_holder = $("#dialog_buttons_custom");
@@ -560,6 +545,7 @@
 
                             $("#dialog_container").hide();
                             $("#dialog_container_custom").show();
+
                             //cflorioluis - hacer click fuera del cuadro de dialogo para aceptar cambios
                             $("#dialog_box").bind('click', (evt) => {
                                 const flyoutElement = document.getElementById("dialog_box_overlay");
@@ -667,13 +653,13 @@
                         var ok = $('<input type="button" value="OK" id="buttonDialogOK">').appendTo(btn_holder);
 
                         //cflorioluis - validar formulario con boton ok
-                        switch (mecanizadoType) {
-                            case "cajeado":
+                        switch (machiningType) {
+                            case "pocket":
                                 var rectRoundInputs = 0;
                                 var errorInput = false;
                                 $("#dialog_buttons_custom").children().first().click(function(event) {
                                     rectRoundInputs = $(
-                                        'input[machiningOption="cajeado"]:checked'
+                                        'input[machiningOption="pocket"]:checked'
                                     ).length;
                                     if (rectRoundInputs == 0) {
                                         $(".tablero").addClass("input-error");
@@ -681,15 +667,15 @@
                                         $(".tablero").removeClass("input-error");
                                     }
 
-                                    if ($('#inputErrorWCajeado').is(":visible")) {
+                                    if ($('#inputErrorWPocket').is(":visible")) {
                                         $('#dialog_container_custom').height("-=15");
                                         $('#dialog_content_custom').height("-=15");
                                     }
-                                    if ($('#inputErrorHCajeado').is(":visible")) {
+                                    if ($('#inputErrorHPocket').is(":visible")) {
                                         $('#dialog_container_custom').height("-=15");
                                         $('#dialog_content_custom').height("-=15");
                                     }
-                                    if ($('#inputErrorRCajeado').is(":visible")) {
+                                    if ($('#inputErrorRPocket').is(":visible")) {
                                         $('#dialog_container_custom').height("-=15");
                                         $('#dialog_content_custom').height("-=15");
                                     }
@@ -699,7 +685,7 @@
                                         $('#dialog_content_custom').width("-=60");
                                     }
 
-                                    $('input[mecanizadoInput="cajeado"]').each(function() {
+                                    $('input[machiningInput="pocket"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).val() != "") {
 
@@ -707,28 +693,28 @@
                                                 math.evaluate($(this).val(), curConfig.scope)
                                                 rectRoundInputs++;
 
-                                                if ($(this).hasClass("inputErrorWCajeado"))
-                                                    $('#inputErrorWCajeado').hide();
+                                                if ($(this).hasClass("inputErrorWPocket"))
+                                                    $('#inputErrorWPocket').hide();
 
-                                                if ($(this).hasClass("inputErrorHCajeado"))
-                                                    $('#inputErrorHCajeado').hide();
+                                                if ($(this).hasClass("inputErrorHPocket"))
+                                                    $('#inputErrorHPocket').hide();
 
-                                                if ($(this).hasClass("inputErrorRCajeado"))
-                                                    $('#inputErrorRCajeado').hide();
+                                                if ($(this).hasClass("inputErrorRPocket"))
+                                                    $('#inputErrorRPocket').hide();
                                             } catch (error) {
                                                 //console.log(error.split('/n')[0]);
                                                 $(this).addClass("input-error");
                                                 errorInput = true;
 
-                                                if ($(this).hasClass("inputErrorWCajeado"))
-                                                    $('#inputErrorWCajeado').show();
+                                                if ($(this).hasClass("inputErrorWPocket"))
+                                                    $('#inputErrorWPocket').show();
 
 
-                                                if ($(this).hasClass("inputErrorHCajeado"))
-                                                    $('#inputErrorHCajeado').show();
+                                                if ($(this).hasClass("inputErrorHPocket"))
+                                                    $('#inputErrorHPocket').show();
 
-                                                if ($(this).hasClass("inputErrorRCajeado"))
-                                                    $('#inputErrorRCajeado').show();
+                                                if ($(this).hasClass("inputErrorRPocket"))
+                                                    $('#inputErrorRPocket').show();
 
                                                 //if (!$('#inputErrorWHDrill').is(":visible")) {
                                                 $('#dialog_container_custom').height("+=15");
@@ -786,7 +772,7 @@
                                         $('#dialog_content_custom').height("-=15");
                                     }
 
-                                    $('input[mecanizadoInput="drill"]').each(function() {
+                                    $('input[machiningInput="drill"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).prop("required")) {
                                             if (($(this).val() != "") /*&& eval(!math.evaluate($(this).val(), curConfig.scope))*/ ) {
@@ -870,11 +856,11 @@
                             case "hinge":
                                 $("#dialog_buttons_custom").children().first().click(function(event) {
                                     /**var hingeInputs = 0,
-                                        existsHinge = $("[nameMecanizado=hinge]").length;
+                                        existsHinge = $("[machining=hinge]").length;
 
                                     $("#dialog_buttons_custom").removeClass("input-error");
 
-                                    $('input[mecanizadoInput="hinge"]').each(function() {
+                                    $('input[machiningInput="hinge"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
@@ -914,7 +900,7 @@
                                         $('#dialog_content_custom').height("-=15");
                                     }
 
-                                    $('input[mecanizadoInput="poly"]').each(function() {
+                                    $('input[machiningInput="poly"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).val() != "") {
 
@@ -978,7 +964,7 @@
                                         $('#dialog_content_custom').height("-=15");
                                     }
 
-                                    $('input[mecanizadoInput="rect"]').each(function() {
+                                    $('input[machiningInput="rect"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
@@ -1072,7 +1058,7 @@
                                         $('#dialog_content_custom').height("-=15");
                                     }
 
-                                    $('input[mecanizadoInput="rectRound"]').each(function() {
+                                    $('input[machiningInput="rectRound"]').each(function() {
                                         $(this).removeClass("input-error");
                                         if ($(this).prop("required")) {
                                             if ($(this).val() != "") {
@@ -1178,13 +1164,13 @@
 
                         box.show();
                         //cflorioluis - ocultar evento callback original si se trata de un mecanizado
-                        switch (mecanizadoType) {
+                        switch (machiningType) {
                             case "rectRound":
                             case "rect":
                             case "poly":
                             case "hinge":
                             case "drill":
-                            case "cajeado":
+                            case "pocket":
                                 break;
                             default:
                                 ok.on("click touchstart", function() {
@@ -1200,8 +1186,8 @@
                     $.alert = function(msg, cb) {
                         dbox("alert", msg, cb);
                     };
-                    $.confirm = function(msg, cb, width, height, custom, mecanizadoType) {
-                        dbox("confirm", msg, cb, width, height, custom, mecanizadoType);
+                    $.confirm = function(msg, cb, width, height, custom, machiningType) {
+                        dbox("confirm", msg, cb, width, height, custom, machiningType);
                     };
                     $.process_cancel = function(msg, cb) {
                         dbox("process", msg, cb);
@@ -2356,7 +2342,7 @@
                     }
 
                     if (elem != null) {
-                        if (!$(elem).attr("nameMecanizado")) {
+                        if (!$(elem).attr("machining")) {
                             //cforioluis
                             $("#stroke_panel").show();
                         }
@@ -2367,7 +2353,7 @@
                         var blurval = svgCanvas.getBlur(elem);
                         $("#blur").val(blurval);
                         if (!is_node && currentMode != "pathedit") {
-                            if (!$(elem).attr("nameMecanizado")) {
+                            if (!$(elem).attr("machining")) {
                                 //cflorioluis - no monstrar el panel original de los elementos seleccionados
                                 $("#selected_panel").show();
                             }
@@ -2436,21 +2422,23 @@
                             text: ["x", "y"],
                             use: [],
                             path: [],
-                            //cforioluis - update cajeado contextual tools
-                            cajeado: ["widthX", "heightY", "radio"],
+                            //cforioluis - Herramientas laterales de Mecanizados
+                            pocket: ["widthX", "heightY", "radio"],
                             drill: ["realX", "realY", "diameter"],
                             poly: ["widthX", "heightY"],
                             rect: ["width", "height", "realX", "realY"],
                             rectRound: ["width", "height", "realX", "realY", "rx", "ry"],
+                            hinge: ["beginX", "endX", "hingeCount", "axisDist"], //qwerty
+                            //multiDrilling:["beginX", "endX", "hingeCount", "axisDist"]
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
                         //console.log(elem);
 
-                        if (!$(elem).attr("nameMecanizado")) {
+                        if (!$(elem).attr("machining")) {
                             var el_name = elem.tagName;
                         } else {
-                            var el_name = $(elem).attr("nameMecanizado");
+                            var el_name = $(elem).attr("machining");
                         }
 
                         /*console.log("elem.tagName");
@@ -2460,7 +2448,7 @@
                             $("#g_panel").show();
                         }
 
-                        if (!$(elem).attr("nameMecanizado")) {
+                        if (!$(elem).attr("machining")) {
                             if (el_name == "path" || el_name == "polyline") {
                                 $("#path_panel").show();
                             }
@@ -2474,9 +2462,9 @@
                             //if(elem.)
                             //console.log("cur_panel")
                             //console.log(cur_panel)
-                            /*switch ($(elem).attr("nameMecanizado")) {
-                                                            case "cajeado":
-                                                                $("#cajeado_panel").show();
+                            /*switch ($(elem).attr("machining")) {
+                                                            case "pocket":
+                                                                $("#pocket_panel").show();
                                                                 break;
                                                             case "drill":
                                                                 $("#drill_panel").show();
@@ -2485,14 +2473,29 @@
                                                             default:
                                                                 break;
                                                         }
-                                                        if (!$(elem).attr("nameMecanizado")) {*/
+                                                        if (!$(elem).attr("machining")) {*/
                             $("#" + el_name + "_panel").show();
                             //}
-                            //console.log($(elem).attr("nameMecanizado"))
+                            //console.log($(elem).attr("machining"))
 
                             // corner radius has to live in a different panel
                             // because otherwise it changes the position of the
                             // of the elements
+                            /*switch (el_name) {
+                                case "rect":
+                                    $("#cornerRadiusLabel").show();
+                                    break;
+                                case "hinge":
+                                    if ($('#hinge_endX').val() == "0")
+                                        $("#hinge_endX").val($("#textEnd").val());
+                                    if ($('#hinge_axisDist').val() == "0")
+                                        $("#hinge_axisDist").val($("#textEqual").val());
+                                    break;
+
+                                default:
+                                    $("#cornerRadiusLabel").hide();
+                                    break;
+                            }*/
                             if (el_name == "rect") $("#cornerRadiusLabel").show();
                             else $("#cornerRadiusLabel").hide();
 
@@ -2741,7 +2744,7 @@
                     svgCanvas.setTextContent(this.value);
                 });
 
-                changeAttributeCajeado = function(el, completed) {
+                changeAttributePocket = function(el, completed) {
                     var attr = el.getAttribute("data-attr");
                     var multiplier = el.getAttribute("data-multiplier") || 1;
                     multiplier = parseFloat(multiplier);
@@ -2753,20 +2756,20 @@
                         return false;
                     }
 
-                    var minValue = parseInt($("#cajeado_heightY").val());
+                    var minValue = parseInt($("#pocket_heightY").val());
 
-                    if (parseInt($("#cajeado_widthX").val()) < minValue) {
-                        minValue = parseInt($("#cajeado_widthX").val());
+                    if (parseInt($("#pocket_widthX").val()) < minValue) {
+                        minValue = parseInt($("#pocket_widthX").val());
                     }
 
-                    if (parseInt($("#cajeado_radio").val()) > minValue) {
+                    if (parseInt($("#pocket_radio").val()) > minValue) {
                         r = minValue;
-                        $("#cajeado_radio").val(minValue);
+                        $("#pocket_radio").val(minValue);
                     }
 
-                    svgCanvas.getSelectedElems()[0].setAttribute("widthX", $("#cajeado_widthX").val());
-                    svgCanvas.getSelectedElems()[0].setAttribute("heightY", $("#cajeado_heightY").val());
-                    svgCanvas.getSelectedElems()[0].setAttribute("radio", $("#cajeado_radio").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("widthX", $("#pocket_widthX").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("heightY", $("#pocket_heightY").val());
+                    svgCanvas.getSelectedElems()[0].setAttribute("radio", $("#pocket_radio").val());
 
                     var side = svgCanvas.getSelectedElems()[0].getAttribute("side");
                     var w = svgCanvas.getSelectedElems()[0].getAttribute("widthX");
@@ -2774,7 +2777,7 @@
                     var r = svgCanvas.getSelectedElems()[0].getAttribute("radio");
                     var id = svgCanvas.getSelectedElems()[0].getAttribute("id");
                     var face = svgCanvas.getSelectedElems()[0].getAttribute("face");
-                    var d = svgCanvas.createRoundedCajeadoSide(w, h, r, side, face);
+                    var d = svgCanvas.createRoundedPocketSide(w, h, r, side, face);
 
                     svgCanvas.getSelectedElems()[0].setAttribute("d", d);
                     svgCanvas.editLinesInEdges(side, w, h, id, face);
@@ -2798,7 +2801,7 @@
                         realY = parseInt($("#drill_realY").val()),
                         diameter = parseInt($("#drill_diameter").val()),
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
-                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant");
+                        quadrant = svgCanvas.getSelectedElems()[0].getAttribute("quadrant");
 
                     svgCanvas.getSelectedElems()[0].setAttribute("r", diameter / 2);
 
@@ -2806,7 +2809,7 @@
                     svgCanvas.getSelectedElems()[0].setAttribute("cx", realX + 100);
                     svgCanvas.getSelectedElems()[0].setAttribute("cy", realY + 100);
 
-                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                    switch (Math.abs(parseInt(face) - parseInt(quadrant))) {
                         case 1:
                             svgCanvas.getSelectedElems()[0].setAttribute("cy", curConfig.realDimensions[1] - realY + 100);
                             break;
@@ -2827,6 +2830,23 @@
                     //var r = parseInt(svgCanvas.getSelectedElems()[0].getAttribute("r"));
                 };
 
+                changeAttributeHinge = function(el, completed) {
+                    var attr = el.getAttribute("data-attr");
+                    var multiplier = el.getAttribute("data-multiplier") || 1;
+                    multiplier = parseFloat(multiplier);
+                    var val = el.value * multiplier;
+                    var valid = svgedit.units.isValidUnit(attr, val, selectedElement);
+                    if (!valid) {
+                        $.alert("Invalid value given");
+                        el.value = selectedElement.getAttribute(attr);
+                        return false;
+                    }
+
+                    svgCanvas.editHinge(attr, val)
+
+                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+                };
+
                 changeAttributeRect = function(el, completed) {
                     var attr = el.getAttribute("data-attr");
                     var multiplier = el.getAttribute("data-multiplier") || 1;
@@ -2842,7 +2862,7 @@
                         realY = parseInt($("#rect_realY").val()),
                         width = parseInt($("#rect_width").val()),
                         height = parseInt($("#rect_height").val()),
-                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant"),
+                        quadrant = svgCanvas.getSelectedElems()[0].getAttribute("quadrant"),
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
                         isCenter = svgCanvas.getSelectedElems()[0].getAttribute("lw") == "2" ? true : false,
                         cX = realX + 100,
@@ -2866,7 +2886,7 @@
                     posY = curConfig.realDimensions[1] - realY - height + 100;
 
 
-                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                    switch (Math.abs(parseInt(face) - parseInt(quadrant))) {
                         case 1:
                             if (isCenter) {
                                 cX -= (width / 2);
@@ -2921,7 +2941,7 @@
                         height = parseInt($("#rectRound_height").val()),
                         rx = parseInt($("#rectRound_rx").val()),
                         ry = parseInt($("#rectRound_ry").val()),
-                        cuadrant = svgCanvas.getSelectedElems()[0].getAttribute("cuadrant"),
+                        quadrant = svgCanvas.getSelectedElems()[0].getAttribute("quadrant"),
                         face = svgCanvas.getSelectedElems()[0].getAttribute("face"),
                         isCenter = svgCanvas.getSelectedElems()[0].getAttribute("lw") == "2" ? true : false,
                         posX, posY,
@@ -2946,7 +2966,7 @@
                     posY = curConfig.realDimensions[1] - realY - height + 100;
 
 
-                    switch (Math.abs(parseInt(face) - parseInt(cuadrant))) {
+                    switch (Math.abs(parseInt(face) - parseInt(quadrant))) {
                         case 1:
                             if (isCenter) {
                                 cX -= (width / 2);
@@ -2984,13 +3004,13 @@
 
                     /*switch (face) {
                         case "0":
-                            switch (cuadrant) {
+                            switch (quadrant) {
 
                             }
                             break;
 
                         case "5":
-                            switch (cuadrant) {
+                            switch (quadrant) {
                                 case "4":
                                     if (isCenter) {
                                         cX -= (width / 2);
@@ -3513,22 +3533,25 @@
                     }
                 };
                 //add new toll - cflorioluis
-                var clickCajeadoTool = function() {
-                    if (toolButtonClick("#tool_cajeadoTool")) {
-                        svgCanvas.setMode("cajeado");
+                var clickPocketTool = function() {
+                    if (toolButtonClick("#tool_pocketTool")) {
+                        svgCanvas.setMode("pocket");
                     }
                     svgCanvas.clearSelection();
-                    svgCanvas.clickCajeadoTool(null);
+                    svgCanvas.clickPocketTool(null);
                     //cflorioluis - al presionar r se repite la ultima funcion
-                    repeatFn(clickCajeadoTool)
+                    repeatFn(clickPocketTool)
                 };
 
-                var clickCremalleraTool = function() {
-                    if (toolButtonClick("#tool_cremalleraTool")) {
-                        svgCanvas.setMode("cremalleraToolCanvas");
+                var clickmultiDrillingTool = function() {
+                    if (toolButtonClick("#tool_multiDrillingTool")) {
+                        svgCanvas.setMode("multiDrillingToolCanvas");
                     }
+                    svgCanvas.clearSelection();
+                    svgCanvas.clickmultiDrillingTool(null);
+
                     //cflorioluis - al presionar r se repite la ultima funcion
-                    repeatFn(clickCremalleraTool)
+                    repeatFn(clickmultiDrillingTool)
                 };
 
                 var clickDrillTool = function() {
@@ -3584,136 +3607,9 @@
                     //cflorioluis - al presionar r se repite la ultima funcion
                     repeatFn(clickRectRoundTool)
 
-
-
-
-                    /**/
-
-                    /*
-                                        $.svgIcons(curConfig.imgPath + "svg_edit_icons.svg", {
-                                            w: 27,
-                                            h: 27,
-                                            id_match: false,
-                                            no_img: true, // Opera & Firefox 4 gives odd behavior w/images
-                                            fallback_path: curConfig.imgPath,
-                                            fallback: {
-                                                logo: "logo.png",
-                                                select: "select.png",
-                                                //add new toll - cflorioluis - se usa el mismo nombre que en el item de placement
-                                                cajeadoTool: "cajeadoTool.png",
-                                                cremalleraTool: "cremallera.png",
-                                                drillTool: "drill.png",
-                                                hingeTool: "hinge.png",
-                                                polyTool: "poly.png",
-                                                rectTools: "rectRound.png",
-                                                rectTool: "rectTool.png",
-                                                rectRoundTool: "rectRound.png",
-                                                select_node: "select_node.png",
-                                                pencil: "pencil.png",
-                                                pen: "line.png",
-                                                rect: "square.png",
-                                                ellipse: "ellipse.png",
-                                                path: "path.png",
-                                                text: "text.png",
-                                                image: "image.png",
-                                                zoom: "zoom.png",
-                                                delete: "delete.png",
-                                                spapelib: "shapelib.png",
-                                                node_delete: "node_delete.png",
-                                                align_left: "align-left.png",
-                                                align_center: "align-center.png",
-                                                align_right: "align-right.png",
-                                                align_top: "align-top.png",
-                                                align_middle: "align-middle.png",
-                                                align_bottom: "align-bottom.png",
-                                                arrow_right: "flyouth.png",
-                                                arrow_down: "dropdown.gif",
-                                            },
-                                            placement: {
-                                                "#logo": "logo",
-                                                "#tool_select": "select",
-                                                //add new toll - cflorioluis - Elegir el nombre de la Herramienta, este se usara para elegir la imagen de la misma
-                                                "#tool_cajeadoTool": "cajeadoTool",
-                                                "#tool_cremalleraTool": "cremalleraTool",
-                                                "#tool_drillTool": "drillTool",
-                                                "#tool_hingeTool": "hingeTool",
-                                                "#tool_polyTool": "polyTool",
-                                                "#tool_rectTools": "rectRoundTool",
-                                                "#tool_rectTool": "rectTool",
-                                                "#tool_rectRoundTool": "rectRoundTool",
-
-                                                //
-                                                "#tool_fhpath": "pencil",
-                                                "#tool_line": "pen",
-                                                "#tool_rect,#tools_rect_show": "rect",
-                                                "#tool_ellipse,#tools_ellipse_show": "ellipse",
-                                                "#tool_path": "path",
-                                                "#tool_text,#layer_rename": "text",
-                                                "#tool_image": "image",
-                                                "#tool_zoom": "zoom",
-                                                "#tool_node_clone": "node_clone",
-                                                "#tool_node_delete": "node_delete",
-                                                "#tool_add_subpath": "add_subpath",
-                                                "#tool_openclose_path": "open_path",
-                                                "#tool_alignleft, #tool_posleft": "align_left",
-                                                "#tool_aligncenter, #tool_poscenter": "align_center",
-                                                "#tool_alignright, #tool_posright": "align_right",
-                                                "#tool_aligntop, #tool_postop": "align_top",
-                                                "#tool_alignmiddle, #tool_posmiddle": "align_middle",
-                                                "#tool_alignbottom, #tool_posbottom": "align_bottom",
-                                                "#cur_position": "align",
-                                                "#zoomLabel": "zoom",
-                                            },
-                                            resize: {
-                                                "#logo .svg_icon": 15,
-                                                ".flyout_arrow_horiz .svg_icon": 5,
-                                                "#fill_bg .svg_icon, #stroke_bg .svg_icon": svgedit.browser.isTouch() ?
-                                                    24 : 24,
-                                                ".palette_item:first .svg_icon": svgedit.browser.isTouch() ?
-                                                    30 : 16,
-                                                "#zoomLabel .svg_icon": 16,
-                                                "#zoom_dropdown .svg_icon": 7,
-                                            },
-                                            callback: function(icons) {
-                                                $(
-                                                    ".toolbar_button button > svg, .toolbar_button button > img"
-                                                ).each(function() {
-                                                    $(this).parent().prepend(this);
-                                                });
-                                                $(".tool_button, .tool_button_current").addClass("loaded");
-                                                var tleft = $("#tools_left");
-                                                if (tleft.length != 0) {
-                                                    var min_height = tleft.offset().top + tleft.outerHeight();
-                                                }
-
-                                                // Look for any missing flyout icons from plugins
-                                                $(".tools_flyout").each(function() {
-                                                    var shower = $("#" + this.id + "_show");
-                                                    var sel = shower.attr("data-curopt");
-                                                    // Check if there's an icon here
-                                                    if (!shower.children("svg, img").length) {
-                                                        var clone = $(sel).children().clone();
-                                                        if (clone.length) {
-                                                            clone[0].removeAttribute("style"); //Needed for Opera
-                                                            shower.append(clone);
-                                                        }
-                                                    }
-                                                });
-                                                methodDraw.runCallbacks();
-
-                                                setTimeout(function() {
-                                                    $(".flyout_arrow_horiz:empty").each(function() {
-                                                        $(this).append($.getSvgIcon("arrow_right").width(5).height(5));
-                                                    });
-                                                }, 1);
-                                            },
-                                        });
-                    */
                     $('#tool_rectTools').removeClass("tool_rectRoundTools");
                     $('#tool_rectTools').removeClass("tool_rectTools");
                     $('#tool_rectTools').addClass("tool_rectRoundTools");
-
-
                 };
 
                 var clickFHPath = function() {
@@ -3798,8 +3694,8 @@
                 // Delete is a contextual tool that only appears in the ribbon if
                 // an element has been selected
                 var deleteSelected = function() {
-                    curConfig.cuadrant = 1;
-                    svgCanvas.updateRulersCuadrant(curConfig.cuadrant, $('#faceSelector').val())
+                    curConfig.quadrant = 1;
+                    svgCanvas.updateRulersQuadrant(curConfig.quadrant, $('#faceSelector').val())
                     if (selectedElement != null || multiselected) {
                         //mantener los id de la seleccion para ver si son mecanizados y borrar
                         //sus relacionados de manera correcta para que queden en el historial Ctrl-Z
@@ -3816,8 +3712,8 @@
                                 var element = tempMultiSelected[ii];
                                 //cflorioluis - si es un cajeado eliminar su linea respectiva que se representa en el canto de la pieza
                                 if (
-                                    element.getAttribute("nameMecanizado") == "cajeado" ||
-                                    element.getAttribute("nameMecanizado") == "poly"
+                                    element.getAttribute("machining") == "pocket" ||
+                                    element.getAttribute("machining") == "poly"
                                 ) {
                                     svgCanvas.addToSelection(
                                         [svgCanvas.getElem(element.id + "_line1")],
@@ -3834,8 +3730,8 @@
 
                         if (!isMulti) {
                             if (
-                                tempSelected.getAttribute("nameMecanizado") == "cajeado" ||
-                                tempSelected.getAttribute("nameMecanizado") == "poly"
+                                tempSelected.getAttribute("machining") == "pocket" ||
+                                tempSelected.getAttribute("machining") == "poly"
                             ) {
                                 svgCanvas.addToSelection(
                                     [svgCanvas.getElem(tempSelected.id + "_line1")],
@@ -3962,16 +3858,16 @@
                         }
                         $("input").blur();
                         //cflorioluis - evitar que un mecanizado se mueva correctamente con las flechas del techado
-                        switch (selectedElement.getAttribute("nameMecanizado")) {
+                        switch (selectedElement.getAttribute("machining")) {
                             case "hinge":
                             case "poly":
-                            case "cajeado":
+                            case "pocket":
                                 return;
                             case "drill":
                                 var posX = parseInt(selectedElement.getAttribute("cx")) - 100,
                                     posY = parseInt(selectedElement.getAttribute("cy")) - 100,
                                     face = parseInt(selectedElement.getAttribute("face")),
-                                    cuadrant = parseInt(selectedElement.getAttribute("cuadrant")),
+                                    quadrant = parseInt(selectedElement.getAttribute("quadrant")),
                                     DY = dy;
 
                                 if ($('#faceSelector').val() == "5")
@@ -3982,7 +3878,7 @@
 
                                 if (posX < 0 || posY < 0 || posX > curConfig.realDimensions[0] || posY > curConfig.realDimensions[1]) return;
 
-                                switch (Math.abs(parseInt(face) - cuadrant)) {
+                                switch (Math.abs(parseInt(face) - quadrant)) {
                                     case 1:
                                         selectedElement.setAttribute("realX", posX);
                                         selectedElement.setAttribute("realY", curConfig.realDimensions[1] - posY);
@@ -4008,7 +3904,7 @@
                                 var posX = parseInt(selectedElement.getAttribute("x")) - 100,
                                     posY = parseInt(selectedElement.getAttribute("y")) - 100,
                                     face = parseInt(selectedElement.getAttribute("face")),
-                                    cuadrant = parseInt(selectedElement.getAttribute("cuadrant")),
+                                    quadrant = parseInt(selectedElement.getAttribute("quadrant")),
                                     isCenter = selectedElement.getAttribute("lw") == "2" ? true : false,
                                     DY = dy;
 
@@ -4029,7 +3925,7 @@
                                 if ((posX < 0 || posY < 0 || posX > curConfig.realDimensions[0] || posY > curConfig.realDimensions[1])) return;
                                 if ((cX < 0 || cY < 0 || cX > curConfig.realDimensions[0] || cY > curConfig.realDimensions[1])) return;
 
-                                switch (Math.abs(parseInt(face) - cuadrant)) {
+                                switch (Math.abs(parseInt(face) - quadrant)) {
                                     case 1:
                                         if (isCenter) {
                                             posX += (width / 2);
@@ -4073,8 +3969,8 @@
                 var scaleRadiusSelected = function(r) {
                     if (
                         selectedElement != null ||
-                        selectedElement.getAttribute("nameMecanizado") != null ||
-                        selectedElement.getAttribute("nameMecanizado") != "drill"
+                        selectedElement.getAttribute("machining") != null ||
+                        selectedElement.getAttribute("machining") != "drill"
                     )
                         return;
 
@@ -4235,13 +4131,13 @@
 
                     var partDarw = '';
 
-                    var mecanizados = $("[nameMecanizado]");
-                    //console.log(mecanizados);
+                    var machinings = $("[machining]");
+                    //console.log(machinings);
                     var doc = document.implementation.createDocument('', '', null);
-                    var hingeReady = false;
+                    var findPoly = false;
 
-                    for (let ii = 0; ii < mecanizados.length; ii++) {
-                        const mecanizado = mecanizados[ii];
+                    for (let ii = 0; ii < machinings.length; ii++) {
+                        const machining = machinings[ii];
                         var drawElement = doc.createElement("Draw");
                         var functNameElement = doc.createElement("FUNCTNAME");
                         var paramElement = doc.createElement("PARAM");
@@ -4254,33 +4150,35 @@
                         drawElement.appendChild(opsideElement);
                         drawElement.appendChild(sideElement);
 
-                        switch (mecanizado.getAttribute("nameMecanizado")) {
-                            case "cajeado":
+                        switch (machining.getAttribute("machining")) {
+                            case "pocket":
                                 functNameElement.append("_Cajeado");
-                                var param = '"DiaFr" VAR "' + mecanizado.getAttribute('radio') + '":"Hoek" VAR "' + mecanizado.getAttribute('side') + '":"StartX" VAR "' + mecanizado.getAttribute('widthX') + '":"StartY" VAR "' + mecanizado.getAttribute("heightY") + '"';
+                                var param = '"DiaFr" VAR "' + machining.getAttribute('radio') + '":"Hoek" VAR "' + machining.getAttribute('side') + '":"StartX" VAR "' + machining.getAttribute('widthX') + '":"StartY" VAR "' + machining.getAttribute("heightY") + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                sideElement.append(mecanizado.getAttribute('face'));
+                                opsideElement.append(machining.getAttribute("quadrant"));
+                                sideElement.append(machining.getAttribute('face'));
                                 break;
                             case "drill":
                                 functNameElement.append("_Taladro");
-                                var param = '"Origine" VAR "0":"Depart_X" VAR "' + mecanizado.getAttribute("realX") + '":"Depart_Y" VAR "' + mecanizado.getAttribute("realY") + '":"diametre" VAR "' + mecanizado.getAttribute("diameter") + '":"profondeur" VAR "' + mecanizado.getAttribute("depth") + '":"debouchant" VAR "' + mecanizado.getAttribute("cross") + '"';
+                                var param = '"Origine" VAR "0":"Depart_X" VAR "' + machining.getAttribute("realX") + '":"Depart_Y" VAR "' + machining.getAttribute("realY") + '":"diametre" VAR "' + machining.getAttribute("diameter") + '":"profondeur" VAR "' + machining.getAttribute("depth") + '":"debouchant" VAR "' + machining.getAttribute("cross") + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                sideElement.append(mecanizado.getAttribute('face'));
+                                opsideElement.append(machining.getAttribute("quadrant"));
+                                sideElement.append(machining.getAttribute('face'));
                                 break;
                             case "hinge":
                                 functNameElement.append("_Cazoleta");
-                                var param = '"Origine" VAR "' + mecanizado.getAttribute("origin") + '":"Depart_X" VAR "' + mecanizado.getAttribute("beginX") + '":"Fin_X" VAR "' + mecanizado.getAttribute("endX") + '":"nombre" VAR "' + mecanizado.getAttribute("hingeCount") + '":"entraxe" VAR "' + mecanizado.getAttribute("axisDist") + '":"Dia_insert" VAR "' + mecanizado.getAttribute("drillDiameter") + '":"Prof_insert" VAR "' + mecanizado.getAttribute("drillDepth") + '":"Dia_charniere" VAR "' + mecanizado.getAttribute("hingeDiameter") + '":"Prof_charn" VAR "' + mecanizado.getAttribute("hingeDepth") + '"';
+                                var param = '"Origine" VAR "' + machining.getAttribute("origin") + '":"Depart_X" VAR "' + machining.getAttribute("beginX") + '":"Fin_X" VAR "' + machining.getAttribute("endX") + '":"nombre" VAR "' + machining.getAttribute("hingeCount") + '":"entraxe" VAR "' + machining.getAttribute("axisDist") + '":"Dia_insert" VAR "' + machining.getAttribute("drillDiameter") + '":"Prof_insert" VAR "' + machining.getAttribute("drillDepth") + '":"Dia_charniere" VAR "' + machining.getAttribute("hingeDiameter") + '":"Prof_charn" VAR "' + machining.getAttribute("hingeDepth") + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                sideElement.append(mecanizado.getAttribute('face'));
+                                opsideElement.append(machining.getAttribute("quadrant"));
+                                sideElement.append(machining.getAttribute('face'));
                                 break;
 
                             case "poly":
                                 //cflorioluis - capturar todos los poly (angulos en lados)
-                                if (hingeReady) continue;
-                                var polys = $('[nameMecanizado="poly"]'),
+                                if (findPoly)
+                                    continue;
+
+                                var polys = $('[machining="poly"]'),
                                     b1 = "",
                                     b2 = "",
                                     b3 = "",
@@ -4310,38 +4208,37 @@
                                             b2 = poly.getAttribute("widthX");
                                             h2 = poly.getAttribute("heightY");
                                             break;
-
-                                        default:
-                                            break;
                                     }
                                 }
 
                                 functNameElement.append("_Anguloenlados");
                                 var param = '"b1" VAR "' + b1 + '":"h1" VAR "' + h1 + '":"b2" VAR "' + b2 + '":"h2" VAR "' + h2 + '":"b3" VAR "' + b3 + '":"h3" VAR "' + h3 + '":"b4" VAR "' + b4 + '":"h4" VAR "' + h4 + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
-                                hingeReady = true;
+                                opsideElement.append(machining.getAttribute("quadrant"));
+                                findPoly = true;
                                 break;
                             case "rect":
                                 functNameElement.append("_Rectangulo");
-                                var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '"';
+                                var param = '"StartX1" VAR "' + machining.getAttribute("realX") + '":"StartY1" VAR "' + machining.getAttribute("realY") + '":"Width" VAR "' + machining.getAttribute("width") + '":"Height" VAR "' + machining.getAttribute("height") + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
+                                opsideElement.append(machining.getAttribute("quadrant"));
                                 drawElement.appendChild(lwElement);
-                                lwElement.append(mecanizado.getAttribute('lw'));
-                                sideElement.append(mecanizado.getAttribute('face'));
+                                lwElement.append(machining.getAttribute('lw'));
+                                sideElement.append(machining.getAttribute('face'));
                                 break;
                             case "rectRound":
                                 functNameElement.append("_RectanguloRedondeado");
-                                var param = '"StartX1" VAR "' + mecanizado.getAttribute("realX") + '":"StartY1" VAR "' + mecanizado.getAttribute("realY") + '":"Width" VAR "' + mecanizado.getAttribute("width") + '":"Height" VAR "' + mecanizado.getAttribute("height") + '":"RadiusX" VAR "' + mecanizado.getAttribute("rx") + '":"RadiusY" VAR "' + mecanizado.getAttribute("ry") + '"';
+                                var param = '"StartX1" VAR "' + machining.getAttribute("realX") + '":"StartY1" VAR "' + machining.getAttribute("realY") + '":"Width" VAR "' + machining.getAttribute("width") + '":"Height" VAR "' + machining.getAttribute("height") + '":"RadiusX" VAR "' + machining.getAttribute("rx") + '":"RadiusY" VAR "' + machining.getAttribute("ry") + '"';
                                 paramElement.append(param);
-                                opsideElement.append(mecanizado.getAttribute('cuadrant'));
+                                opsideElement.append(machining.getAttribute("quadrant"));
                                 drawElement.appendChild(lwElement);
-                                lwElement.append(mecanizado.getAttribute('lw'));
-                                sideElement.append(mecanizado.getAttribute('face'));
+                                lwElement.append(machining.getAttribute('lw'));
+                                sideElement.append(machining.getAttribute('face'));
                                 break;
-                        }
 
+                            default:
+                                continue;
+                        }
                         doc.appendChild(drawElement);
                         var draw = new XMLSerializer().serializeToString(doc);
                         //console.log(draw);
@@ -4410,15 +4307,15 @@
 
                 //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
                 var clickExportPartDraw = function() {
-                    //svgCanvas.removeDivsExport();
-                    //var newOrder = JSON.parse(localStorage.newOrder);
-                    //var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
-                    //newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
+                    svgCanvas.removeDivsExport();
+                    var newOrder = JSON.parse(localStorage.newOrder);
+                    var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+                    newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
 
-                    //localStorage.setItem("newOrder", JSON.stringify(newOrder));
+                    localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
                     //localStorage.setItem("svgPreview", svgCanvas.svgCanvasToString());
-                    //svgCanvas.createDivs(curConfig.edges);
+                    svgCanvas.createDivs(curConfig.edges);
                     saveFileCSV(generatePartDraw());
                 };
 
@@ -4599,30 +4496,32 @@
 
                     var face = $("#faceSelector").val();
 
-                    var mecanizados = $("[nameMecanizado]");
+                    var machinings = $("[machining]");
+
+                    curConfig.viewAllMachining = viewAllMachining;
 
                     if (viewAllMachining) {
                         $("#tool_viewAllMachining").addClass("push_button_pressed");
 
-                        for (let ii = 0; ii < mecanizados.length; ii++) {
-                            var mecanizado = mecanizados[ii];
-                            if (mecanizado.getAttribute("cross") == "0") {
-                                if (mecanizado.getAttribute("face") != face) {
-                                    $(mecanizado).show();
-                                    $(mecanizado).attr("fill", "transparent");
-                                    $(mecanizado).attr("stroke-width", "1");
+                        for (let ii = 0; ii < machinings.length; ii++) {
+                            var machining = machinings[ii];
+                            if (machining.getAttribute("cross") == "0") {
+                                if (machining.getAttribute("face") != face) {
+                                    $(machining).show();
+                                    $(machining).attr("fill", "transparent");
+                                    $(machining).attr("stroke-width", "1");
                                 }
                             }
                         }
                     } else {
                         $("#tool_viewAllMachining").removeClass("push_button_pressed");
-                        for (let ii = 0; ii < mecanizados.length; ii++) {
-                            var mecanizado = mecanizados[ii];
-                            if (mecanizado.getAttribute("cross") == "0") {
-                                if (mecanizado.getAttribute("face") != face) {
-                                    $(mecanizado).hide();
-                                    $(mecanizado).attr("fill", "#3F3F3F");
-                                    $(mecanizado).attr("stroke-width", "0");
+                        for (let ii = 0; ii < machinings.length; ii++) {
+                            var machining = machinings[ii];
+                            if (machining.getAttribute("cross") == "0") {
+                                if (machining.getAttribute("face") != face) {
+                                    $(machining).hide();
+                                    $(machining).attr("fill", "#3F3F3F");
+                                    $(machining).attr("stroke-width", "0");
                                 }
                             }
                         }
@@ -5411,14 +5310,14 @@
                         },
                         //add new toll - cflorioluis
                         {
-                            sel: "#tool_cajeadoTool",
-                            fn: clickCajeadoTool,
+                            sel: "#tool_pocketTool",
+                            fn: clickPocketTool,
                             evt: "click",
                             key: [modKey + "Shift+2"],
                         },
                         {
-                            sel: "#tool_cremalleraTool",
-                            fn: clickCremalleraTool,
+                            sel: "#tool_multiDrillingTool",
+                            fn: clickmultiDrillingTool,
                             evt: "click",
                             key: [modKey + "Shift+3"],
                         },
@@ -6191,25 +6090,25 @@
                     cursor: false,
                 });
                 //cflorioluis - agregar funciones al cajeado
-                $("#cajeado_widthX").dragInput({
+                $("#pocket_widthX").dragInput({
                     min: 1,
                     max: curConfig.realDimensions[0],
                     step: 1,
-                    callback: changeAttributeCajeado,
+                    callback: changeAttributePocket,
                     cursor: true,
                 });
-                $("#cajeado_heightY").dragInput({
+                $("#pocket_heightY").dragInput({
                     min: 1,
                     max: curConfig.realDimensions[1],
                     step: 1,
-                    callback: changeAttributeCajeado,
+                    callback: changeAttributePocket,
                     cursor: true,
                 });
-                $("#cajeado_radio").dragInput({
+                $("#pocket_radio").dragInput({
                     min: 0,
                     max: lowDimension - 200,
                     step: 1,
-                    callback: changeAttributeCajeado,
+                    callback: changeAttributePocket,
                     cursor: true,
                 });
                 //cflorioluis - agregar funciones al Taladro
@@ -6325,6 +6224,72 @@
                     step: 1,
                     callback: changeAttributeRectRound,
                     cursor: true,
+                });
+
+                //cflorioluis - agragar funciones a la Cazoleta
+                var textToNum = function(e, obj) {
+                    if ($.isNumeric(obj.val())) {
+                        if (e.originalEvent.wheelDelta / 120 > 0) {
+                            obj.val(parseFloat(obj.val()) + 1)
+                        } else {
+                            obj.val(parseFloat(obj.val()) - 1)
+                        }
+                    } else {
+                        obj.val("0")
+                    }
+                }
+
+                $("#hinge_beginX").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributeHinge,
+                    cursor: false,
+                });
+
+                $("#hinge_endX").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeHinge,
+                    cursor: false,
+                });
+                $('#hinge_endX').bind('mousewheel', (e) => { textToNum(e, $('#hinge_endX')) });
+                $('#hinge_endX').bind('mousedown', (e) => {
+                    $('#hinge_endX').bind('mousemove', textToNum(e, $('#hinge_endX')));
+                });
+
+
+                /*$('#control-vol').bind('mousedown', function(e){
+                  $('#control-vol').bind('mousemove', function(e){
+                      var volumen = e.pageX - this.offsetLeft;
+                      $('#barra-vol').width(volumen + 'px');
+                      $('audio')[7].volume = volumen/50;
+                  });
+
+                  $('#control-vol').bind('mouseup',function(){
+                      $('#control-vol').unbind('mousemove')
+                  });
+              });*/
+
+                $("#hinge_hingeCount").dragInput({
+                    min: 0,
+                    max: 10,
+                    step: 1,
+                    callback: changeAttributeHinge,
+                    cursor: false,
+                });
+
+                $("#hinge_axisDist").dragInput({
+                    min: 0,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeHinge,
+                    cursor: false,
+                });
+                $('#hinge_axisDist').bind('mousewheel', (e) => { textToNum(e, $('#hinge_axisDist')) });
+                $('#hinge_axisDist').bind('mousedown', (e) => {
+                    $('#hinge_axisDist').bind('mousemove', textToNum(e, $('#hinge_axisDist')));
                 });
 
                 $("#g_x").dragInput({
@@ -6703,15 +6668,12 @@
                         w_area[0].scrollTop = new_ctr.y - h_orig / 2;
                     }
                     if (curConfig.showRulers) {
-                        /*console.log("ruler");
-                        console.log(zoom);
-                        console.log(cnvs);*/
-
-                        //console.log(svgCanvas.getCuadrant());
-
-                        updateRulers(svgCanvas.getCuadrant(), cnvs, zoom);
-                        //svgCanvas.updateRulersCuadrant(curConfig.cuadrant, cnvs, zoom)
+                        updateRulers(svgCanvas.getQuadrant(), cnvs, zoom);
+                        //svgCanvas.updateRulersQuadrant(curConfig.quadrant, cnvs, zoom)
                         workarea.scroll();
+                    }
+                    if (curConfig.viewAllMachining) {
+                        clickViewAllMachiningBegin();
                     }
                 });
 
@@ -6723,7 +6685,45 @@
                     r_intervals.push(5 * i);
                 }
 
-                function updateRulers(cuadrant, scanvas, zoom) {
+                //cflorioluis - Ver todos los Mecanizados, definicion de la funcion
+                var clickViewAllMachiningBegin = function() {
+                    //var viewAllMachining = !$("#tool_viewAllMachining").hasClass("push_button_pressed");
+                    //var face = "0";
+                    //if ($("#faceSelector").val() == "1") face = "5";
+
+                    var face = $("#faceSelector").val();
+                    var machinings = $("[machining]");
+
+                    //if (viewAllMachining) {
+                    $("#tool_viewAllMachining").addClass("push_button_pressed");
+
+                    for (let ii = 0; ii < machinings.length; ii++) {
+                        var machining = machinings[ii];
+                        if (machining.getAttribute("cross") == "0") {
+                            if (machining.getAttribute("face") != face) {
+                                $(machining).show();
+                                $(machining).attr("fill", "transparent");
+                                $(machining).attr("stroke-width", "1");
+                            }
+                        }
+                    }
+                    //}
+                    /*else {
+                        $("#tool_viewAllMachining").removeClass("push_button_pressed");
+                        for (let ii = 0; ii < machinings.length; ii++) {
+                            var machining = machinings[ii];
+                            if (machining.getAttribute("cross") == "0") {
+                                if (machining.getAttribute("face") != face) {
+                                    $(machining).hide();
+                                    $(machining).attr("fill", "#3F3F3F");
+                                    $(machining).attr("stroke-width", "0");
+                                }
+                            }
+                        }
+                    }*/
+                };
+
+                function updateRulers(quadrant, scanvas, zoom) {
                     var workarea = document.getElementById("workarea");
                     var title_show = document.getElementById("title_show");
                     var offset_x = 66;
@@ -6836,17 +6836,17 @@
                             if (multi >= 1) {
                                 //cflorioluis ajustar regla para que diga 0,0 abajo a la izquierda
                                 var cuad = null
-                                    //cflorioluis - Cambiar la Regla dependiendo del cuadrante
-                                if (cuadrant) {
-                                    cuad = cuadrant;
-                                    curConfig.cuadrant = cuadrant;
-                                    //console.log("cuadrante actualizado");
+                                    //cflorioluis - Cambiar la Regla dependiendo del quadrante
+                                if (quadrant) {
+                                    cuad = quadrant;
+                                    curConfig.quadrant = quadrant;
+                                    //console.log("quadrante actualizado");
                                 }
 
-                                $('#svg__cuadrant_1').attr('fill', '#3F3F3F');
-                                $('#svg__cuadrant_2').attr('fill', '#3F3F3F');
-                                $('#svg__cuadrant_3').attr('fill', '#3F3F3F');
-                                $('#svg__cuadrant_4').attr('fill', '#3F3F3F');
+                                $('#svg__quadrant_1').attr('fill', '#3F3F3F');
+                                $('#svg__quadrant_2').attr('fill', '#3F3F3F');
+                                $('#svg__quadrant_3').attr('fill', '#3F3F3F');
+                                $('#svg__quadrant_4').attr('fill', '#3F3F3F');
 
                                 switch (cuad) {
                                     case 1: //Abajo a la Izquierda
@@ -6855,7 +6855,7 @@
                                         } else {
                                             label = Math.round(num) - 100;
                                         }
-                                        $('#svg__cuadrant_1').attr('fill', '#0F0');
+                                        $('#svg__quadrant_1').attr('fill', '#0F0');
                                         break;
                                     case 2: //Abajo a la Derecha
                                         if (dim == "y") {
@@ -6863,7 +6863,7 @@
                                         } else {
                                             label = -1 * (Math.round(num) - curConfig.dimensions[0] + 100);
                                         }
-                                        $('#svg__cuadrant_2').attr('fill', '#0F0');
+                                        $('#svg__quadrant_2').attr('fill', '#0F0');
                                         break;
                                     case 3: //Arriba a la Derecha
                                         if (dim == "y") {
@@ -6871,11 +6871,11 @@
                                         } else {
                                             label = -1 * (Math.round(num) - curConfig.dimensions[0] + 100);
                                         }
-                                        $('#svg__cuadrant_3').attr('fill', '#0F0');
+                                        $('#svg__quadrant_3').attr('fill', '#0F0');
                                         break;
                                     case 4: //Arriba a la Izquierda
                                         label = Math.round(num) - 100;
-                                        $('#svg__cuadrant_4').attr('fill', '#0F0');
+                                        $('#svg__quadrant_4').attr('fill', '#0F0');
                                         break;
                                 }
                             } else {
@@ -7027,7 +7027,7 @@
 
                         for (let ii = 1; ii < machinnings[2].childNodes.length; ii += 2) {
                             const element = machinnings[2].childNodes[ii];
-                            if (element.hasAttribute("nameMecanizado"))
+                            if (element.hasAttribute("machining"))
                                 svgContent.appendChild(element.cloneNode(true))
                         }
                     }
@@ -7035,7 +7035,7 @@
                     //cflorioluis - hacer animacion de cambio de cara
                     $("#faceSelector").on("change", function() {
 
-                        svgCanvas.updateRulersCuadrant(curConfig.cuadrant, $('#faceSelector').val())
+                        svgCanvas.updateRulersQuadrant(curConfig.quadrant, $('#faceSelector').val())
                         var rotation = 0;
                         if ($(this).val() == "5") rotation = 180;
 
@@ -7047,9 +7047,9 @@
                         //console.log();
                         //bloquear cajeado para que no se haga por la cara tracera
                         var regExp = /\(([^)]+)\)/; //get command short for cajeado
-                        var command = regExp.exec($("#tool_cajeadoTool")[0].title);
+                        var command = regExp.exec($("#tool_pocketTool")[0].title);
 
-                        var mecanizados = $("[nameMecanizado]");
+                        var machinings = $("[machining]");
 
                         var viewAllMachining = $("#tool_viewAllMachining").hasClass("push_button_pressed");
 
@@ -7057,18 +7057,18 @@
                         var face = $("#faceSelector").val();
 
                         if (viewAllMachining) {
-                            for (let ii = 0; ii < mecanizados.length; ii++) {
-                                var mecanizado = mecanizados[ii];
-                                if (mecanizado.getAttribute("cross") == "0") {
-                                    $(mecanizado).attr("fill", "#3F3F3F");
-                                    $(mecanizado).attr("stroke-width", "0");
-                                    $(mecanizado).hide();
-                                    if (mecanizado.getAttribute("face") != face) {
-                                        $(mecanizado).show();
-                                        $(mecanizado).attr("fill", "transparent");
-                                        $(mecanizado).attr("stroke-width", "1");
+                            for (let ii = 0; ii < machinings.length; ii++) {
+                                var machining = machinings[ii];
+                                if (machining.getAttribute("cross") == "0") {
+                                    $(machining).attr("fill", "#3F3F3F");
+                                    $(machining).attr("stroke-width", "0");
+                                    $(machining).hide();
+                                    if (machining.getAttribute("face") != face) {
+                                        $(machining).show();
+                                        $(machining).attr("fill", "transparent");
+                                        $(machining).attr("stroke-width", "1");
                                     } else {
-                                        $(mecanizado).show();
+                                        $(machining).show();
                                     }
 
                                 }
@@ -7076,35 +7076,35 @@
                         } else {
                             if (rotation == 180) {
                                 //en cara tracera
-                                for (let ii = 0; ii < mecanizados.length; ii++) {
-                                    var mecanizado = mecanizados[ii];
-                                    if (mecanizado.getAttribute("cross") == "0") {
-                                        switch (mecanizado.getAttribute("face")) {
+                                for (let ii = 0; ii < machinings.length; ii++) {
+                                    var machining = machinings[ii];
+                                    if (machining.getAttribute("cross") == "0") {
+                                        switch (machining.getAttribute("face")) {
                                             case "0":
-                                                //$(mecanizado).slideToggle("fast");
-                                                $(mecanizado).hide();
-                                                $(mecanizado).attr("fill", "transparent");
-                                                $(mecanizado).attr("stroke-width", "1");
+                                                //$(machining).slideToggle("fast");
+                                                $(machining).hide();
+                                                $(machining).attr("fill", "transparent");
+                                                $(machining).attr("stroke-width", "1");
                                                 break;
                                             case "5":
-                                                $(mecanizado).show();
+                                                $(machining).show();
                                                 break;
                                         }
                                     }
                                 }
                             } else {
                                 //en cara delantera
-                                for (let ii = 0; ii < mecanizados.length; ii++) {
-                                    var mecanizado = mecanizados[ii];
-                                    if (mecanizado.getAttribute("cross") == "0") {
-                                        switch (mecanizado.getAttribute("face")) {
+                                for (let ii = 0; ii < machinings.length; ii++) {
+                                    var machining = machinings[ii];
+                                    if (machining.getAttribute("cross") == "0") {
+                                        switch (machining.getAttribute("face")) {
                                             case "0":
-                                                $(mecanizado).show();
-                                                $(mecanizado).attr("fill", "#3F3F3F");
-                                                $(mecanizado).attr("stroke-width", "0");
+                                                $(machining).show();
+                                                $(machining).attr("fill", "#3F3F3F");
+                                                $(machining).attr("stroke-width", "0");
                                                 break;
                                             case "5":
-                                                $(mecanizado).hide();
+                                                $(machining).hide();
                                                 break;
                                         }
                                     }
@@ -7116,7 +7116,7 @@
 
                                                                         fill="transparent"  stroke-width="1" */
 
-                        //$('#tool_cajeadoTool').off('keydown');
+                        //$('#tool_pocketTool').off('keydown');
 
                         /*$(document).bind("keydown", key, function(e) {
                                                     fn();

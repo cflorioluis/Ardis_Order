@@ -38,15 +38,39 @@ $('#mainFace').click(function() {
     }
     $(this).attr("rotation", rotation)
     $(this).val((parseInt($(this).val()) + 5) % 10)
-    svgCanvas.editDrill('face', $(this).val(), $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editRectRound('face', $(this).val(), $('input[name="quadrant"]:checked').val());
+
+    $("#faceSelector").val($(this).val());
+    $("#faceSelector").trigger('change');
 });
 
 $('#rectRoundPositionCenter').click(function() {
     svgCanvas.editRectRound('isCenter', $(this).is(':checked'));
 });
 
-$('input[name="cuadrant"]').click(function() {
-    svgCanvas.editRectRound('cuadrant', $(this).val());
+
+$("#newXRect").change(function() {
+    svgCanvas.editRectRound('newXRect', this.value, $('input[name="quadrant"]:checked').val());
+});
+$("#newYRect").change(function() {
+    svgCanvas.editRectRound('newYRect', this.value, $('input[name="quadrant"]:checked').val());
+});
+$("#newWidthRect").change(function() {
+    svgCanvas.editRectRound('newWidthRect', this.value, $('input[name="quadrant"]:checked').val());
+});
+$("#newHeightRect").change(function() {
+    svgCanvas.editRectRound('newHeightRect', this.value, $('input[name="quadrant"]:checked').val());
+});
+$("#newRX").change(function() {
+    svgCanvas.editRectRound('newRX', this.value, $('input[name="quadrant"]:checked').val());
+});
+$("#newRY").change(function() {
+    svgCanvas.editRectRound('newRY', this.value, $('input[name="quadrant"]:checked').val());
+});
+
+
+$('input[name="quadrant"]').click(function() {
+    svgCanvas.editRectRound("quadrant", $(this).val());
 });
 
 $('#rectRoundPositionCenter').keyup(function(e) {
@@ -63,23 +87,26 @@ $('#rectRoundPositionCenter').keyup(function(e) {
 });
 
 $('#dialog_container_custom').keyup(function(e) {
-    if (e.ctrlKey && e.keyCode == 49) //press 1 for select cuadrant 1
-        $('input[name="cuadrant"]:nth(1)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 49) //press 1 for select quadrant 1
+        $('input[name="quadrant"]:nth(1)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 50) //press 2 for select cuadrant 2
-        $('input[name="cuadrant"]:nth(3)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 50) //press 2 for select quadrant 2
+        $('input[name="quadrant"]:nth(3)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 51) //press 3 for select cuadrant 3
-        $('input[name="cuadrant"]:nth(2)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 51) //press 3 for select quadrant 3
+        $('input[name="quadrant"]:nth(2)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 52) //press 4 for select cuadrant 4
-        $('input[name="cuadrant"]:nth(0)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 52) //press 4 for select quadrant 4
+        $('input[name="quadrant"]:nth(0)').prop("checked", true);
 
     if (e.ctrlKey && e.keyCode == 53) //press 5 for select face
         $('input[name="face"]').trigger('click');
 
     if (e.keyCode == 27) //press escape to close
         $('#buttonDialogCancel').trigger('click');
+
+    if (e.keyCode == 13) //press enter in any side to submit
+        $('#buttonDialogOK').trigger('click');
 
     /*if( e.keyCode == 13 ) //press Enter to submit form
       $('#buttonDialogOK').click();*/
@@ -89,3 +116,5 @@ $('#dialog_container_custom').keyup(function(e) {
             $('#buttonDialogOK').trigger('click');
     });
 });
+
+$('#tool_rectTools > svg').replaceWith($('#tool_rectRoundTool > svg').clone(true));

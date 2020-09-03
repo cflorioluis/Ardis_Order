@@ -37,24 +37,27 @@ $('#mainFace').click(function() {
     }
     $(this).attr("rotation", rotation)
     $(this).val((parseInt($(this).val()) + 5) % 10)
-    svgCanvas.editDrill('face', $(this).val(), $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editDrill('face', $(this).val(), $('input[name="quadrant"]:checked').val());
+
+    $("#faceSelector").val($(this).val());
+    $("#faceSelector").trigger('change');
 });
 
-$('input[name="cuadrant"]').click(function() {
-    svgCanvas.editDrill('cuadrant', $(this).val());
+$('input[name="quadrant"]').click(function() {
+    svgCanvas.editDrill("quadrant", $(this).val());
 });
 
 $("#newWidthDrill").change(function() {
-    svgCanvas.editDrill('newWidthDrill', this.value, $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editDrill('newWidthDrill', this.value, $('input[name="quadrant"]:checked').val());
 });
 $("#newHeightDrill").change(function() {
-    svgCanvas.editDrill('newHeightDrill', this.value, $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editDrill('newHeightDrill', this.value, $('input[name="quadrant"]:checked').val());
 });
 $("#newDiameterDrill").change(function() {
-    svgCanvas.editDrill('newDiameterDrill', this.value, $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editDrill('newDiameterDrill', this.value, $('input[name="quadrant"]:checked').val());
 });
 $("#newDepthDrill").change(function() {
-    svgCanvas.editDrill('newDepthDrill', this.value, $('input[name="cuadrant"]:checked').val());
+    svgCanvas.editDrill('newDepthDrill', this.value, $('input[name="quadrant"]:checked').val());
 });
 
 $('#cboxPasante').click(function() {
@@ -67,6 +70,8 @@ $('#cboxPasante').click(function() {
         $('.hidden').fadeIn("slow", );
         $('#dialog_container_custom').height("+=50");
     }
+
+    svgCanvas.editDrill('cross', $(this).is(':checked'));
 });
 
 $('#cboxPasante').keyup(function(e) {
@@ -90,23 +95,26 @@ $('#cboxPasante').keyup(function(e) {
 });
 
 $('#dialog_container_custom').keyup(function(e) {
-    if (e.ctrlKey && e.keyCode == 49) //press 1 for select cuadrant 1
-        $('input[name="cuadrant"]:nth(1)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 49) //press 1 for select quadrant 1
+        $('input[name="quadrant"]:nth(1)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 50) //press 2 for select cuadrant 2
-        $('input[name="cuadrant"]:nth(3)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 50) //press 2 for select quadrant 2
+        $('input[name="quadrant"]:nth(3)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 51) //press 3 for select cuadrant 3
-        $('input[name="cuadrant"]:nth(2)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 51) //press 3 for select quadrant 3
+        $('input[name="quadrant"]:nth(2)').prop("checked", true);
 
-    if (e.ctrlKey && e.keyCode == 52) //press 4 for select cuadrant 4
-        $('input[name="cuadrant"]:nth(0)').prop("checked", true);
+    if (e.ctrlKey && e.keyCode == 52) //press 4 for select quadrant 4
+        $('input[name="quadrant"]:nth(0)').prop("checked", true);
 
     if (e.ctrlKey && e.keyCode == 53) //press 5 for select face
         $('input[name="face"]').trigger('click');
 
     if (e.keyCode == 27) //press escape to close
         $('#buttonDialogCancel').trigger('click');
+
+    if (e.keyCode == 13) //press enter in any side to submit
+        $('#buttonDialogOK').trigger('click');
 
     $('#buttonDialogOK').one('keyup', function(e) {
         if (e.keyCode == 32) //press spacebar to submit form
@@ -121,46 +129,46 @@ $('#dialog_container_custom').keyup(function(e) {
                       <img src="images/drill/main_face.png" style="outline: 1px solid #000;">
                     </div>
                     <div class="gridDrill zIndex1" style="padding-top: 10px;">
-                        <div class="columnDrill cuadrantColumn">
+                        <div class="columnDrill quadrantColumn">
                             <label style="padding-top: 5px;">
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="4" ` + cuadrant4 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="4" ` + quadrant4 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="5" ` + cuadrant5 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="5" ` + quadrant5 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="1" ` + cuadrant1 + `>
-                                <img src="images/machining/cuadrant.png">
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="1" ` + quadrant1 + `>
+                                <img src="images/machining/quadrant.png">
                             </label>
                         </div>
-                        <div class="columnDrill cuadrantColumn">
+                        <div class="columnDrill quadrantColumn">
                             <label style="padding-top: 5px;">
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="8" ` + cuadrant8 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="8" ` + quadrant8 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="9" ` + cuadrant9 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="9" ` + quadrant9 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="6" ` + cuadrant6 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="6" ` + quadrant6 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                         </div>
-                        <div class="columnDrill cuadrantColumn">
+                        <div class="columnDrill quadrantColumn">
                             <label style="padding-top: 5px;">
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="3" ` + cuadrant3 + `>
-                                <img src="images/machining/cuadrant.png" >
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="3" ` + quadrant3 + `>
+                                <img src="images/machining/quadrant.png" >
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="7" ` + cuadrant7 + `>
-                                <img src="images/machining/cuadrant.png">
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="7" ` + quadrant7 + `>
+                                <img src="images/machining/quadrant.png">
                             </label>
                             <label>
-                                <input type="radio" name="cuadrant" hiddenRadio machiningOption="drill" value="2" ` + cuadrant2 + `>
-                                <img src="images/machining/cuadrant.png">
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="2" ` + quadrant2 + `>
+                                <img src="images/machining/quadrant.png">
                             </label>
                         </div>
                     </div>

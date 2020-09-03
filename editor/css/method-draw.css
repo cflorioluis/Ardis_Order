@@ -2375,13 +2375,13 @@ input[readonly=readonly]:focus {
 
 [type=radio][name="corner"]:checked+img,
 [type=radio][name="origin"]:checked+img,
-[type=radio][name="cuadrant"]:checked+img,
+[type=radio][name="quadrant"]:checked+img,
 [type=radio][name="face"]:checked+img {
     outline: 2px solid #f00 !important;
     overflow: hidden;
 }
 
-[type=radio][machiningOption="cajeado"]:checked+img {
+[type=radio][machiningOption="pocket"]:checked+img {
     outline: 2px solid #f00 !important;
     overflow: hidden;
 }
@@ -2422,7 +2422,7 @@ input[readonly=readonly]:focus {
     padding-left: 1px;
 }
 
-.columnDrill.wideCuadrant {
+.columnDrill.wideQuadrant {
     width: 75px;
     padding-left: 1px;
 }
@@ -2437,11 +2437,11 @@ input[readonly=readonly]:focus {
     position: fixed;
 }
 
-.cuadrantColumn {
+.quadrantColumn {
     width: 42px !important;
 }
 
-.cuadrantColumn>label {
+.quadrantColumn>label {
     height: 14px;
 }
 
@@ -2524,21 +2524,21 @@ input[readonly=readonly]:focus {
     padding-right: 5%;
 }
 
-.inputMecanizado {
+.inputMachining {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;
     width: 100px !important;
 }
 
-.inputMecanizadoHinge {
+.inputMachiningHinge {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;
     width: 121px !important;
 }
 
-.inputMecanizadoXY {
+.inputMachiningXY {
     font-size: 17px;
     vertical-align: middle;
     margin-block-start: 10px;
