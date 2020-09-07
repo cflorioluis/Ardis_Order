@@ -545,9 +545,10 @@ var svgedit = svgedit || {};
                 height: 1106,
             },
         });
-        var row = JSON.parse(localStorage.getItem('row'));
-
-        if (row && row[1] == "A") {
+        //var row = JSON.parse(localStorage.getItem('row'));
+        var newOrder = JSON.parse(localStorage.newOrder);
+        var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+        if (newOrder && newOrder[currentRowSelected][1] == "A") {
 
             var imageImg = svgFactory_.createSVGElement({
                 element: "image",
@@ -576,16 +577,11 @@ var svgedit = svgedit || {};
             });
         }
 
-
-
-
-
         canvasbg.appendChild(defsImg);
         defsImg.appendChild(patternImg);
         patternImg.appendChild(imageImg);
 
         svgFactory_.svgRoot().insertBefore(canvasbg, svgFactory_.svgContent());
-
     };
 
     // Function: svgedit.select.SelectorManager.requestSelector

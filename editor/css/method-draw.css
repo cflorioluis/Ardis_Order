@@ -248,7 +248,7 @@ body {
     top: 30px;
     /*55*/
     left: 66px;
-    right: 175px;
+    right: 250px;
     border-top: solid #444 1px;
     border-right: solid #444 1px;
 }
@@ -579,7 +579,7 @@ div#workarea {
     top: 30px;
     left: 50px;
     bottom: 40px;
-    right: 175px;
+    right: 250px;
     background-color: #444;
     overflow: auto;
     text-align: center;
@@ -659,7 +659,7 @@ div#workarea {
 
 #tools_top {
     position: absolute;
-    width: 160px;
+    width: 235px;
     height: 100%;
     background: #2f2f2c;
     right: 0;
@@ -2512,6 +2512,16 @@ input[readonly=readonly]:focus {
     width: 60%;
 }
 
+.columnFromMD {
+    float: left;
+    width: 45%;
+}
+
+.columnFromMD.hide {
+    float: left;
+    width: 50%;
+}
+
 
 /*
 .columnFromHinge>h3 {
@@ -2668,6 +2678,461 @@ input[right][type="text"]::placeholder {
     position: relative;
     left: calc(50% - 150px);
 }
+
+
+/*cflorioluis - TESTCF*/
+
+.input-boxTestCF {
+    width: 20px;
+    border: none;
+}
+
+.hingeFigTestCF {
+    position: relative;
+    left: calc(50% - 150px);
+    width: 300px;
+    height: 201px;
+}
+
+.cDistanceInputTestCF {
+    width: 20px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 7px;
+    right: 41px;
+    font-size: 14px;
+}
+
+.hingeDiameterTestCF {
+    color: black;
+    font-size: 14px;
+    width: 40px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 65px;
+    right: 134px;
+    font-size: 14px;
+}
+
+.drillDiameterTestCF {
+    color: black;
+    font-size: 14px;
+    width: 40px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 62px;
+    right: 244px;
+}
+
+.drillDistanceTestCF {
+    width: 20px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 123px;
+    right: 138px;
+    font-size: 14px;
+}
+
+.drillDistanceFromCenterTestCF {
+    width: 20px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 82px;
+    right: 21px;
+    font-size: 14px;
+}
+
+.hingeDepthTestCF {
+    width: 20px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 165px;
+    right: 20px;
+    font-size: 14px;
+}
+
+.drillDepthTestCF {
+    width: 20px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 165px;
+    right: 257px;
+    font-size: 14px;
+}
+
+.multidrillingFigTestCF {
+    position: relative;
+    left: calc(50% - 183px);
+    width: 365px;
+    height: 201px;
+}
+
+.mdInput {
+    width: 30px;
+    height: 18px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    font-size: 14px;
+}
+
+.mdBeginX_Q1W {
+    top: 124px;
+    right: 328px;
+}
+
+.mdBeginX_Q2W {
+    top: 124px;
+    left: 328px;
+}
+
+.mdBeginX_Q3W {
+    bottom: 144px;
+    left: 328px;
+}
+
+.mdBeginX_Q4W {
+    bottom: 144px;
+    right: 328px;
+}
+
+.mdEndX_Q1W {
+    top: 155px;
+    right: 4px;
+}
+
+.mdEndX_Q2W {
+    top: 155px;
+    left: 4px;
+}
+
+.mdEndX_Q3W {
+    bottom: 175px;
+    left: 4px;
+}
+
+.mdEndX_Q4W {
+    bottom: 175px;
+    right: 4px;
+}
+
+.mdBeginY_Q1W {
+    top: 156px;
+    right: 285px;
+}
+
+.mdBeginY_Q2W {
+    top: 156px;
+    left: 285px;
+}
+
+.mdBeginY_Q3W {
+    bottom: 176px;
+    left: 285px;
+}
+
+.mdBeginY_Q4W {
+    bottom: 176px;
+    right: 285px;
+}
+
+.mdEndY_Q1W {
+    top: 6px;
+    right: 285px;
+}
+
+.mdEndY_Q2W {
+    top: 6px;
+    left: 285px;
+}
+
+.mdEndY_Q3W {
+    bottom: 26px;
+    left: 285px;
+}
+
+.mdEndY_Q4W {
+    bottom: 26px;
+    right: 285px;
+}
+
+.mdAxisDist_Q1W {
+    top: 82px;
+    right: 231px;
+}
+
+.mdAxisDist_Q2W {
+    top: 82px;
+    left: 231px;
+}
+
+.mdAxisDist_Q3W {
+    bottom: 102px;
+    left: 231px;
+}
+
+.mdAxisDist_Q4W {
+    bottom: 102px;
+    right: 231px;
+}
+
+.mdStep_Q1W {
+    width: 20px;
+    top: 90px;
+    right: 103px;
+}
+
+.mdStep_Q2W {
+    width: 20px;
+    top: 90px;
+    left: 103px;
+}
+
+.mdStep_Q3W {
+    width: 20px;
+    bottom: 110px;
+    left: 103px;
+}
+
+.mdStep_Q4W {
+    width: 20px;
+    bottom: 110px;
+    right: 103px;
+}
+
+.md_Q1W {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 75px;
+    right: 43px;
+}
+
+.md_Q2W {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 76px;
+    left: 13px;
+}
+
+.md_Q3W {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    bottom: 93px;
+    left: 12px;
+}
+
+.md_Q4W {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    bottom: 93px;
+    right: 43px;
+}
+
+
+/*H*/
+
+.mdBeginY_Q1H {
+    top: 114px;
+    right: 320px;
+}
+
+.mdBeginY_Q2H {
+    top: 114px;
+    left: 320px;
+}
+
+.mdBeginY_Q3H {
+    bottom: 135px;
+    left: 320px;
+}
+
+.mdBeginY_Q4H {
+    bottom: 135px;
+    right: 320px;
+}
+
+.mdEndY_Q1H {
+    top: 143px;
+    right: 16px;
+}
+
+.mdEndY_Q2H {
+    top: 143px;
+    left: 16px;
+}
+
+.mdEndY_Q3H {
+    bottom: 164px;
+    left: 17px;
+}
+
+.mdEndY_Q4H {
+    bottom: 164px;
+    right: 16px;
+}
+
+.mdBeginX_Q1H {
+    top: 150px;
+    right: 266px;
+}
+
+.mdBeginX_Q2H {
+    top: 150px;
+    left: 266px;
+}
+
+.mdBeginX_Q3H {
+    bottom: 171px;
+    left: 267px;
+}
+
+.mdBeginX_Q4H {
+    bottom: 171px;
+    right: 265px;
+}
+
+.mdEndX_Q1H {
+    top: 17px;
+    right: 265px;
+}
+
+.mdEndX_Q2H {
+    top: 17px;
+    left: 265px;
+}
+
+.mdEndX_Q3H {
+    bottom: 38px;
+    left: 266px;
+}
+
+.mdEndX_Q4H {
+    bottom: 38px;
+    right: 265px;
+}
+
+.mdAxisDist_Q1H {
+    top: 101px;
+    right: 166px;
+}
+
+.mdAxisDist_Q2H {
+    top: 101px;
+    left: 166px;
+}
+
+.mdAxisDist_Q3H {
+    bottom: 122px;
+    left: 165px;
+}
+
+.mdAxisDist_Q4H {
+    bottom: 122px;
+    right: 165px;
+}
+
+.mdStep_Q1H {
+    width: 20px;
+    top: 43px;
+    right: 174px;
+}
+
+.mdStep_Q2H {
+    width: 20px;
+    top: 43px;
+    left: 174px;
+}
+
+.mdStep_Q3H {
+    width: 20px;
+    bottom: 64px;
+    left: 175px;
+}
+
+.mdStep_Q4H {
+    width: 20px;
+    bottom: 64px;
+    right: 174px;
+}
+
+.md_Q1H {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 30px;
+    right: 114px;
+}
+
+.md_Q2H {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    top: 29px;
+    left: 83px;
+}
+
+.md_Q3H {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    bottom: 47px;
+    left: 83px;
+}
+
+.md_Q4H {
+    color: black;
+    font-size: 14px;
+    width: 69px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    bottom: 47px;
+    right: 115px;
+}
+
+.mdDiameter {
+    width: 20px;
+    height: 19px;
+    border: none;
+    text-align: center;
+    position: absolute;
+    font-size: 14px;
+}
+
+
+/*cflorioluis - TESTCF*/
 
 .parentSquare {
     width: 300px;
