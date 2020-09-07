@@ -1,11 +1,11 @@
-$('#inputErrorWCajeado').hide();
-$('#inputErrorHCajeado').hide();
-$('#inputErrorRCajeado').hide();
-setTimeout(function() { $('#newWidthCajeado').focus(); }, 100);
+$('#inputErrorWPocket').hide();
+$('#inputErrorHPocket').hide();
+$('#inputErrorRPorcket').hide();
+setTimeout(function() { $('#newWidthPocket').focus(); }, 100);
 
 
 function getSyncScriptParams() {
-    var scripts = document.getElementById('scriptCajeado');
+    var scripts = document.getElementById('scriptPocket');
     return {
         side: scripts.getAttribute('side'),
         face: scripts.getAttribute('face')
@@ -19,7 +19,7 @@ if (side != "") {
 
 } else {
     //buscar el cuadrante de manera ordenada que queda disponible para seleccionar, si no consigue por defecto selecciona el primero
-    var notUsed = $('img[src$="cajeado_not_use.png"]').prev();
+    var notUsed = $('img[src$="pocket_not_use.png"]').prev();
     var notUsedValue = 5;
     var facenotUsed;
     for (let ii = 0; ii < notUsed.length; ii++) {
