@@ -3077,7 +3077,6 @@ $.SvgCanvas = function(container, config) {
                             for (var i = 0; i < len; ++i) {
                                 var selected = selectedElements[i];
                                 if (selected == null) break;
-                                //              if (i==0) {
                                 //                var box = svgedit.utilities.getBBox(selected);
                                 //                  selectedBBoxes[i].x = box.x + dx;
                                 //                  selectedBBoxes[i].y = box.y + dy;
@@ -10057,6 +10056,19 @@ $.SvgCanvas = function(container, config) {
     // Create deep DOM copies (clones) of all selected elements and move them slightly
     // from their originals
     this.cloneSelectedElements = function(x, y, drag) {
+        //cflorioluis-hacer que el clonar no funcione para los mecanizados
+
+
+        switch (selectedElements[0].getAttribute("machining")) {
+            case "pocket":
+            case "multiDrilling":
+            case "multiDrilling":
+            case "hinge":
+            case "poly":
+            case "rect":
+            case "rectRound":
+                return;
+        }
         var batchCmd = new BatchCommand("Clone Elements");
         // find all the elements selected (stop at first null)
         var len = selectedElements.length;
@@ -10388,293 +10400,566 @@ $.SvgCanvas = function(container, config) {
         return obj;
     };
 
-
-
-    //cflorioluis - Ventana Editar Cajeado - Edita uno por uno
+    //cflorioluis - Ventana Crear/Editar Cremallera
     var clickmultiDrillingTool = (this.clickmultiDrillingTool = function(elem) {
-        var side = "",
-            widthX = "",
-            heightY = "",
-            radio = "",
-            face = "",
-            isNewTitle = true;
+        var beginX = "100",
+            endX = "100",
+            beginY = "60",
+            endY = "60",
+            multiDrillingCount = "2",
+            drillCount = "",
+            axisDist = "",
+            drillDiameter = "5",
+            step = "32",
+            direction = "W",
+
+            drillDepth = "11",
+            isNewTitle = true,
+            quadrant = '1',
+            quadrant1 = ``,
+            quadrant2 = ``,
+            quadrant3 = ``,
+            quadrant4 = ``,
+            quadrant1Value = 1,
+            quadrant2Value = 2,
+            quadrant3Value = 3,
+            quadrant4Value = 4,
+            face0 = "checked",
+            face = "0",
+            rotation = "0",
+            imgSrc = "images/drill/main_face.png"
+
+        var tempMultiDrilling, tempFace = $("#faceSelector").val();
 
 
+        if (!elem && $("#faceSelector").val() == "5") {
+            face = "5",
+                imgSrc = "images/drill/back_face.png";
+        }
 
-        if (elem && elem.getAttribute("machining") == "pocket") {
-            var side = elem.getAttribute("side"),
-                widthX = elem.getAttribute("widthX"),
-                heightY = elem.getAttribute("heightY"),
-                radio = elem.getAttribute("radio"),
+        if (elem && elem.getAttribute("machining") == "multiDrilling") {
+            beginX = elem.getAttribute("beginX"),
+                endX = elem.getAttribute("endX"),
+                beginY = elem.getAttribute("beginY"),
+                endY = elem.getAttribute("endY"),
+                multiDrillingCount = elem.getAttribute("count"),
+                drillCount = elem.getAttribute("drillCount"),
+                axisDist = elem.getAttribute("axisDist"),
+                drillDiameter = elem.getAttribute("drillDiameter"),
+                step = elem.getAttribute("step"),
+                direction = elem.getAttribute("direction"),
                 face = elem.getAttribute("face"),
+                quadrant = elem.getAttribute("quadrant"),
+                drillDepth = elem.getAttribute("drillDepth"),
                 isNewTitle = false;
 
+            if (axisDist != "")
+                endY = ""
 
-        }
+            if (drillCount != "")
+                endX = ""
 
-        //dimension mas pequeña para limitar el radio
-        var radioLimit = Math.min(curConfig.dimensions[0], curConfig.dimensions[1]);
+            quadrant1 = ``,
+                quadrant2 = ``,
+                quadrant3 = ``,
+                quadrant4 = ``
 
-        var pocketReady1 = `<label>
-              <input onclick="svgCanvas.selectPocket('1', ` + $('#faceSelector').val() + `);" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + $('#faceSelector').val() + `" value="1">
-              <img src="images/machining/pocket_not_use.png">
-          </label>`,
-            pocketReady2 = `<label>
-              <input onclick="svgCanvas.selectPocket('2', ` + $('#faceSelector').val() + `);" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + $('#faceSelector').val() + `" value="2">
-              <img src="images/machining/pocket_not_use.png">
-          </label>`,
-            pocketReady3 = `<label>
-              <input onclick="svgCanvas.selectPocket('3', ` + $('#faceSelector').val() + `);" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + $('#faceSelector').val() + `" value="3">
-              <img src="images/machining/pocket_not_use.png">
-          </label>`,
-            pocketReady4 = `<label>
-              <input onclick="svgCanvas.selectPocket('4', ` + $('#faceSelector').val() + `);" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + $('#faceSelector').val() + `" value="4">
-              <img src="images/machining/pocket_not_use.png">
-          </label>`;
+            switch (quadrant) {
+                case "1":
+                    quadrant1 = `checked`
+                    break;
 
-        //var pocketReady = $("path[machining*='pocket_']");
-        var pocketReady = $("path[machining*='pocket']");
-
-        if (pocketReady.length > 0) {
-            for (let i = 0; i < pocketReady.length; i++) {
-                const element = pocketReady[i];
-                switch ($('#faceSelector').val()) {
-                    case "0":
-                        switch (element.getAttribute("face")) {
-                            case "0":
-                                switch (element.getAttribute("side")) {
-                                    case "1":
-                                        pocketReady1 = `<label>
-                                              <input onclick="svgCanvas.selectPocket('1', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="1">
-                                              <img src="images/machining/pocket_in_use.png">
-                                          </label>`;
-                                        break;
-                                    case "2":
-                                        pocketReady2 = `<label>
-                                              <input onclick="svgCanvas.selectPocket('2', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="2">
-                                              <img src="images/machining/pocket_in_use.png">
-                                          </label>`;
-                                        break;
-                                    case "3":
-                                        pocketReady3 = `<label>
-                                              <input onclick="svgCanvas.selectPocket('3', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="3">
-                                              <img src="images/machining/pocket_in_use.png">
-                                          </label>`;
-                                        break;
-                                    case "4":
-                                        pocketReady4 = `<label>
-                                              <input onclick="svgCanvas.selectPocket('4', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="4">
-                                              <img src="images/machining/pocket_in_use.png">
-                                          </label>`;
-                                        break;
-                                }
-                                break;
-
-                            case "5":
-                                switch (element.getAttribute("side")) {
-                                    case "1":
-                                        pocketReady4 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('1', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="1">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "2":
-                                        pocketReady3 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('2', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="2">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "3":
-                                        pocketReady2 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('3', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="3">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "4":
-                                        pocketReady1 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('4', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="4">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-
-                    case "5":
-                        switch (element.getAttribute("face")) {
-                            case "0":
-                                switch (element.getAttribute("side")) {
-                                    case "1":
-                                        pocketReady4 = `<label>
-                                      <input onclick="svgCanvas.selectPocket('1', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="1">
-                                      <img src="images/machining/pocket_in_use.png">
-                                  </label>`;
-                                        break;
-                                    case "2":
-                                        pocketReady3 = `<label>
-                                      <input onclick="svgCanvas.selectPocket('2', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="2">
-                                      <img src="images/machining/pocket_in_use.png">
-                                  </label>`;
-                                        break;
-                                    case "3":
-                                        pocketReady2 = `<label>
-                                      <input onclick="svgCanvas.selectPocket('3', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="3">
-                                      <img src="images/machining/pocket_in_use.png">
-                                  </label>`;
-                                        break;
-                                    case "4":
-                                        pocketReady1 = `<label>
-                                      <input onclick="svgCanvas.selectPocket('4', '0');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="4">
-                                      <img src="images/machining/pocket_in_use.png">
-                                  </label>`;
-                                        break;
-
-                                }
-                                break;
-
-                            case "5":
-                                switch (element.getAttribute("side")) {
-
-                                    case "1":
-                                        pocketReady1 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('1', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="1">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "2":
-                                        pocketReady2 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('2', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="2">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "3":
-                                        pocketReady3 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('3', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="3">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-                                    case "4":
-                                        pocketReady4 = `<label>
-                                          <input onclick="svgCanvas.selectPocket('4', '5');" type="radio" hiddenRadio name="corner" machiningOption="pocket" face="` + element.getAttribute("face") + `" value="4">
-                                          <img src="images/machining/pocket_in_use.png">
-                                      </label>`;
-                                        break;
-
-                                }
-                                break;
-                        }
-                        break;
-                }
-
+                case "2":
+                    quadrant2 = `checked`
+                    break;
+                case "3":
+                    quadrant3 = `checked`
+                    break;
+                case "4":
+                    quadrant4 = `checked`
+                    break;
             }
+
+
+
+            tempMultiDrilling = $('#' + elem.id).clone(true);
         }
 
-        pocketBox = $.confirm(
-            `<strong><h2 id="moveConfirm" style="cursor: move; margin-bottom: 5px;">` + (isNewTitle ? $('#textPocket').val() : $('#textEditPocket ').val()) + `</h2></strong>` +
+        multiDrillingBox = $.confirm(
+            `<strong><h2 id="moveConfirm" style="cursor: move; margin-bottom: 5px;">` + (isNewTitle ? $('#textMultiDrilling').val() : $('#textEditMultiDrilling').val()) + `</h2></strong>` +
+            `<object id="helpMachining-md"
+            data ="images/machining/help.svg"
+            type ="image/svg+xml"
+            style="right: 10px; top: 10px; position: absolute;"/>` +
+
             `<form>
-              <div class="rowForm" style="padding-bottom: 0px;">
-                  <div class="columnFormMachining mini30 right"><h3>` + $('#textSelectCorner').val() + `</h3></div>
-                  <div class="columnFormMachining">
-                      <div class="tablero grid">
-                          <div class="columnMachining">` + pocketReady4 +
-            `<label>
-                                  <input type="radio" hiddenRadio name="notUsed" machiningOption="pocket" value="0" disabled >
-                                  <img src="images/machining/box_empty.png" >
-                              </label>` +
-            pocketReady1 +
-            `</div>
-                          <div class="columnMachining">
-                              <label>
-                                  <input type="radio" hiddenRadio name="notUsed" machiningOption="pocket" value="0" disabled>
-                                  <img src="images/machining/box_empty.png" >
-                              </label>
 
-                              <label>
-                                  <input type="radio" hiddenRadio name="notUsed" machiningOption="pocket" value="0" disabled>
-                                  <img src="images/machining/box_empty.png" >
-                              </label>
 
-                              <label>
-                                  <input type="radio" hiddenRadio name="notUsed" machiningOption="pocket" value="0" disabled>
-                                  <img src="images/machining/box_empty.png" >
-                              </label>
-                          </div>
+            <div class="rowForm" style="padding-bottom: 10px;">
+                <div class="columnFromMD right"><h3>` + $('#textSelectQuadrantFace').val() + `</h3></div>
+                <div class="columnFormMachining FaceSelection" style="height: 69px;width: 121px;display: contents;">
+                    <div class="gridDrill" style="float: left;">
+                        <div class="columnDrill">
+                            <label>
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="` + quadrant4Value + `" ` + quadrant4 + `>
+                                <img src="images/machining/quadrant.png">
+                            </label>
+                            <label>
+                                <input type="radio" name="notUsed" hiddenRadio machiningOption="drill" value="4" disabled>
+                                <img src="images/drill/edge_left_right_white.png">
+                            </label>
 
-                          <div  class="columnMachining" style="margin-bottom: -40px !important;">` +
-            pocketReady3 +
-            `<label>
-                                  <input type="radio" hiddenRadio name="notUsed" machiningOption="pocket" value="0" disabled >
-                                  <img src="images/machining/box_empty.png">
-                              </label>` +
-            pocketReady2 +
-            `</div>
-                      </div>
-                  </div>
+                            <label>
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="` + quadrant1Value + `" ` + quadrant1 + `>
+                                <img src="images/machining/quadrant.png">
+                            </label>
+                        </div>
+                        <div class="columnDrill wide">
+                            <label>
+                                <input type="radio" name="notUsed" hiddenRadio machiningOption="drill" value="1" disabled>
+                                <img src="images/drill/edge_sup_down_white.png">
+                            </label>
+                            <label>
+                                <input id="mainFace" type="radio" name="face" hiddenRadio machiningOption="drill" rotation="` + rotation + `" value="` + face + `"  ` + face0 + `>
+                                <img src="` + imgSrc + `" style="outline: 1px solid #000;">
+                            </label>
+
+                            <label>
+                                <input type="radio" name="notUsed" hiddenRadio machiningOption="drill" value="4" disabled>
+                                <img src="images/drill/edge_sup_down_white.png">
+                            </label>
+                        </div>
+                        <div class="columnDrill">
+                            <label>
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="` + quadrant3Value + `" ` + quadrant3 + `>
+                                <img src="images/machining/quadrant.png">
+                            </label>
+                            <label>
+                                <input type="radio" name="notUsed" hiddenRadio machiningOption="drill" value="0" disabled>
+                                <img src="images/drill/edge_left_right_white.png">
+                            </label>
+
+                            <label>
+                                <input type="radio" name="quadrant" hiddenRadio machiningOption="drill" value="` + quadrant2Value + `" ` + quadrant2 + `>
+                                <img src="images/machining/quadrant.png">
+                            </label>
+                        </div>
+                    </div>
+                    <div style="text-align-last: center;right: 75px;position: absolute;top: 25px;"><h3>` + $('#textDirection').val() + `</h3>
+                      <label style="color: black;">
+                        <input style=color: black;" id="mdDW" type="radio" name="direction" hiddenRadioDiv value="W"> ` + $('#textWidth').val() + `
+                      </label>
+                      <label style="color: black;">
+                        <input style=color: black;" id="mdDH" type="radio" name="direction" hiddenRadioDiv value="H"> ` + $('#textHeight').val() + `
+                    </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="rowForm">
+                <div class="columnFromMD right"><h3 style="margin-top: 8px !important;">` + $('#textMDCount').val() + `</h3></div>
+                <div class="columnFromMD hide">
+                  <input tabindex="1" value="` + multiDrillingCount + `" required class="inputMachiningHinge inputErrorHingeCount" id="mdCount"/>
+                </div>
               </div>
+
               <div class="rowForm">
-                  <div class="columnFormMachining mini30 right"><h3>` + $('#textWidth').val() + `</h3></div>
-                  <div class="columnFormMachining">
-                      <input required value="` + widthX + `" class="inputMachining inputErrorWPocket" machiningInput="pocket" id="newWidthPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newWidthX', this.value);"/>
-                  </div>
-                  <div class="columnFormMachining" id="inputErrorWPocket"  style="width: 55%;">
-                      <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                  </div>
+                <div  class="columnFromMD right"><h3>` + $('#textMDDrillCount').val() + `</h3></div>
+                <div class="columnFromMD hide">
+                  <input tabindex="2" value="` + drillCount + `" placeholder="` + $('#textMDDrillCountMax').val() + `" class="inputMachiningHinge" id="mdDrillCount"/>
+                </div>
               </div>
+
               <div class="rowForm">
-                  <div class="columnFormMachining mini30 right"><h3>` + $('#textHeight').val() + `</h3></div>
-                  <div class="columnFormMachining">
-                      <input required value="` + heightY + `" class="inputMachining inputErrorHPocket" machiningInput="pocket" id="newHeightPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newHeightY', this.value);"/>
-                  </div>
-                  <div class="columnFormMachining" id="inputErrorHPocket"  style="width: 55%;">
-                      <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                  </div>
+                <div  class="columnFromMD right"><h3>` + $('#textMDDepth').val() + `</h3></div>
+                <div class="columnFromMD hide">
+                  <input tabindex="3" value="` + drillDepth + `" class="inputMachiningHinge" id="mdDepth"/>
+                </div>
               </div>
-              <div class="rowForm">
-                  <div class="columnFormMachining mini30 right"><h3>` + $('#textRadio').val() + `</h3></div>
-                  <div class="columnFormMachining">
-                      <input required value="` + radio + `" class="inputMachining inputErrorRPocket" machiningInput="pocket" id="newRadioPocket" type="text" height="100%" onchange="svgCanvas.editPocket('radio', this.value);"/>
-                  </div>
-                  <div class="columnFormMachining" id="inputErrorRPocket"  style="width: 55%;">
-                      <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                  </div>
-              </div>
-          </form>
-          <script id="scriptPocket" src="src/machining-script/create-edit/pocket.js" side="` + side + `" face="` + face + `"></script>
-          `,
+
+            <div class="multidrillingFigTestCF">
+
+              <object style="display: none;" id="mutidrilling-svg-object-Q1W" data="images/machining/multiDrilling/multiDrillingQ1W.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q2W" data="images/machining/multiDrilling/multiDrillingQ2W.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q3W" data="images/machining/multiDrilling/multiDrillingQ3W.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q4W" data="images/machining/multiDrilling/multiDrillingQ4W.svg" type="image/svg+xml"></object>
+
+              <object style="display: none;" id="mutidrilling-svg-object-Q1H" data="images/machining/multiDrilling/multiDrillingQ1H.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q2H" data="images/machining/multiDrilling/multiDrillingQ2H.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q3H" data="images/machining/multiDrilling/multiDrillingQ3H.svg" type="image/svg+xml"></object>
+              <object style="display: none;" id="mutidrilling-svg-object-Q4H" data="images/machining/multiDrilling/multiDrillingQ4H.svg" type="image/svg+xml"></object>
+
+
+              <input tabindex="4" value="` + beginX + `" placeholder="` + $('#textBegin').val() + `" required class="mdInput mdBeginX_Q1W" id="mdBeginX"/>
+              <input tabindex="5" value="` + endX + `" placeholder="` + $('#textEnd').val() + `" right required class="mdInput mdEndX_Q1W" id="mdEndX"/>
+              <input tabindex="6" value="` + beginY + `" placeholder="` + $('#textBegin').val() + `" required class="mdInput mdBeginY_Q1W" id="mdBeginY"/>
+              <input tabindex="7" value="` + endY + `" placeholder="` + $('#textEnd').val() + `" right required class="mdInput mdEndY_Q1W" id="mdEndY"/>
+              <input tabindex="8" value="` + axisDist + `" placeholder="` + $('#textEqual').val() + `" class="mdInput mdAxisDist_Q1W" id="mdAxisDist"/>
+              <input tabindex="9" value="` + step + `" class="mdInput mdStep_Q1W" id="mdStep"/>
+              <label class="md_Q1W"> ø <input tabindex="10" value="` + drillDiameter + `" class="mdDiameter" id="mdDrillDiameter"/></label>
+
+            </div>
+      </form>
+      <script id="scriptMultiDrilling"  quadrant="` + quadrant + `" direction="` + direction + `" src="src/machining-script/create-edit/multiDrilling.js"></script>
+      `,
             function(ok) {
                 if (!ok) {
                     svgCanvas.setMode("select");
+                    if (elem) {
+                        svgCanvas.editMultiDrilling("cancel", tempMultiDrilling[0]);
+
+                        $("#faceSelector").val(tempFace);
+                        $("#faceSelector").trigger('change');
+                    }
                     return;
                 }
-                //Capturando los Datos del Formulario Pop-Up para el Cajeado
-                side = $("input[name=corner]:checked").val();
-                widthX = math.evaluate($("#newWidthPocket").val(), curConfig.scope);
-                heightY = math.evaluate($("#newHeightPocket").val(), curConfig.scope);
-                radio = math.evaluate($("#newRadioPocket").val(), curConfig.scope);
-                face = $('#faceSelector').val();
-                cross = 1
 
-                if (selectedElements[0] == null) {
-                    svgCanvas.pocket(side, widthX, heightY, curConfig.dimensions[0], curConfig.dimensions[1], radio, cross, face);
-                } else {
-                    return;
-                    var d = createRoundedPocketSide(widthX, heightY, radio, side, face);
-                    selectedElements[0].setAttribute("d", d);
-                    var id = selectedElements[0].id,
-                        w = widthX,
-                        h = heightY;
+                var bX = $("#mdBeginX").val();
+                var eX = $("#mdEndX").val();
+                var bY = $("#mdBeginY").val();
+                var eY = $("#mdEndY").val();
+                var count = $("#mdCount").val();
+                var axisDist = $("#mdAxisDist").val();
+                var drillCount = $("#mdDrillCount").val();
+                var drillDiameter = $("#mdDrillDiameter").val();
+                var step = parseInt($("#mdStep").val());
+                var drillDepth = parseInt($("#mdDepth").val());
+                var faceOut = 0;
 
-                    editLinesInEdges(side, w, h, id, face);
-                    selectorManager.requestSelector(selectedElements[0]).resize();
+                var face = $("input[name=face]:checked").val();
+                var direction = $('input[name="direction"]:checked').val()
+                var quadrant = $('input[name="quadrant"]:checked').val()
+
+
+                if (elem == null) {
+                    svgCanvas.multiDrilling(bX, eX, bY, eY, count, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant);
                 }
+
             },
-            260,
-            300,
+            550,
+            480,
             true,
-            "pocket"
+            false,
+            "hinge"
         );
     });
+
+    var multiDrilling = (this.multiDrilling = function(bX, eX, bY, eY, count, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant) {
+        var pocketCreated = addSvgElementFromJson({
+            element: "path",
+            curStyles: true,
+            attr: {
+                d: createMultiDrilling(bX, eX, bY, eY, count, axisDist, drillCount, drillDiameter, step, direction, face, quadrant),
+                id: getNextId(),
+                stroke: "#000",
+                fill: "#3F3F3F",
+                "stroke-width": 0,
+                machining: "multiDrilling",
+                beginX: bX,
+                endX: eX,
+                beginY: bY,
+                endY: eY,
+                count: count,
+                axisDist: axisDist,
+                drillCount: drillCount,
+                opacity: 0.5,
+                face: face,
+                quadrant: quadrant,
+                cross: 0,
+                drillDepth: drillDepth,
+                direction: direction,
+                step: step,
+                drillDiameter: drillDiameter,
+            },
+        });
+
+        curConfig.quadrant = parseInt(quadrant);
+        updateRulersQuadrant(curConfig.quadrant, face);
+
+        this.setMode("select");
+        selectOnly([getElem(getId())], true);
+    });
+
+    var editMultiDrilling = (this.editMultiDrilling = function(attrName, attrValue1, attrValue2, attrValue3, attrValue4) {
+        if (!selectedElements[0]) return;
+
+
+        var beginX = selectedElements[0].getAttribute("beginX"),
+            endX = selectedElements[0].getAttribute("endX"),
+            beginY = selectedElements[0].getAttribute("beginY"),
+            endY = selectedElements[0].getAttribute("endY"),
+            multiDrillingCount = selectedElements[0].getAttribute("count"),
+            drillCount = selectedElements[0].getAttribute("drillCount"),
+            axisDist = selectedElements[0].getAttribute("axisDist"),
+            drillDiameter = selectedElements[0].getAttribute("drillDiameter"),
+            step = selectedElements[0].getAttribute("step"),
+            direction = selectedElements[0].getAttribute("direction"),
+            face = selectedElements[0].getAttribute("face"),
+            quadrant = selectedElements[0].getAttribute("quadrant"),
+            drillDepth = selectedElements[0].getAttribute("drillDepth")
+
+        /*
+        svgCanvas.editMultiDrillingTool(element, beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                */
+
+        switch (attrName) {
+            case "beginX":
+                $("#multiDrilling_beginX").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], attrValue1, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "endX":
+                $("#multiDrilling_endX").val(attrValue1);
+                $("#multiDrilling_drillCount").val($("#textMDMax").val());
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, attrValue1, beginY, endY, multiDrillingCount, axisDist, "0", drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "beginY":
+                $("#multiDrilling_beginY").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, attrValue1, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "endY":
+                $("#multiDrilling_endY").val(attrValue1);
+                $("#multiDrilling_axisDist").val($("#textEqual").val());
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, attrValue1, multiDrillingCount, "0", drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "count":
+                $("#multiDrilling_count").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, attrValue1, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "axisDist":
+                $("#multiDrilling_axisDist").val(attrValue1);
+                $("#multiDrilling_endY").val($("#textEnd").val());
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, "0", multiDrillingCount, attrValue1, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "drillCount":
+                $("#multiDrilling_drillCount").val(attrValue1);
+                $("#multiDrilling_endX").val($("#textEnd").val());
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, "0", beginY, endY, multiDrillingCount, axisDist, attrValue1, drillDiameter, drillDepth, step, direction, face, quadrant)
+                break;
+            case "drillDiameter":
+                $("#multiDrilling_drillDiameter").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, attrValue1, drillDepth, step, direction, face, quadrant)
+                break;
+            case "drillDepth":
+                $("#multiDrilling_drillDepth").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, attrValue1, step, direction, face, quadrant)
+                break;
+            case "step":
+                $("#multiDrilling_step").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, attrValue1, direction, face, quadrant)
+                break;
+            case "direction":
+                $("#multiDrilling_direction").val(attrValue1);
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, attrValue1, face, quadrant)
+                break;
+            case "face":
+
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, direction, attrValue1, attrValue2)
+                break;
+                /*case "quadrant":
+                    svgCanvas.editHingeTool(selectedElements[0], origin, originSide, beginX, endX, hCount, axisDist, dDiameter,
+                        dDepth, hDiameter, hDepth, dDistance, cDistance, dDistanceFC, face, attrValue1);
+                    break;*/
+            case "cancel":
+
+                beginX = attrValue1.getAttribute("beginX"),
+                    endX = attrValue1.getAttribute("endX"),
+                    beginY = attrValue1.getAttribute("beginY"),
+                    endY = attrValue1.getAttribute("endY"),
+                    multiDrillingCount = attrValue1.getAttribute("count"),
+                    drillCount = attrValue1.getAttribute("drillCount"),
+                    axisDist = attrValue1.getAttribute("axisDist"),
+                    drillDiameter = attrValue1.getAttribute("drillDiameter"),
+                    step = attrValue1.getAttribute("step"),
+                    direction = attrValue1.getAttribute("direction"),
+                    face = attrValue1.getAttribute("face"),
+                    quadrant = attrValue1.getAttribute("quadrant"),
+                    drillDepth = attrValue1.getAttribute("drillDepth");
+
+                /*$("#hinge_beginX").val(beginX);
+
+                $("#hinge_hingeCount").val(hCount);
+                $("#hinge_axisDist").val(axisDist == "0" ? $('#textEqual').val() : axisDist);*/
+
+
+                $("#multiDrilling_beginX").val(beginX);
+                $("#multiDrilling_endX").val(endX == "0" ? $('#textEnd').val() : endX);
+                $("#multiDrilling_beginY").val(beginY);
+                $("#multiDrilling_endY").val(endY == "0" ? $('#textEnd').val() : endY);
+                $("#multiDrilling_count").val(multiDrillingCount);
+                $("#multiDrilling_axisDist").val(axisDist);
+                $("#multiDrilling_drillCount").val(drillCount);
+                $("#multiDrilling_drillDiameter").val(drillDiameter);
+                $("#multiDrilling_drillDepth").val(drillDepth);
+                $("#multiDrilling_step").val(step);
+                $("#multiDrilling_direction").val(direction);
+
+
+                svgCanvas.editMultiDrillingTool(selectedElements[0], beginX, endX, beginY, endY, multiDrillingCount, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant)
+
+                break;
+        }
+    });
+
+    var editMultiDrillingTool = (this.editMultiDrillingTool = function(element, bX, eX, bY, eY, count, axisDist, drillCount, drillDiameter, drillDepth, step, direction, face, quadrant) {
+        svgedit.utilities.assignAttributes(
+            element, {
+                d: createMultiDrilling(bX, eX, bY, eY, count, axisDist, drillCount, drillDiameter, step, direction, face, quadrant),
+                beginX: bX,
+                endX: eX,
+                beginY: bY,
+                endY: eY,
+                count: count,
+                axisDist: axisDist,
+                drillCount: drillCount,
+                face: face,
+                quadrant: quadrant,
+                drillDepth: drillDepth,
+                direction: direction,
+                step: step,
+                drillDiameter: drillDiameter,
+            },
+            100
+        );
+        curConfig.quadrant = parseInt(quadrant);
+        updateRulersQuadrant(curConfig.quadrant, face);
+
+        //actualizar cuador se seleccion
+        selectorManager.requestSelector(element).resize();
+    });
+
+    var createMultiDrilling = (this.createMultiDrilling = function(bX, eX, bY, eY, q, axisDist, drillCount, drillDiameter, step, direction, face, quadrant) {
+
+        if ((face == "5") && (direction == "W")) {
+            return createMultiDrilling(bX, eX, eY, bY, q, axisDist, drillCount, drillDiameter, step, direction, "0", quadrant)
+        }
+        if ((face == "5") && (direction == "H")) {
+            return createMultiDrilling(bX, eX, bY, eY, q, axisDist, drillCount, drillDiameter, step, direction, "0", quadrant)
+        }
+        var d = "",
+            dDiameter = parseFloat(drillDiameter),
+            dRaduis = dDiameter / 2,
+            quant = parseFloat(q),
+            //valor establecido por el usuario cuando quiere las cremalleras a una distancia dada
+            aDist = parseFloat(axisDist),
+            //valor establecido por el usuario cuando quiere una cantidad de perforaciones dadas
+            dCount = parseFloat(drillCount)
+
+
+        if (direction == "W") {
+            var beginX = parseFloat(bX),
+                endX = parseFloat(eX),
+                beginY = parseFloat(bY),
+                endY = parseFloat(eY),
+                //valor Calculado cuando el usuario quiere que las cazoletas esten a la misma distancia
+                mdDist = (curConfig.realDimensions[1] - beginY - endY) / (quant - 1),
+                //calcular las perforaciones totales
+                dMaxCount = Math.floor((curConfig.realDimensions[0] - beginX - endX) / step)
+            if (((curConfig.realDimensions[0] - beginX - endX) % step) == 0)
+                dMaxCount++
+        } else {
+            var beginY = parseFloat(bX),
+                endY = parseFloat(eX),
+                beginX = parseFloat(bY),
+                endX = parseFloat(eY),
+                //valor Calculado cuando el usuario quiere que las cazoletas esten a la misma distancia
+                mdDist = (curConfig.realDimensions[0] - beginX - endX) / (quant - 1),
+                //calcular las perforaciones totales
+                dMaxCount = Math.floor((curConfig.realDimensions[1] - beginY - endY) / step)
+            if (((curConfig.realDimensions[1] - beginY - endY) % step) == 0)
+                dMaxCount++
+        }
+        if (Number.isNaN(parseFloat(axisDist)))
+            aDist = 0
+
+        if (Number.isNaN(parseFloat(drillCount)))
+            dCount = 0
+
+        if (dCount != "")
+            dMaxCount = Math.floor(parseFloat(dCount))
+
+        var inverse = 1
+
+        switch (quadrant) {
+            case "1":
+                inverse = 1;
+                hCX = curConfig.corners[0] + beginX
+                hCY = curConfig.corners[2] - beginY
+                break;
+            case "2":
+                inverse = -1;
+                if (direction == "H")
+                    inverse = 1;
+                hCX = curConfig.corners[1] - beginX
+                hCY = curConfig.corners[2] - beginY
+                break;
+            case "3":
+                inverse = -1;
+                hCX = curConfig.corners[1] - beginX
+                hCY = curConfig.corners[0] + beginY
+                break;
+            case "4":
+                inverse = 1;
+                if (direction == "H")
+                    inverse = -1;
+                hCX = curConfig.corners[0] + beginX
+                hCY = curConfig.corners[0] + beginY
+                break;
+        }
+
+        for (let ii = 0; ii < dMaxCount; ii++) {
+            if (direction == "W")
+                var tempC = hCY;
+            else
+                var tempC = hCX;
+
+            for (let jj = 0; jj < quant; jj++) {
+
+                d += "M " + (hCX - dRaduis) + ", " + hCY + " " +
+                    "a " + dRaduis + "," + dRaduis + " 0 1,0 " + (dRaduis * 2) + ",0 " +
+                    "a " + dRaduis + "," + dRaduis + " 0 1,0 " + (-1 * (dRaduis * 2)) + ",0 "
+
+                if (direction == "W") {
+                    if (quadrant == "1" || quadrant == "2") {
+                        if (aDist != 0)
+                            hCY -= (aDist)
+                        else
+                            hCY -= (mdDist)
+                    }
+                    if (quadrant == "4" || quadrant == "3") {
+                        if (aDist != 0)
+                            hCY += (aDist)
+                        else
+                            hCY += (mdDist)
+                    }
+                } else {
+                    if (quadrant == "1" || quadrant == "4") {
+                        if (aDist != 0)
+                            hCX += (aDist)
+                        else
+                            hCX += (mdDist)
+                    }
+                    if (quadrant == "2" || quadrant == "3") {
+                        if (aDist != 0)
+                            hCX -= (aDist)
+                        else
+                            hCX -= (mdDist)
+                    }
+                }
+            }
+            //moverse a la siguiente posicion de las perforaciones
+            if (direction == "W") {
+                hCX += (step * inverse)
+                hCY = tempC;
+            } else {
+                hCY -= (step * inverse)
+                hCX = tempC;
+            }
+        }
+        return d;
+    });
+
+
 
     /***********************************************************************************************************/
 
@@ -10907,7 +11192,7 @@ $.SvgCanvas = function(container, config) {
                 <div class="rowForm">
                     <div class="columnFormMachining mini30 right"><h3>` + $('#textWidth').val() + `</h3></div>
                     <div class="columnFormMachining">
-                        <input required value="` + widthX + `" class="inputMachining inputErrorWPocket" machiningInput="pocket" id="newWidthPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newWidthX', this.value);"/>
+                        <input tabindex="1" required value="` + widthX + `" class="inputMachining inputErrorWPocket" machiningInput="pocket" id="newWidthPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newWidthX', this.value);"/>
                     </div>
                     <div class="columnFormMachining" id="inputErrorWPocket"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -10916,7 +11201,7 @@ $.SvgCanvas = function(container, config) {
                 <div class="rowForm">
                     <div class="columnFormMachining mini30 right"><h3>` + $('#textHeight').val() + `</h3></div>
                     <div class="columnFormMachining">
-                        <input required value="` + heightY + `" class="inputMachining inputErrorHPocket" machiningInput="pocket" id="newHeightPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newHeightY', this.value);"/>
+                        <input tabindex="2" required value="` + heightY + `" class="inputMachining inputErrorHPocket" machiningInput="pocket" id="newHeightPocket" type="text" height="100%" onchange="svgCanvas.editPocket('newHeightY', this.value);"/>
                     </div>
                     <div class="columnFormMachining" id="inputErrorHPocket"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -10925,7 +11210,7 @@ $.SvgCanvas = function(container, config) {
                 <div class="rowForm">
                     <div class="columnFormMachining mini30 right"><h3>` + $('#textRadio').val() + `</h3></div>
                     <div class="columnFormMachining">
-                        <input required value="` + radio + `" class="inputMachining inputErrorRPocket" machiningInput="pocket" id="newRadioPocket" type="text" height="100%" onchange="svgCanvas.editPocket('radio', this.value);"/>
+                        <input tabindex="3" required value="` + radio + `" class="inputMachining inputErrorRPocket" machiningInput="pocket" id="newRadioPocket" type="text" height="100%" onchange="svgCanvas.editPocket('radio', this.value);"/>
                     </div>
                     <div class="columnFormMachining" id="inputErrorRPocket"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -10967,6 +11252,7 @@ $.SvgCanvas = function(container, config) {
             260,
             300,
             true,
+            false,
             "pocket"
         );
     });
@@ -11518,8 +11804,8 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textPositionXY').val() + `</h3></div>
                 <div class="columnFormMachining" style="width: 55%;">
-                    <input value="` + realX + `" required class="inputMachiningXY inputErrorWDrill" id="newWidthDrill" machiningInput="drill" type="text" height="100%"/>
-                    <input value="` + realY + `" required class="inputMachiningXY inputErrorHDrill" id="newHeightDrill" machiningInput="drill" type="text" height="100%"/>
+                    <input tabindex="1" value="` + realX + `" required class="inputMachiningXY inputErrorWDrill" id="newWidthDrill" machiningInput="drill" type="text" height="100%"/>
+                    <input tabindex="2" value="` + realY + `" required class="inputMachiningXY inputErrorHDrill" id="newHeightDrill" machiningInput="drill" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorWDrill"  style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -11534,7 +11820,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textDiameter').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + diameter + `"required class="inputMachining inputErrorDiameterDrill" id="newDiameterDrill" machiningInput="drill" type="text" height="100%"/>
+                    <input tabindex="3" value="` + diameter + `"required class="inputMachining inputErrorDiameterDrill" id="newDiameterDrill" machiningInput="drill" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorDiameterDrill"  style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -11543,13 +11829,13 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textCross').val() + `</h3></div>
                 <div class="columnFormMachining">
-                        <input type="checkbox" id="cboxPasante" value="pasante"  ` + cross + `>
+                    <input tabindex="4" type="checkbox" id="cboxPasante" value="pasante"  ` + cross + `>
                 </div>
             </div>
             <div class="rowForm hidden" ` + crossStyle + `>
                 <div  class="columnFormMachining right"><h3>` + $('#textDepth').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + depth + `" required class="inputMachining inputErrorDepthDrill" id="newDepthDrill" machiningInput="drill" type="text" height="100%"/>
+                    <input tabindex="5" value="` + depth + `" required class="inputMachining inputErrorDepthDrill" id="newDepthDrill" machiningInput="drill" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorDepthDrill"  style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -11560,7 +11846,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>Broca</h3></div>
                 <div class="columnFormMachining broachSelection" style="padding-bottom: 10px;">
-                    <input type="radio" name="BroachDrill" value="flat"` + flat + `>Plana
+                    <input  type="radio" name="BroachDrill" value="flat"` + flat + `>Plana
                     <input type="radio" name="BroachDrill" value="lance"` + lance + `>Lanza
                 </div>
             </div> --> `,
@@ -11602,6 +11888,7 @@ $.SvgCanvas = function(container, config) {
             500,
             cross == "checked" ? 280 : 330,
             true,
+            false,
             "drill"
         );
     });
@@ -11966,114 +12253,103 @@ $.SvgCanvas = function(container, config) {
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
                     </div>
                 </div>
-                <div class="hingeFig">
-  <div class="parentSquare">
-    <div class="horizontalLineC"></div>
-    <div class="horizontalLineC2">
-      <span class="lineV arrow-up topLine"></span>
-      <!-- Distancia C -->
-      <label> <input tabindex="9" value="` + cDistance + `" required class="input-box rightLine topLine25 inputErrorCDistance" id="newCDistance"/> </label>
-      <span class="lineV arrow-down topLine25"></span>
-    </div>
-    <div class="hingeRadius" >
-      <!--<p class="input"> 8 </p> -->
-      <span class="line arrow-left"></span>
-      <!-- Radio de la Cazoleta -->
-      <label style="color: black; font-size: 14px;" > ø <input tabindex="7" value="` + hingeDiameter + `" required class="input-box inputErrorHingeDiameter" id="newHingeDiameter"/></label>
-      <span class="line arrow-right"></span>
 
-    </div>
+                <div class="hingeFigTestCF">
 
-    <div class="hingeDrillRadiusLeft"></div>
-    <div class="distanceDrillHinge">
-      <span class="line arrow-left"></span>
-      <!-- Distancia Entre los Tornillos de la Cazoleta -->
-        <label> <input tabindex="8" value="` + drillDistance + `" id="newDrillDistance" class="input-box inputErrorDrillDistance">  </label>
-      <span class="line arrow-right"></span>
-    </div>
-    <div class="hingeDrillRadiusRight"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="300px" height="201px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                viewBox="0 0 300 201"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+                 <defs>
+                  <style type="text/css">
+                   <![CDATA[
+                    .str3 {stroke:#FEFEFE;stroke-miterlimit:22.9256}
+                    .str2 {stroke:#2B2A29;stroke-miterlimit:22.9256}
+                    .str1 {stroke:#2B2A29;stroke-miterlimit:22.9256}
+                    .str0 {stroke:#2B2A29;stroke-width:2;stroke-miterlimit:22.9256}
+                    .str4 {stroke:#2B2A29;stroke-miterlimit:22.9256;stroke-dasharray:2.000000 4.000000}
+                    .fil2 {fill:none}
+                    .fil3 {fill:#FEFEFE}
+                    .fil0 {fill:#C19A6B}
+                    .fil1 {fill:#C19A6B}
+                    .fil4 {fill:#2B2A29;fill-rule:nonzero}
+                   ]]>
+                  </style>
+                 </defs>
+                 <g id="Capa_x0020_1">
+                  <metadata id="CorelCorpID_0Corel-Layer"/>
+                  <rect class="fil0" y="1" width="300" height="150"/>
+                  <rect class="fil1" y="161" width="300" height="40"/>
+                  <line class="fil2 str0" x1="300" y1="1" x2="0" y2= "1" />
+                  <circle class="fil3 str1" cx="150" cy="76" r="40"/>
+                  <circle class="fil3 str2" cx="79" cy="108.5" r="10"/>
+                  <circle class="fil3 str2" cx="222" cy="108.5" r="10"/>
+                  <rect class="fil3 str3" x="110" y="161" width="80" height="30"/>
+                  <rect class="fil3 str3" x="69" y="161" width="20" height="20"/>
+                  <rect class="fil3 str3" x="212" y="161" width="20" height="20"/>
+                  <g>
+                   <path class="fil4" d="M79.5 91.04l-1 0 0 -1.04 1 0 0 1.04zm0 6.23l-1 0 0 -2.08 1 0 0 2.08zm0 6.23l-1 0 0 -2.07 1 0 0 2.07zm0 6.24l-1 0 0 -2.08 1 0 0 2.08zm0 6.23l-1 0 0 -2.08 1 0 0 2.08zm0 6.23l-1 0 0 -2.08 1 0 0 2.08zm0 6.23l-1 0 0 -2.07 1 0 0 2.07zm-1 5.2l0 -1.04 1 0 0 1.04 -1 0z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M222.5 91.46l-1 0 0 -1.09 1 0 0 1.09zm-1 5.42l0 -1.08 1 0 0 1.08 0 0 -1 0zm1 1.03l-1 0 0 -1.03 1 0 0 1.03zm0 6.19l-1 0 0 -2.06 1 0 0 2.06zm0 6.18l-1 0 0 -2.06 1 0 0 2.06zm0 6.19l-1 0 0 -2.06 1 0 0 2.06zm0 6.19l-1 0 0 -2.06 1 0 0 2.06zm0 6.18l-1 0 0 -2.06 1 0 0 2.06zm-1 5.16l0 -1.03 1 0 0 1.03 -1 0z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M205.64 108l0 1 -1.14 0 0 -1 1.14 0zm5.72 1l-1.14 0 0 -1 1.14 0 0 0 0 1zm1 -1l0 1 -1 0 0 -1 1 0zm5.57 0l0 1 -1.85 0 0 -1 1.85 0zm5.57 0l0 1 -1.85 0 0 -1 1.85 0zm5.57 0l0 1 -1.85 0 0 -1 1.85 0zm5.58 0l0 1 -1.86 0 0 -1 1.86 0zm5.57 0l0 1 -1.86 0 0 -1 1.86 0zm5.57 0l0 1 -1.86 0 0 -1 1.86 0zm4.71 1l-1 0 0 -1 1 0 0 1z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M62.5 108l0 1 -1 0 0 -1 1 0zm4.22 1l-1 0 0 -1 1 0 0 0 0 1zm1 -1l0 1 -1 0 0 -1 1 0zm5.95 0l0 1 -1.98 0 0 -1 1.98 0zm5.96 0l0 1 -1.99 0 0 -1 1.99 0zm5.95 0l0 1 -1.99 0 0 -1 1.99 0zm5.95 0l0 1 -1.98 0 0 -1 1.98 0zm4.97 1l-1 0 0 -1 1 0 0 1z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M84.48 130.6l-0.02 6.09 -5.52 -3.06 5.54 -3.03zm-5.48 3.53c-0.28,0 -0.5,-0.23 -0.5,-0.5 0,-0.28 0.23,-0.5 0.5,-0.5l0 1zm143 0.37l-143 -0.37 0 -1 143 0.37 0 1zm-5.46 -3.56l5.53 3.06 -5.54 3.03 0.01 -6.09zm5.46 2.56c0.28,0 0.5,0.23 0.5,0.5 0,0.28 -0.22,0.5 -0.5,0.5l0 -1z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M118.51 90.67l3.02 5.29 -6.32 0.1 3.3 -5.39zm-3 5.79c-0.24,0.14 -0.54,0.05 -0.68,-0.19 -0.13,-0.24 -0.05,-0.54 0.19,-0.68l0.49 0.87zm69.47 -39.67l-69.47 39.67 -0.49 -0.87 69.46 -39.67 0.5 0.87zm-6.51 -0.37l6.32 -0.1 -3.3 5.39 -3.02 -5.29zm6.01 -0.5c0.24,-0.14 0.55,-0.06 0.69,0.18 0.13,0.24 0.05,0.55 -0.19,0.69l-0.5 -0.87z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M191 75.5l0 1 -1 0 0 -1 1 0zm4.25 0l0 1 -1.42 0 0 -1 1.42 0zm3.83 1l-1 0 0 -1 1 0 0 0 0 1zm1 -1l0 1 -1 0 0 -1 1 0zm5.74 0l0 1 -1.91 0 0 -1 1.91 0zm5.75 0l0 1 -1.92 0 0 -1 1.92 0zm5.74 0l0 1 -1.91 0 0 -1 1.91 0zm5.75 0l0 1 -1.92 0 0 -1 1.92 0zm5.75 0l0 1 -1.92 0 0 -1 1.92 0zm5.74 0l0 1 -1.91 0 0 -1 1.91 0zm5.75 0l0 1 -1.92 0 0 -1 1.92 0zm5.74 0l0 1 -1.91 0 0 -1 1.91 0zm4.83 1l-0.99 0 0 -1 0.99 0 0 1z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M247.52 103l6.09 0.07 -3.11 5.49 -2.98 -5.56zm3.48 5.51c0,0.27 -0.23,0.49 -0.51,0.49 -0.27,0 -0.49,-0.23 -0.49,-0.51l1 0.02zm0.37 -32.5l-0.37 32.5 -1 -0.02 0.37 -32.49 1 0.01zm-3.6 5.42l3.1 -5.49 2.98 5.56 -6.08 -0.07zm2.6 -5.43c0,-0.28 0.23,-0.5 0.51,-0.5 0.27,0 0.49,0.23 0.49,0.51l-1 -0.01z"/>
+                  </g>
+                  <line class="fil2 str2" x1="150" y1="36" x2="229" y2= "36" />
+                  <g>
+                   <path class="fil4" d="M226.02 30.5l6.08 0.07 -3.1 5.49 -2.98 -5.56zm3.48 5.51c0,0.27 -0.23,0.49 -0.51,0.49 -0.27,0 -0.49,-0.23 -0.49,-0.5l1 0.01zm0.37 -35l-0.37 35 -1 -0.01 0.37 -35.01 1 0.02zm-3.6 5.42l3.1 -5.49 2.99 5.56 -6.09 -0.07zm2.6 -5.44c0.01,-0.27 0.23,-0.49 0.51,-0.49 0.27,0 0.49,0.23 0.49,0.51l-1 -0.02z"/>
+                  </g>
+                  <polyline class="fil2 str4" points="48.84,161 51.85,161 69,161 "/>
+                  <polyline class="fil2 str4" points="48.84,181 51.85,181 69,181 "/>
+                  <g>
+                   <path class="fil4" d="M45.53 175.48l6.08 0.11 -3.14 5.47 -2.94 -5.58zm3.44 5.53c-0.01,0.28 -0.24,0.49 -0.51,0.49 -0.28,0 -0.5,-0.23 -0.49,-0.51l1 0.02zm0.37 -20l-0.37 20 -1 -0.02 0.37 -20 1 0.02zm-3.64 5.4l3.14 -5.47 2.94 5.58 -6.08 -0.11zm2.64 -5.42c0.01,-0.28 0.24,-0.49 0.51,-0.49 0.28,0 0.5,0.23 0.49,0.51l-1 -0.02z"/>
+                  </g>
+                  <polyline class="fil2 str4" points="250.28,161 241.29,161 190,161 "/>
+                  <polyline class="fil2 str4" points="250.28,191 241.29,191 190,191 "/>
+                  <g>
+                   <path class="fil4" d="M247.54 185.57l6.08 -0.07 -2.97 5.56 -3.11 -5.49zm3.61 5.42c0,0.28 -0.22,0.51 -0.5,0.51 -0.27,0 -0.5,-0.22 -0.5,-0.49l1 -0.02zm-0.37 -30l0.37 30 -1 0.02 -0.37 -30 1 -0.02zm-3.48 5.52l2.98 -5.57 3.11 5.49 -6.09 0.08zm2.48 -5.5c-0.01,-0.28 0.22,-0.51 0.49,-0.51 0.28,0 0.5,0.22 0.51,0.49l-1 0.02z"/>
+                  </g>
+                  <g>
+                   <path class="fil4" d="M72.96 106.85l4.26 -4.36 1.83 6.06 -6.09 -1.7zm6.39 1.29c0.2,0.2 0.2,0.51 0.01,0.71 -0.19,0.2 -0.51,0.2 -0.71,0.01l0.7 -0.72zm-25.61 -25.08l25.61 25.08 -0.7 0.72 -25.61 -25.09 0.7 -0.71zm-0.7 0.71c-0.2,-0.19 -0.2,-0.51 -0.01,-0.7 0.19,-0.2 0.51,-0.21 0.71,-0.01l-0.7 0.71z"/>
+                  </g>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 53.3941 83.702)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 258.5 29.5)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 278.499 104.5)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 42.4996 186.5)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 279.5 187.501)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 161.499 87.4992)" width="22.4" height="23.02"/>
+                  <rect class="fil3 str3" transform="matrix(-1.02557 -3.14686E-10 -0.00135957 -0.999163 161.999 145.313)" width="22.4" height="23.02"/>
+                 </g>
+                </svg>
 
-    <div class="verticalDashLine drillL"></div>
-    <div class="verticalDashLine drillR"></div>
-    <div class="horizontalDashLine hDrillL"></div>
 
-    <div class="horizontalDashLine centerHinge">
-      <span class="lineV arrow-up"></span>
-      <label> <input tabindex="11" value="` + drillDistanceFromCenter + `" required class="input-box rightLine" id="newDrillDistanceFromCenter"/></label>
-      <span class="lineV arrow-down"></span>
-    </div>
-    <div class="horizontalDashLine hDrillR"></div>
+            <input tabindex="9" value="` + cDistance + `" required class="cDistanceInputTestCF" id="newCDistance"/>
+            <label class="hingeDiameterTestCF" > ø <input tabindex="7" value="` + hingeDiameter + `" required class="input-box" id="newHingeDiameter"/></label>
+            <input tabindex="8" value="` + drillDistance + `" id="newDrillDistance" class="drillDistanceTestCF">
+            <input tabindex="11" value="` + drillDistanceFromCenter + `" required class="drillDistanceFromCenterTestCF" id="newDrillDistanceFromCenter"/>
+            <label class="drillDiameterTestCF"> ø <input tabindex="5" value="` + drillDiameter + `"  required class="input-boxTestCF" id="newDrillDiameter"/></label>
+            <input tabindex="11" value="` + hingeDepth + `" required class="hingeDepthTestCF" id="newHingeDepth"/>
+            <input tabindex="6" value="` + drillDepth + `" required class="drillDepthTestCF" id="newDrillDepth"/>
 
-
-    <div class="deg45"></div>
-    <span class="arrow-right45"></span>
-    <label class=" leftLine45" style="color: black; font-size: 14px;"> ø <input tabindex="5" value="` + drillDiameter + `"  required class="input-box inputErrorDrillDiameter" id="newDrillDiameter" /></label>
-
-
-
-  </div>
-
-  <div class="parentSquareEdge">
-    <div class="edgeDrillLeft"></div>
-    <div class="edgeDrillHinge"></div>
-    <div class="edgeDrillRight"></div>
-
-
-    <div class="horizontalDashLine centerHingeEdge">
-      <span class="lineV arrow-up"></span>
-      <label> <input tabindex="11" value="` + hingeDepth + `" required class="input-box rightLine inputErrorHingeDepth" id="newHingeDepth"/> </label>
-      <span class="lineV arrow-down"></span>
-    </div>
-    <div class="horizontalDashLine hDrillREdge"></div>
-
-    <div class="horizontalDashLine centerHingeDrillEdge">
-      <span class="lineVEdgeDrill arrow-up"></span>
-      <label> <input tabindex="6" value="` + drillDepth + `" required class="input-box leftLine inputErrorDrillDepth" id="newDrillDepth"/></label>
-      <span class="lineVEdgeDrill arrow-down"></span>
-    </div>
-    <div class="horizontalDashLine hDrillLEdge"></div>
-
-  </div>
 
 </div>
-                <!--  tabindex="1"
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 5px !important; line-height: 18px !important;">Diametro Taladros Inserción</h3></div>
-                    <div class="columnFromHinge hide">
-                        <input value="` + drillDiameter + `"  required class="inputMachiningHinge inputErrorDrillDiameter" id="newDrillDiameter" machiningInput="hinge" type="text" height="100%"/>
-                    </div>
-                    <div class="columnFormMachining" id="inputErrorDrillDiameter"  style="width: 55%;">
-                        <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 5px !important; line-height: 18px !important;"> Profundidad Taladros de Inserción</h3></div>
-                    <div class="columnFromHinge hide">
-                        <input value="` + drillDepth + `" required class="inputMachiningHinge inputErrorDrillDepth" id="newDrillDepth" machiningInput="hinge" type="text" height="100%"/>
-                    </div>
-                    <div class="columnFormMachining" id="inputErrorDrillDepth"  style="width: 55%;">
-                        <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 8px !important;">Diametro de la cazoleta</h3></div>
-                    <div class="columnFromHinge hide">
-                        <input value="` + hingeDiameter + `" required class="inputMachiningHinge inputErrorHingeDiameter" id="newHingeDiameter" machiningInput="hinge" type="text" height="100%"/>
-                    </div>
-                    <div class="columnFormMachining" id="inputErrorHingeDiameter"  style="width: 55%;">
-                        <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                    </div>
-                </div>
-                <div class="rowForm">
-                    <div  class="columnFromHinge right"><h3 style="margin-top: 14px !important; line-height: 18px !important;">Profundidad de la Cazoleta</h3></div>
-                    <div class="columnFromHinge hide">
-                        <input value="` + hingeDepth + `" required class="inputMachiningHinge inputErrorHingeDepth" id="newHingeDepth" machiningInput="hinge" type="text" height="100%"/>
-                    </div>
-                    <div class="columnFormMachining" id="inputErrorHingeDepth"  style="width: 55%;">
-                        <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
-                    </div>
-                </div>
-                -->
+
 
             </form>
                 <script src="src/machining-script/create-edit/hinge.js"></script>
@@ -12135,6 +12411,7 @@ $.SvgCanvas = function(container, config) {
             480,
             510,
             true,
+            false,
             "hinge"
         );
     });
@@ -12631,7 +12908,7 @@ $.SvgCanvas = function(container, config) {
                 <div class="rowForm">
                     <div class="columnFormMachining mini30 right"><h3>` + $('#textWidth').val() + `</h3></div>
                     <div class="columnFormMachining">
-                        <input required value="` + widthX + `"` + `class="inputMachining inputErrorWPoly" machiningInput="poly" id="newWidthPoly" type="text" height="100%" onchange="svgCanvas.editPoly('newWidthX', this.value);"/>
+                        <input tabindex="1" required value="` + widthX + `"` + `class="inputMachining inputErrorWPoly" machiningInput="poly" id="newWidthPoly" type="text" height="100%" onchange="svgCanvas.editPoly('newWidthX', this.value);"/>
                     </div>
                     <div class="columnFormMachining" id="inputErrorWPoly"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -12640,7 +12917,7 @@ $.SvgCanvas = function(container, config) {
                 <div class="rowForm">
                     <div class="columnFormMachining mini30 right"><h3>` + $('#textHeight').val() + `</h3></div>
                     <div class="columnFormMachining">
-                        <input required value="` + heightY + `"` + `class="inputMachining inputErrorHPoly" machiningInput="poly" id="newHeightPoly" type="text" height="100%" onchange="svgCanvas.editPoly('newHeightY', this.value);"/>
+                        <input tabindex="2" required value="` + heightY + `"` + `class="inputMachining inputErrorHPoly" machiningInput="poly" id="newHeightPoly" type="text" height="100%" onchange="svgCanvas.editPoly('newHeightY', this.value);"/>
                     </div>
                     <div class="columnFormMachining" id="inputErrorHPoly"  style="width: 55%;">
                         <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -12703,6 +12980,7 @@ $.SvgCanvas = function(container, config) {
             320,
             250,
             true,
+            false,
             "poly"
         );
     });
@@ -12943,7 +13221,7 @@ $.SvgCanvas = function(container, config) {
             `<strong><h2 id="moveConfirm" style="cursor: move; margin-bottom: 5px;">` + (isNewTitle ? $('#textRect').val() : $('#textEditRect').val()) + `</h2></strong>` +
             `<form>
             <div class="rowForm" style="padding-bottom: 10px;">
-                <div class="columnFormMachining right"><h3>` + $('#textSelectCuadrnat').val() + `</h3></div>
+                <div class="columnFormMachining right"><h3>` + $('#textSelectQuadrantFace').val() + `</h3></div>
                 <!--<div class="columnFormMachining">
                     <div class="tablero grid">
                         <div class="columnMachining">
@@ -13004,8 +13282,8 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textPositionXY').val() + `</h3></div>
                 <div class="columnFormMachining"  style="width: 55%;">
-                    <input value="` + realX + `" required class="inputMachiningXY inputErrorRealXRect" id="newXRect" machiningInput="rect" type="text" height="100%"/>
-                    <input value="` + realY + `" required class="inputMachiningXY inputErrorRealYRect" id="newYRect" machiningInput="rect" type="text" height="100%"/>
+                    <input tabindex="1" value="` + realX + `" required class="inputMachiningXY inputErrorRealXRect" id="newXRect" machiningInput="rect" type="text" height="100%"/>
+                    <input tabindex="2" value="` + realY + `" required class="inputMachiningXY inputErrorRealYRect" id="newYRect" machiningInput="rect" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorRealXRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13020,16 +13298,16 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textWidth').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + widthX + `" required class="inputMachining inputErrorWRect" id="newWidthRect" machiningInput="rect" type="text" height="100%"/>
+                    <input tabindex="3" value="` + widthX + `" required class="inputMachining inputErrorWRect" id="newWidthRect" machiningInput="rect" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorWRect" style="width: 55%;">
-                    <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
+                    <span tabindex="4" class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
                 </div>
             </div>
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textHeight').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + heightY + `" required class="inputMachining inputErrorHRect" id="newHeightRect" machiningInput="rect" type="text" height="100%"/>
+                    <input tabindex="5" value="` + heightY + `" required class="inputMachining inputErrorHRect" id="newHeightRect" machiningInput="rect" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorHRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13038,7 +13316,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textCenter').val() + `</h3></div>
                 <div class="columnFormMachining">
-                        <input type="checkbox" id="rectPositionCenter" value="center"  ` + center + `>
+                    <input tabindex="6" type="checkbox" id="rectPositionCenter" value="center"  ` + center + `>
                 </div>
             </div>
             <script src="src/machining-script/create-edit/rect.js"></script>
@@ -13084,6 +13362,7 @@ $.SvgCanvas = function(container, config) {
             500,
             330,
             true,
+            false,
             "rect"
         );
     });
@@ -13453,6 +13732,7 @@ $.SvgCanvas = function(container, config) {
             350,
             140,
             true,
+            false,
             "editEdge"
         );
     });
@@ -13531,7 +13811,7 @@ $.SvgCanvas = function(container, config) {
         rectRoundBox = $.confirm(
             `<strong><h2 id="moveConfirm" style="cursor: move; margin-bottom: 5px;">` + (isNewTitle ? $('#textRectRound').val() : $('#textEditRectRound').val()) + `</h2></strong>` + `<form>
             <div class="rowForm" style="padding-bottom: 10px;">
-                <div class="columnFormMachining right"><h3>` + $('#textSelectCuadrnat').val() + `</h3></div>
+                <div class="columnFormMachining right"><h3>` + $('#textSelectQuadrantFace').val() + `</h3></div>
                 <div class="columnFormMachining FaceSelection" style="height: 69px;width: 121px;display: contents;">
                     <div class="gridDrill">
                         <div class="columnDrill">
@@ -13585,8 +13865,8 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textPositionXY').val() + `</h3></div>
                 <div class="columnFormMachining" style="width: 55%;">
-                    <input value="` + realX + `" required class="inputMachiningXY inputErrorRealXRect" id="newXRect" machiningInput="rectRound" type="text" height="100%"/>
-                    <input value="` + realY + `" required class="inputMachiningXY inputErrorRealYRect" id="newYRect" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="1" value="` + realX + `" required class="inputMachiningXY inputErrorRealXRect" id="newXRect" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="2" value="` + realY + `" required class="inputMachiningXY inputErrorRealYRect" id="newYRect" machiningInput="rectRound" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorRealXRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13601,7 +13881,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textWidth').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + widthX + `" required class="inputMachining inputErrorWRect" id="newWidthRect" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="3" value="` + widthX + `" required class="inputMachining inputErrorWRect" id="newWidthRect" machiningInput="rectRound" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorWRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13610,7 +13890,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textHeight').val() + `</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + heightY + `" required class="inputMachining inputErrorHRect" id="newHeightRect" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="4" value="` + heightY + `" required class="inputMachining inputErrorHRect" id="newHeightRect" machiningInput="rectRound" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorHRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13620,7 +13900,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>Radio X</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + rx + `" required class="inputMachining inputErrorRXRect" id="newRX" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="5" value="` + rx + `" required class="inputMachining inputErrorRXRect" id="newRX" machiningInput="rectRound" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorRXRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13630,7 +13910,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>Radio Y</h3></div>
                 <div class="columnFormMachining">
-                    <input value="` + ry + `" required class="inputMachining inputErrorRYRect" id="newRY" machiningInput="rectRound" type="text" height="100%"/>
+                    <input tabindex="6" value="` + ry + `" required class="inputMachining inputErrorRYRect" id="newRY" machiningInput="rectRound" type="text" height="100%"/>
                 </div>
                 <div class="columnFormMachining" id="inputErrorRYRect" style="width: 55%;">
                     <span class="shortcut" style="color: red;">` + $('#textErrorVariable').val() + `</span>
@@ -13639,7 +13919,7 @@ $.SvgCanvas = function(container, config) {
             <div class="rowForm">
                 <div class="columnFormMachining right"><h3>` + $('#textCenter').val() + `</h3></div>
                 <div class="columnFormMachining">
-                        <input type="checkbox" id="rectRoundPositionCenter" value="center"  ` + center + `>
+                    <input tabindex="7" type="checkbox" id="rectRoundPositionCenter" value="center"  ` + center + `>
                 </div>
             </div>
             <script src="src/machining-script/create-edit/rectRound.js"></script>
@@ -13685,7 +13965,8 @@ $.SvgCanvas = function(container, config) {
             500,
             420,
             true,
-            "rectRound"
+            false,
+            "rectRound",
         );
     });
 

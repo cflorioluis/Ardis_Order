@@ -356,11 +356,79 @@
         </label>
             </div>
 
-            <h4 class="clearfix">Seleccionar Cara:</h4>
-            <select id="faceSelector">
-                <option value="0">Cara Principal</option>
-                <option value="5" >Cara Trasera</option>
-            </select>
+            <div id="hinge_panel" class="context_panel">
+                <h4 class="clearfix">Cazoleta</h4>
+                <label>
+                  <input id="hinge_beginX" class="attr_changer" size="3" data-attr="beginX" pattern="[0-9]*"/>
+                  <span>Inicio</span>
+              </label>
+                <label>
+                  <input id="hinge_endX" class="attr_changer" size="3" data-attr="endX" pattern="[0-9]*"/>
+                  <span>Fin</span>
+              </label>
+                <label>
+                  <input id="hinge_hingeCount" class="attr_changer" size="3" data-attr="hingeCount" type="text" pattern="[0-9]*" />
+                  <span>Cazoletas</span>
+              </label>
+                <label>
+                  <input id="hinge_axisDist" class="attr_changer" size="3" data-attr="axisDist" type="text" pattern="[0-9]*" />
+                  <span>Separacion</span>
+              </label>
+            </div>
+
+            <div id="multiDrilling_panel" class="context_panel">
+                <h4 class="clearfix">Cremallera</h4>
+                <label>
+                <input id="multiDrilling_beginX" class="attr_changer" size="3" data-attr="beginX" pattern="[0-9]*"/>
+                <span>Inicio X</span>
+              </label>
+                <label>
+                <input id="multiDrilling_endX" class="attr_changer" size="3" data-attr="endX" pattern="[0-9]*"/>
+                <span>Fin X</span>
+              </label>
+                <label>
+                <input id="multiDrilling_beginY" class="attr_changer" size="3" data-attr="beginY" pattern="[0-9]*"/>
+                <span>Inicio Y</span>
+              </label>
+                <label>
+                <input id="multiDrilling_endY" class="attr_changer" size="3" data-attr="endY" pattern="[0-9]*"/>
+                <span>Fin Y</span>
+              </label>
+                <label>
+                <input id="multiDrilling_count" class="attr_changer" size="3" data-attr="count" type="text" pattern="[0-9]*" />
+                <span>Cremalleras</span>
+              </label>
+                <label>
+                <input id="multiDrilling_drillCount" class="attr_changer" size="3" data-attr="drillCount" type="text" pattern="[0-9]*" />
+                <span>Perforaciones</span>
+              </label>
+                <label>
+                <input id="multiDrilling_drillDepth" class="attr_changer" size="3" data-attr="drillDepth" type="text" pattern="[0-9]*" />
+                <span>Profundidad</span>
+              </label>
+                <label>
+                <input id="multiDrilling_axisDist" class="attr_changer" size="3" data-attr="axisDist" type="text" pattern="[0-9]*" />
+                <span>Separacion</span>
+              </label>
+                <label>
+                <input id="multiDrilling_step" class="attr_changer" size="3" data-attr="step" type="text" pattern="[0-9]*" />
+                <span>Paso</span>
+              </label>
+                <label>
+                <input id="multiDrilling_drillDiameter" class="attr_changer" size="3" data-attr="drillDiameter" type="text" pattern="[0-9]*" />
+                <span>Diametro</span>
+              </label>
+            </div>
+
+
+            <div style="float: left;width: 220px;">
+                <h4 class="clearfix">Seleccionar Cara:</h4>
+                <select style="width: 100%;" id="faceSelector">
+                    <option value="0">Cara Principal</option>
+                    <option value="5" >Cara Trasera</option>
+                </select>
+
+            </div>
 
 
             <!--<div id="path_panel" class="context_panel clearfix">
@@ -795,8 +863,10 @@
         <li><a href="#move_back">Send to Back<span class="shortcut">⌘⇧↓</span></a></li>
     </ul>
 
-    <input id="textCajeado" value="Cajeado" type="hidden" />
-    <input id="textEditCajeado" value="Editar Cajeado" type="hidden" />
+    <input id="textPocket" value="Cajeado" type="hidden" />
+    <input id="textEditPocket" value="Editar Cajeado" type="hidden" />
+    <input id="textMultiDrilling" value="Cremallera" type="hidden" />
+    <input id="textEditMultiDrilling" value="Editar Cremallera" type="hidden" />
     <input id="textDrill" value="Taladro" type="hidden" />
     <input id="textEditDrill" value="Editar Taladro" type="hidden" />
     <input id="textHinge" value="Cazoleta" type="hidden" />
@@ -807,21 +877,37 @@
     <input id="textEditRectRound" value="Editar Rectangulo Redondeado" type="hidden" />
     <input id="textPoly" value="Angulo en Lados" type="hidden" />
     <input id="textEditPoly" value="Editar Angulo en Lados" type="hidden" />
-    <input id="textSelectCorner" value="Seleccionar Esquina" type="hidden" />
-    <input id="textWidth" value="Ancho" type="hidden" />
-    <input id="textHeight" value="Fondo" type="hidden" />
-    <input id="textRadio" value="Radio" type="hidden" />
-    <input id="textRadioX" value="Radio X" type="hidden" />
-    <input id="textRadioY" value="Radio Y" type="hidden" />
-    <input id="textSelectCuadrnatFace" value="Seleccionar Cuadrante y Cara" type="hidden" />
-    <input id="textSelectOriginAndSide" value="Seleccionar Origen y Lado" type="hidden" />
-    <input id="textPositionXY" value="Posición (X,Y)" type="hidden" />
-    <input id="textCenter" value="Centrado" type="hidden" />
-    <input id="textDiameter" value="Diámetro" type="hidden" />
-    <input id="textCross" value="Pasante" type="hidden" />
-    <input id="textDepth" value="Profundidad" type="hidden" />
-    <input id="textSelectCuadrnat" value="Seleccionar Cuadrante" type="hidden" />
-    <input id="textErrorVariable" value="Error: Variable no Reconocida" type="hidden" />
+    <input id="textSelectCorner" value="Seleccionar Esquina type=" hidden " />
+<input id="textWidth " value="Largo " type="hidden " />
+<input id="textHeight " value="Ancho " type="hidden " />
+<input id="textRadio " value="Radio " type="hidden " />
+<input id="textRadioX " value="Radio X " type="hidden " />
+<input id="textRadioY " value="Radio Y " type="hidden " />
+<input id="textSelectQuadrantFace " value="Seleccionar Cadrante y Cara " type="hidden " />
+<input id="textSelectOriginAndSide " value="Seleccionar Origen y Lado " type="hidden " />
+<input id="textPositionXY " value="Posicion (X,Y) " type="hidden " />
+<input id="textCenter " value="Centrado " type="hidden " />
+<input id="textDiameter " value="Diametro " type="hidden " />
+<input id="textCross " value="Pasante " type="hidden " />
+<input id="textDepth " value="Profundidad " type="hidden " />
+<input id="textSelectCuadrnat " value="Seleccionar Cuadrante " type="hidden " />
+<input id="textOriginDistance " value="Distancia del Origen " type="hidden " />
+<input id="textBegin " value="Inicio " type="hidden " />
+<input id="textEnd " value="Fin " type="hidden " />
+<input id="textHingeCount " value="Cantidad de Cazoletas " type="hidden " />
+<input id="textAxisDist " value="Distancia entre Ejes " type="hidden " />
+<input id="textEqual " value="Igual " type="hidden " />
+<input id="textDirection " value="Sentido " type="hidden " />
+<input id="textMDCount " value="Cantidad de Cremalleras " type="hidden " />
+<input id="textMDDrillCount " value="Cantidad de Perforaciones " type="hidden " />
+<input id="textMDDrillCountMax " value="Max. Posibles " type="hidden " />
+<input id="textMDMax " value="Max. " type="hidden " />
+<!--<input id="textMDCount " value=" " type="hidden " />
+<input id="textMDCount " value=" " type="hidden " />
+<input id="textMDCount " value=" " type="hidden " />
+<input id="textMDCount " value=" " type="hidden " />-->
+<input id="textErrorVariable " value="Error. Variable no Reconocida " type="hidden " />
+
 </body>
 
 

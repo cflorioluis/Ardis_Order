@@ -545,23 +545,24 @@ var svgedit = svgedit || {};
                 height: 1106,
             },
         });
-        var row = JSON.parse(localStorage.getItem('row'));
+        /*//var row = JSON.parse(localStorage.getItem('row'));
+        var newOrder = JSON.parse(localStorage.newOrder);
+        var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
+        if (newOrder && newOrder[currentRowSelected][1] == "A") {*/
 
-        if (row && row[1] == "A") {
-
-            var imageImg = svgFactory_.createSVGElement({
-                element: "image",
-                attr: {
-                    "xlink:href": "images/texturas/H1887Ancho.jpg",
-                    x: "0",
-                    y: "0",
-                    width: 1106,
-                    height: 1106,
-                    "stroke-width": 2,
-                    "stroke-color": "#3f3f3f",
-                },
-            });
-        } else {
+        var imageImg = svgFactory_.createSVGElement({
+            element: "image",
+            attr: {
+                "xlink:href": "images/texturas/H1887Ancho.jpg",
+                x: "0",
+                y: "0",
+                width: 1106,
+                height: 1106,
+                "stroke-width": 2,
+                "stroke-color": "#3f3f3f",
+            },
+        });
+        /*} else {
             var imageImg = svgFactory_.createSVGElement({
                 element: "image",
                 attr: {
@@ -574,18 +575,13 @@ var svgedit = svgedit || {};
                     "stroke-color": "#3f3f3f",
                 },
             });
-        }
-
-
-
-
+        }*/
 
         canvasbg.appendChild(defsImg);
         defsImg.appendChild(patternImg);
         patternImg.appendChild(imageImg);
 
         svgFactory_.svgRoot().insertBefore(canvasbg, svgFactory_.svgContent());
-
     };
 
     // Function: svgedit.select.SelectorManager.requestSelector

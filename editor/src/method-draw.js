@@ -158,7 +158,7 @@
 
                 //cflorioluis - evento al seleccionar guardar los cambios, definicion de la funcion
                 var clickAutoSaveChanges = (this.clickAutoSaveChanges = function() {
-                    svgCanvas.removeDivsExport();
+                    /*svgCanvas.removeDivsExport();
 
                     var newOrder = JSON.parse(localStorage.newOrder);
                     var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
@@ -170,7 +170,7 @@
                     localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
                     svgCanvas.createDivs(curConfig.edges);
-                    generatePartDraw();
+                    generatePartDraw();*/
                 });
 
                 if (localStorage.autoSave) {
@@ -205,6 +205,9 @@
                     },
                     false
                 );
+
+
+
 
                 //cflorioluis - al cambiar el tamaño de la ventava hacer un update del canvas
                 $(window).resize(function() {
@@ -530,7 +533,7 @@
                         btn_holder = $("#dialog_buttons");
 
                     //cflorioluis - editando dialogo para validaciones de los mecanizados
-                    var dbox = function(type, msg, callback, width, height, custom, machiningType, defText) {
+                    var dbox = function(type, msg, callback, width, height, custom, isCenter, machiningType, defText) {
                         //cflorioluis - custom dialog
                         if (custom !== undefined) {
                             btn_holder = $("#dialog_buttons_custom");
@@ -550,14 +553,15 @@
                             $("#dialog_box").bind('click', (evt) => {
                                 const flyoutElement = document.getElementById("dialog_box_overlay");
                                 let targetElement = evt.target;
-                                do {
-                                    if (targetElement == flyoutElement) {
-                                        // This is a click outside just return.
-                                        $('#buttonDialogOK').trigger('click');
-                                        return;
-                                    }
-                                    targetElement = targetElement.parentNode;
-                                } while (targetElement);
+                                //do {
+                                if (targetElement == flyoutElement) {
+                                    // This is a click outside just return.
+                                    $('#buttonDialogOK').trigger('click');
+                                    $("#dialog_box").unbind('click');
+                                    return;
+                                }
+                                //targetElement = targetElement.parentNode;
+                                // } while (targetElement);
                             });
                         } else {
                             //console.log("original");
@@ -576,17 +580,23 @@
                             var div;
                             var isDown = false;
 
+
                             $("#dialog_container_custom").css({
                                 width: width + "px",
                                 height: height + "px",
-                                left: "",
                                 right: "2%",
                                 position: "absolute",
-                                /*opacity: "0.75",*/
-
-                                /*"margin-left": (width / 2) * -1 + "px !important",*/
-                                /*"margin-top:": (height / 2) * -1 + "px !important",*/
                             });
+
+                            if (isCenter) {
+                                $("#dialog_container_custom").css({
+                                    width: width + "px",
+                                    height: height + "px",
+                                    left: "calc(50% " + (width / 2) + ")",
+                                    top: "calc(35% - " + (height / 2) + "px)",
+                                    position: "absolute",
+                                });
+                            }
 
                             $("#dialog_content_custom").css({
                                 height: height - 65 + "px",
@@ -650,7 +660,7 @@
 
                         btn_holder.empty();
 
-                        var ok = $('<input type="button" value="OK" id="buttonDialogOK">').appendTo(btn_holder);
+                        var ok = $('<input tabindex="100" type="button" value="OK" id="buttonDialogOK">').appendTo(btn_holder);
 
                         //cflorioluis - validar formulario con boton ok
                         switch (machiningType) {
@@ -1186,8 +1196,8 @@
                     $.alert = function(msg, cb) {
                         dbox("alert", msg, cb);
                     };
-                    $.confirm = function(msg, cb, width, height, custom, machiningType) {
-                        dbox("confirm", msg, cb, width, height, custom, machiningType);
+                    $.confirm = function(msg, cb, width, height, custom, isCenter, machiningType) {
+                        dbox("confirm", msg, cb, width, height, custom, isCenter, machiningType);
                     };
                     $.process_cancel = function(msg, cb) {
                         dbox("process", msg, cb);
@@ -2429,7 +2439,7 @@
                             rect: ["width", "height", "realX", "realY"],
                             rectRound: ["width", "height", "realX", "realY", "rx", "ry"],
                             hinge: ["beginX", "endX", "hingeCount", "axisDist"], //qwerty
-                            //multiDrilling:["beginX", "endX", "hingeCount", "axisDist"]
+                            multiDrilling: ["beginX", "endX", "beginY", "endY", "count", "drillCount", "drillDepth", "axisDist", "step", "drillDiameter"]
                         };
 
                         /*cfloriluis - si el elemento es un cajeado se modificara el comportamiento del codigo original*/
@@ -2846,6 +2856,26 @@
 
                     svgCanvas.changeSelectedAttributeNoUndo(attr, val);
                 };
+
+                changeAttributeMultiDrilling = function(el, completed) {
+                    var attr = el.getAttribute("data-attr");
+                    var multiplier = el.getAttribute("data-multiplier") || 1;
+                    multiplier = parseFloat(multiplier);
+                    var val = el.value * multiplier;
+                    var valid = svgedit.units.isValidUnit(attr, val, selectedElement);
+                    if (!valid) {
+                        $.alert("Invalid value given");
+                        el.value = selectedElement.getAttribute(attr);
+                        return false;
+                    }
+
+                    svgCanvas.editMultiDrilling(attr, val)
+
+                    svgCanvas.changeSelectedAttributeNoUndo(attr, val);
+                };
+
+
+
 
                 changeAttributeRect = function(el, completed) {
                     var attr = el.getAttribute("data-attr");
@@ -3533,6 +3563,46 @@
                     }
                 };
                 //add new toll - cflorioluis
+
+
+
+                var clickSelectMachining = function() {
+                    if (selectedElement == null) return;
+                    //else
+                    switch (selectedElement.getAttribute("machining")) {
+                        case "pocket":
+                            svgCanvas.clickPocketTool(selectedElement);
+                            return;
+                        case "multiDrilling":
+                            svgCanvas.clickmultiDrillingTool(selectedElement);
+                            return;
+                        case "drill":
+                            svgCanvas.clickDrillTool(selectedElement);
+                            return;
+                        case "hinge":
+                            svgCanvas.clickHingeTool(selectedElement);
+                            return;
+                        case "poly":
+                            svgCanvas.clickPolyTool(selectedElement);
+                            return;
+                        case "rect":
+                            svgCanvas.clickRectTool(selectedElement);
+                            return;
+                        case "rectRound":
+                            svgCanvas.clickRectRoundTool(selectedElement);
+                            return;
+                        default:
+                            break;
+                    }
+                    /* if (toolButtonClick("#tool_pocketTool")) {
+                         svgCanvas.setMode("pocket");
+                     }
+                     svgCanvas.clearSelection();
+                     svgCanvas.clickPocketTool(null);*/
+                    //cflorioluis - al presionar r se repite la ultima funcion
+                };
+
+
                 var clickPocketTool = function() {
                     if (toolButtonClick("#tool_pocketTool")) {
                         svgCanvas.setMode("pocket");
@@ -4050,6 +4120,7 @@
                         },
                         350,
                         150,
+                        true,
                         true
                     );
                 };
@@ -4088,7 +4159,8 @@
                         },
                         350,
                         150,
-                        true
+                        true,
+                        true,
                     );
                 };
 
@@ -4307,7 +4379,7 @@
 
                 //cflorioluis - evento al seleccionar exportar a partDraw, definicion de la funcion
                 var clickExportPartDraw = function() {
-                    svgCanvas.removeDivsExport();
+                    /*svgCanvas.removeDivsExport();
                     var newOrder = JSON.parse(localStorage.newOrder);
                     var currentRowSelected = JSON.parse(localStorage.currentRowSelected);
                     newOrder[currentRowSelected][14] = svgCanvas.svgCanvasToString();
@@ -4315,7 +4387,7 @@
                     localStorage.setItem("newOrder", JSON.stringify(newOrder));
 
                     //localStorage.setItem("svgPreview", svgCanvas.svgCanvasToString());
-                    svgCanvas.createDivs(curConfig.edges);
+                    svgCanvas.createDivs(curConfig.edges);*/
                     saveFileCSV(generatePartDraw());
                 };
 
@@ -4527,6 +4599,25 @@
                         }
                     }
                 };
+
+                //cflorioluis - Ver Version del Editor
+                var clickViewAbout = function() {
+                    //setTimeout(alert("Version 03/09/2020"), 5000);
+                    $.confirm(
+                        `<strong><h2 id="moveConfirm" style="cursor: move;margin-bottom: 5px;">Version 07/09/2020</h2></strong>`,
+                        function(ok) {
+                            if (!ok) {
+                                return;
+                            }
+                        },
+                        350,
+                        150,
+                        true,
+                        true
+                    );
+                };
+
+
 
                 var updateWireFrame = function() {
                     // Test support
@@ -5309,6 +5400,15 @@
                             key: [modKey + "Shift+1"],
                         },
                         //add new toll - cflorioluis
+
+                        {
+                            sel: "#textErrorVariable",
+                            fn: clickSelectMachining,
+                            evt: "click",
+                            key: ["Space"],
+                            //key: [modKey + "Shift+9"],
+                        },
+
                         {
                             sel: "#tool_pocketTool",
                             fn: clickPocketTool,
@@ -5456,6 +5556,12 @@
                         {
                             sel: "#tool_viewAllMachining",
                             fn: clickViewAllMachining,
+                            evt: "click",
+                        },
+                        //cflorioluis - Ver Version del Editor
+                        {
+                            sel: "#tool_about",
+                            fn: clickViewAbout,
                             evt: "click",
                         },
                         {
@@ -6291,6 +6397,119 @@
                 $('#hinge_axisDist').bind('mousedown', (e) => {
                     $('#hinge_axisDist').bind('mousemove', textToNum(e, $('#hinge_axisDist')));
                 });
+
+
+                //cflorioluis - Cremallera
+
+                //cflorioluis - agragar funciones a la Cazoleta
+
+
+
+
+                $("#multiDrilling_beginX").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[0],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+                $("#multiDrilling_endX").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+                $('#multiDrilling_endX').bind('mousewheel', (e) => { textToNum(e, $('#multiDrilling_endX')) });
+                $('#multiDrilling_endX').bind('mousedown', (e) => {
+                    $('#multiDrilling_endX').bind('mousemove', textToNum(e, $('#multiDrilling_endX')));
+                });
+
+                $("#multiDrilling_beginY").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+                $("#multiDrilling_endY").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+                $('#multiDrilling_endY').bind('mousewheel', (e) => { textToNum(e, $('#multiDrilling_endY')) });
+                $('#multiDrilling_endY').bind('mousedown', (e) => {
+                    $('#multiDrilling_endY').bind('mousemove', textToNum(e, $('#multiDrilling_endY')));
+                });
+
+                $("#multiDrilling_count").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+
+                $("#multiDrilling_drillCount").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+
+
+                $('#multiDrilling_drillCount').bind('mousewheel', (e) => { textToNum(e, $('#multiDrilling_drillCount')) });
+                $('#multiDrilling_drillCount').bind('mousedown', (e) => {
+                    $('#multiDrilling_drillCount').bind('mousemove', textToNum(e, $('#multiDrilling_drillCount')));
+                });
+
+
+                $("#multiDrilling_drillDepth").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+                $("#multiDrilling_axisDist").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+
+
+                $('#multiDrilling_axisDist').bind('mousewheel', (e) => { textToNum(e, $('#multiDrilling_axisDist')) });
+                $('#multiDrilling_axisDist').bind('mousedown', (e) => {
+                    $('#multiDrilling_axisDist').bind('mousemove', textToNum(e, $('#multiDrilling_axisDist')));
+                });
+                $("#multiDrilling_step").dragInput({
+                    min: 16,
+                    max: curConfig.realDimensions[1],
+                    step: 16,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+                $("#multiDrilling_drillDiameter").dragInput({
+                    min: 1,
+                    max: curConfig.realDimensions[1],
+                    step: 1,
+                    callback: changeAttributeMultiDrilling,
+                    cursor: false,
+                });
+
+
 
                 $("#g_x").dragInput({
                     min: null,
