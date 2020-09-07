@@ -1,0 +1,40 @@
+<Draw>
+	<FUNCTNAME>
+		_Cazoleta
+	</FUNCTNAME>
+	<PARAM>
+		"Origine" VAR "0":"Depart_X" VAR "100":"Fin_X" VAR "100":"nombre" VAR "2":"entraxe" VAR "0":"Dia_insert" VAR "10":"Prof_insert" VAR "10":"Dia_charniere" VAR "35":"Prof_charn" VAR "13"
+	</PARAM>
+	<OPSIDE>
+		2
+	</OPSIDE>
+</Draw>
+<Draw>
+	<FUNCTNAME>
+		_Cajeado
+	</FUNCTNAME>
+	<PARAM>
+		"DiaFr" VAR "10":"Hoek" VAR "2":"StartX" VAR "111":"StartY" VAR "111"
+	</PARAM>
+	<OPSIDE>
+		2
+	</OPSIDE>
+	<SIDE>
+		0
+	</SIDE>
+</Draw>
+<Draw>
+	<FUNCTNAME>
+		_Taladro
+	</FUNCTNAME>
+	<PARAM>
+		"Origine" VAR "0":"Depart_X" VAR "80":"Depart_Y" VAR "100":"diametre" VAR "10":"profondeur" VAR "13":"debouchant" VAR ""
+	</PARAM>
+	<OPSIDE>
+		2
+	</OPSIDE>
+	<SIDE>
+		0
+	</SIDE>
+</Draw>
+

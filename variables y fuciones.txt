@@ -1,0 +1,45 @@
+0 = Cara Principal
+1 = Canto Superior
+2 = Canto Derecho
+3 = Canto Inferior
+4 = Canto Izquierdo
+5 = Cara Trasera
+6 = From Parent
+
+
+Nombre de la función : "_Cajeado"
+Variables :
+           Hoek --> 1 = Esquina Abajo Izquierda, 2 = Esquina Abajo Derecha, 3 = Esquina Superior Derecha, 4 = Esquina Superior Izquierda
+           DiaFr --> Diametro
+           StartX --> Ancho del Cajeado
+           StartY --> Alto del Cajeado
+
+Nombre de la función : "_Taladro"   
+Variables :
+           Origine --> Origen de la pieza 0=abajo a la izquierda o 1=Abajo a la derecha(de momento ponemos 0 ya veremos luego) 
+           Depart_X --> Inicio en X 
+           Depart_Y --> Inicio en Y  
+           diametre --> Diametro del Taladro  
+           profondeur --> Profundidad del Taladro
+           debouchant --> ES Pasante? (1=Si o 0=NO)
+           
+Nombre de la función : "_Cazoleta"   
+Variables :
+           Origine --> Inicio desde la derecha o Izquierda 0=izq 1=der
+           Depart_X --> Desplazamiento en X delante 
+           Fin_X --> Desplazamiento en X atras 
+           nombre --> Cantidad
+           entraxe -->	Distancia entre ejes
+           Dia_insert --> Diametro de  taladros de inserción
+           Prof_insert --> Profundidad taladros de inserción
+           Dia_charniere --> Diametros de la cazoleta
+           Prof_charn --> profundidad de la Cazoleta
+
+
+
+           
+
+
+
+
+
